@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="LibCodeMapper">
+    
+    <sql id="base_columns.simple">
+		<![CDATA[
+		libCode, simpleName
+		]]>
+	</sql>
+    
+	<insert id="insertLibCode" keyColumn="LIBCODE" parameterType="LibCode">
+		<![CDATA[
+			INSERT INTO P_LIBCODE (LIBCODE,SIMPLENAME,NAME,ADDRESS,WORKMODE,RETSITE, DEFAULTRDPASSWD, 
+			WEBSERVICEURL, LIBRARYID, OPACKEY, ACSIP, ACSPORT) VALUES 
+			(#{libCode},#{simpleName},#{name},#{address, jdbcType=VARCHAR},#{workMode, jdbcType=INTEGER},#{retSite, jdbcType=VARCHAR},
+			#{defaultRdPasswd, jdbcType=VARCHAR}, #{webserviceUrl, jdbcType=VARCHAR}, #{libraryId, jdbcType=VARCHAR}, 
+			#{opacKey, jdbcType=VARCHAR},#{acsIp, jdbcType=VARCHAR},#{acsPort,jdbcType=VARCHAR})
+		]]>
+	</insert>
+	
+	<select id="checkLibCode" parameterType="String" resultType="String">
+		<![CDATA[
+			SELECT COUNT(0) FROM P_LIBCODE WHERE LIBCODE=#{libCode}
+		]]>
+	</select>
+	
+	<select id="queryLibCodeList" resultType="Map" parameterType="LibCode">
+		SELECT LIBCODE,SIMPLENAME,NAME,ADDRESS,CASE WHEN WORKMODE=1 THEN '验收直接流通' 
+			WHEN WORKMODE=2 THEN '验收-编目-馆藏' END WORKMODE,RETSITE, DEFAULTRDPASSWD FROM P_LIBCODE
+			WHERE 1=1
+			<if test="libCode!=null and libCode!=''">
+				AND LIBCODE LIKE '%'||LTRIM(RTRIM(#{libCode}))||'%'
+			</if>
+			ORDER BY LIBCODE
+	</select>
+	
+	
+	<select id="getLibByCode" parameterType="String" resultType="LibCode">
+		<![CDATA[
+			SELECT LIBCODE,SIMPLENAME,NAME,ADDRESS,WORKMODE,RETSITE, DEFAULTRDPASSWD, WEBSERVICEURL, LIBRARYID, OPACKEY 
+			,ACSIP,ACSPORT 
+			FROM P_LIBCODE
+			WHERE LIBCODE=#{libCode}
+		]]>
+	</select>
+	
+	<select id="checkLibCodeEdit" parameterType="String" resultType="String">
+		SELECT COUNT(0) FROM P_LIBCODE WHERE LIBCODE=#{libCode} AND LIBCODE!=#{libCode_old}
+	</select>
+	
+	<update id="editLibCode" parameterType="LibCode">
+		UPDATE P_LIBCODE SET 
+			SIMPLENAME=#{simpleName},
+			NAME=#{name},
+			ADDRESS=#{address, jdbcType=VARCHAR},
+			WORKMODE=#{workMode, jdbcType=INTEGER},
+			RETSITE=#{retSite, jdbcType=VARCHAR}, 
+			DEFAULTRDPASSWD=#{defaultRdPasswd, jdbcType=VARCHAR},
+			WEBSERVICEURL=#{webserviceUrl, jdbcType=VARCHAR}, 
+			LIBRARYID=#{libraryId, jdbcType=VARCHAR},
+			OPACKEY=#{opacKey, jdbcType=VARCHAR},
+			ACSIP=#{acsIp, jdbcType=VARCHAR},
+			ACSPORT=#{acsPort, jdbcType=VARCHAR}
+		WHERE LIBCODE=#{libCode}
+	</update>
+	
+	<delete id="deleteLibCode" parameterType="String">
+		DELETE FROM P_LIBCODE WHERE LIBCODE=#{libCode}
+	</delete>
+	
+	<select id="getStaticsLibCodeSet" resultType="LibCode">
+		SELECT LIBCODE,SIMPLENAME
+			from P_LIBCODE t, cir_fin_log c
+		 where libcode = reglib
+		 group by libcode, simplename
+		 order by libcode
+	</select>
+	
+	<select id="getLibCodeSet" resultType="LibCode">
+		SELECT LIBCODE,SIMPLENAME
+			from P_LIBCODE t 
+		 group by libcode, simplename
+		 order by libcode
+	</select>
+	
+	<select id="getSelectLibs" parameterType="Map" resultType="LibCode">
+		 SELECT LIBCODE, SIMPLENAME
+		   from P_LIBCODE
+		  where instr(
+		  (select libassign from reader 
+		  <if test="rdId!=null and rdId!=''">
+		 	where rdid = #{rdId}
+		  </if>
+		  ) || ',',',' || libcode || ',') > 0
+		  group by libcode, simplename
+		  order by libcode
+	</select>
+	
+	<select id="getSimpleInfo" resultType="LibCode">
+		SELECT 
+		<include refid="base_columns.simple" />
+		FROM 
+		P_LIBCODE
+		order by LIBCODE
+	</select>
+</mapper>

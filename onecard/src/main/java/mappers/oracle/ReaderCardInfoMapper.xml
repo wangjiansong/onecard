@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ReaderCardInfoMapper">
+
+	<resultMap id="ReaderCardInfo.resultMap" type="ReaderCardInfo">
+		<result property="rdId" column="RDID" />
+		<result property="cardId" column="CARDID" />
+		<result property="cardType" column="CARDTYPE" />
+		<result property="transactTime" column="TRANSACTTIME" />
+		<result property="lastUseTime" column="LASTUSETIME" />
+		<result property="isUsable" column="ISUSABLE" />
+		<result property="totalOfUsed" column="TOTALOFUSED" />
+	</resultMap>
+	
+	<sql id="ReaderCardInfo.base_columns">
+		<![CDATA[
+		RDID, CARDID, CARDTYPE, TRANSACTTIME, LASTUSETIME, ISUSABLE, TOTALOFUSED
+		]]>
+	</sql>
+	
+	<insert id="ReaderCardInfo.insert" parameterType="ReaderCardInfo">
+		<![CDATA[
+		INSERT INTO READER_CARDINFO  
+		(RDID, CARDID, CARDTYPE, TRANSACTTIME, LASTUSETIME, ISUSABLE, TOTALOFUSED) 
+		values 
+		(#{rdId}, #{cardId}, #{cardType}, sysdate, #{lastUseTime, jdbcType=TIMESTAMP}, #{isUsable, jdbcType=INTEGER}, #{totalOfUsed, jdbcType=INTEGER})
+		]]>
+	</insert>
+
+	<update id="ReaderCardInfo.update" parameterType="ReaderCardInfo">
+		<![CDATA[
+		UPDATE READER_CARDINFO 
+		SET 
+		CARDID=#{cardId},
+		LASTUSETIME=#{lastUseTime, jdbcType=TIMESTAMP},
+		ISUSABLE=#{isUsable, jdbcType=INTEGER},
+		TOTALOFUSED=#{totalOfUsed, jdbcType=INTEGER}
+		WHERE 
+		RDID=#{rdId}
+		]]>
+	</update>
+	<update id="ReaderCardInfo.updateCardInfo" parameterType="ReaderCardInfo">
+		<![CDATA[
+		UPDATE READER_CARDINFO 
+		SET 
+		CARDID=#{cardId}
+		WHERE 
+		RDID=#{rdId}
+		]]>
+	</update>
+	
+	<select id="ReaderCardInfo.get" resultMap="ReaderCardInfo.resultMap" parameterType="java.lang.String">
+		SELECT 
+		<include refid="ReaderCardInfo.base_columns"/>
+		<![CDATA[
+		FROM 
+		READER_CARDINFO  
+		WHERE 
+		CARDID=#{cardId}
+		]]>
+	</select>
+	<select id="ReaderCardInfo.getByRdId" resultMap="ReaderCardInfo.resultMap" parameterType="java.lang.String">
+		SELECT 
+		<include refid="ReaderCardInfo.base_columns"/>
+		<![CDATA[
+		FROM 
+		READER_CARDINFO  
+		WHERE 
+		RDID=#{rdId}
+		]]>
+	</select>
+	
+	<select id="ReaderCardInfo.getAllList" resultMap="ReaderCardInfo.resultMap">
+		SELECT 
+		<include refid="ReaderCardInfo.base_columns"/> 
+		<![CDATA[
+		FROM 
+		READER_CARDINFO 
+		]]>
+	</select>
+	
+	<select id="ReaderCardInfo.getTotalCount" resultType="java.lang.Integer">
+		<![CDATA[
+		SELECT  
+		count(*) as totalcount 
+		FROM 
+		READER_CARDINFO 
+		]]>
+	</select>
+	
+	<sql id="ReaderCardInfo.findPage.where">
+		<where>
+			<if test="@Ognl@isNotEmpty(cardId)">
+			 CARDID = #{cardId}
+			</if>
+			<if test="@Ognl@isNotEmpty(cardId)">
+			 RDID = #{rdId}
+			</if>
+		</where>
+	</sql>
+	
+	<select id="ReaderCardInfo.findPage.count" resultType="java.lang.Long">
+		SELECT 
+		count(*) 
+		FROM 
+		READER_CARDINFO  
+		<include refid="ReaderCardInfo.findPage.where"/>
+	</select>
+	
+	<select id="ReaderCardInfo.findPage" resultMap="ReaderCardInfo.resultMap" parameterType="java.util.Map">
+		SELECT 
+		<include refid="ReaderCardInfo.base_columns"/> 
+		FROM 
+		READER_CARDINFO 
+		<include refid="ReaderCardInfo.findPage.where"/>
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY sortColumns
+		</if>
+	</select>
+	
+	<select id="ReaderCardInfo.queryPageList" parameterType="ReaderCardInfo" resultType="Map">
+		SELECT 
+		<include refid="ReaderCardInfo.base_columns"/> 
+		FROM 
+		READER_CARDINFO
+		<include refid="ReaderCardInfo.findPage.where"/>
+	</select>
+	
+	<delete id="ReaderCardInfo.delete" parameterType="java.lang.String">
+		DELETE 
+		FROM 
+		READER_CARDINFO 
+		WHERE 
+		CARDID=#{cardId}
+	</delete>
+	
+	<delete id="ReaderCardInfo.deleteByRdId" parameterType="java.lang.String">
+		DELETE 
+		FROM 
+		READER_CARDINFO 
+		WHERE 
+		RDID=#{rdId}
+	</delete>
+	
+</mapper>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ScanNetReaderTaskMapper">
+	
+	<select id="queryCurrentScans" resultType="Map" parameterType="com.interlib.sso.domain.Reader">
+		SELECT * FROM READER 
+		WHERE (sysdate -RDINTIME)/365 >=1
+		AND LIBUSER !=1 AND RDID like 'E%'
+	</select>
+	
+	<update id="doScan" parameterType="Map">
+		UPDATE READER SET RDCFSTATE = 2
+		WHERE (sysdate -RDINTIME)/365 >=1
+		AND LIBUSER !=1 AND RDID like 'E%'
+	</update>
+	<update id="doScanForNetReader" parameterType="Map">
+		UPDATE NETREADER SET readerCardState = 2
+		WHERE (sysdate -READERHANDLEDATE)/365 >=1
+		AND READERID like 'E%'
+	</update>
+	
+	<delete id="batchDeleteNetReaders" parameterType="int">
+	        DELETE FROM NETREADER
+	        <where>
+		        READERID IN (
+		        SELECT READERID FROM NETREADER 
+				WHERE (sysdate -READERHANDLEDATE)/365 >=1)	 			AND READERID like 'E%'
+ 			</where> 
+	 </delete>
+</mapper>

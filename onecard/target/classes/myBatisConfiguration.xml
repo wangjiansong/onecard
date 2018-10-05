@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<typeAliases>
+		<typeAlias type="com.interlib.sso.domain.LibCode" alias="LibCode" />
+		<typeAlias type="com.interlib.sso.domain.ReaderType" alias="ReaderType" />
+		<typeAlias type="com.interlib.sso.domain.Reader" alias="Reader" />
+		<typeAlias type="com.interlib.sso.domain.NetReader" alias="NetReader" />
+		<typeAlias type="com.interlib.sso.domain.Roles" alias="Roles" />
+		<typeAlias type="com.interlib.sso.domain.Compets" alias="Compets" />
+		<typeAlias type="com.interlib.sso.domain.FinApp" alias="FinApp" />
+		<typeAlias type="com.interlib.sso.domain.FinType" alias="FinType" />
+		<typeAlias type="com.interlib.sso.domain.ChargeType" alias="ChargeType" />
+		<typeAlias type="com.interlib.sso.domain.Resources" alias="Resources" />
+		<typeAlias type="com.interlib.sso.domain.CirFinLog" alias="CirFinLog" />
+		<typeAlias type="com.interlib.sso.domain.RdAccount" alias="RdAccount" />
+		<typeAlias type="com.interlib.sso.domain.ReaderFee" alias="ReaderFee" />
+		<typeAlias type="com.interlib.sso.domain.LogCir" alias="LogCir" />
+		<typeAlias type="com.interlib.sso.domain.Authorization" alias="Authorization" />
+		<typeAlias type="com.interlib.sso.domain.Blackboard" alias="Blackboard" />
+		<typeAlias type="com.interlib.sso.domain.Guide" alias="Guide" />
+		<typeAlias type="com.interlib.sso.domain.SubsidyGrant" alias="SubsidyGrant" />
+		<typeAlias type="com.interlib.sso.domain.ReaderGroup" alias="ReaderGroup" />
+		<typeAlias type="com.interlib.sso.domain.RestaurantWorkConfig" alias="RestaurantWorkConfig" />
+		<typeAlias type="com.interlib.sso.domain.CardGroup" alias="CardGroup" />
+		<typeAlias type="com.interlib.sso.domain.CardRule" alias="CardRule" />
+		<typeAlias type="com.interlib.sso.domain.CardRuleDetail" alias="CardRuleDetail" />
+		<typeAlias type="com.interlib.sso.domain.ReaderCardInfo" alias="ReaderCardInfo" />
+		<typeAlias type="com.interlib.sso.domain.LogCirType" alias="LogCirType" />
+		<typeAlias type="com.interlib.sso.domain.SyncRecord" alias="SyncRecord" />
+	</typeAliases>
+	
+	<plugins>
+		<plugin interceptor="com.interlib.sso.page.PagePlugin" />
+	
+		<!-- implementation 1 
+		<plugin interceptor="com.interlib.opac.mybatis.plugin.pagination2.DialectStatementHandlerInterceptor"/>
+		<plugin interceptor="com.interlib.opac.mybatis.plugin.pagination2.DialectResultSetHandlerInterceptor"/>
+		-->
+		
+		<!-- 指定数据库分页方言Dialect, 其它方言:OracleDialect,SQLServerDialect,SybaseDialect,DB2Dialect,PostgreSQLDialect,MySQLDialect,DerbyDialect-->
+		<!-- implementation 2 -->
+		<!-- 
+		<plugin interceptor="com.interlib.sso.mybatis.plugin.pagination.OffsetLimitInterceptor">
+			<property name="dialectClass" value="com.interlib.sso.mybatis.dialect.OracleDialect"/>
+		</plugin>
+		 -->
+	</plugins>
+	
+	<!-- 通过spring注入, spring-servlet.xml 
+	<environments default="development">
+		<environment id="development">
+			<transactionManager type="JDBC" />
+			<dataSource type="POOLED">
+				<property name="driver" value="${driver}" />
+				<property name="url" value="${url}" />
+				<property name="username" value="${username}" />
+				<property name="password" value="${password}" />
+			</dataSource>
+		</environment>
+	</environments>
+	<mappers>
+		<mapper resource="org/mybatis/example/BlogMapper.xml" />
+	</mappers>
+	-->
+</configuration>

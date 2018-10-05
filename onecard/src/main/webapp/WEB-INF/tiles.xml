@@ -1,0 +1,461 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 2.0//EN"
+       "http://tiles.apache.org/dtds/tiles-config_2_0.dtd">
+<tiles-definitions>
+	<!-- 工作台管理界面 -->
+	<definition name="admin.base" template="/jsp_tiles/layout/admin/default_layout.jsp">
+		<put-attribute name="html_header" value="/jsp_tiles/include/html_header.jsp" />
+		<put-attribute name="page_title" value="统一用户管理系统" type="string" />
+		<put-attribute name="navbar" value="/jsp_tiles/include/admin/navbar.jsp" />
+		<put-attribute name="page_menu" value="/jsp_tiles/include/admin/page_menu.jsp" />
+		<put-attribute name="page_content" value="" />
+		<put-attribute name="page_footer" value="/jsp_tiles/include/admin/page_footer.jsp" />
+	</definition>
+	
+	<!-- demo -->
+	<definition name="demo.base" template="/jsp_tiles/layout/demo/default_layout.jsp">
+		<put-attribute name="html_header" value="/jsp_tiles/include/html_header.jsp" />
+		<put-attribute name="page_title" value="统一用户管理系统" type="string" />
+		<put-attribute name="page_menu" value="/jsp_tiles/include/demo/page_menu.jsp" />
+		<put-attribute name="page_header" value="/jsp_tiles/include/demo/page_header.jsp" />
+		<put-attribute name="page_shortcut" value="/jsp_tiles/include/demo/shortcut.jsp" />
+		<put-attribute name="page_content" value="" />
+		<put-attribute name="page_footer" value="/jsp_tiles/include/demo/page_footer.jsp" />
+	</definition>
+	
+	<!-- index -->
+	<definition name="admin/index" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/index.jsp" /> 
+	</definition>
+	
+	<!-- 读者管理界面 -->
+	<definition name="admin/reader/add" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/reader/addReader.jsp" /> 
+	</definition>
+	<definition name="admin/reader/edit" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/reader/editReader.jsp" /> 
+	</definition>
+	<definition name="admin/reader/avatar" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/reader/resetAvatar.jsp" /> 
+	</definition>
+	<definition name="admin/reader/index" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/reader/readerIndex.jsp" />
+	</definition>
+	<definition name="admin/reader/batch" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/reader/batchReader.jsp" />
+	</definition>
+	<definition name="admin/reader/batchList" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/reader/batchReader.jsp" />
+	</definition>
+	<definition name="admin/reader/detailReader" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/reader/readerDetail.jsp" />
+	</definition>
+	<definition name="admin/reader/resetPasswd" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/reader/resetPassword.jsp" />
+	</definition>
+	<definition name="admin/reader/deduction"  extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/reader/readerDeduction.jsp" />
+	</definition>
+	<!-- 欠款信息界面 -->
+	<definition name="admin/sys/readerPay/detail" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/reader/readerPayDetail.jsp" />
+	</definition>
+
+	<definition name="admin/reader/adminResetPasswd" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/reader/adminResetPassword.jsp" />
+	</definition>
+	<definition name="admin/reader/readerUnSynList" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/reader/readerUnSynList.jsp" />
+	</definition>
+	<definition name="admin/sys/reader/libassign" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/reader/libassign.jsp" />
+	</definition>
+	
+	
+	
+	<!-- 网络用户 -->
+	<definition name="admin/netreader/regist" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/reader/netreader/regist.jsp" />
+	</definition>
+	<definition name="admin/netreader/approve" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/reader/netreader/approve.jsp" />
+	</definition>
+	<definition name="admin/netreader/netreaderDetail" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/reader/netreader/netreaderDetail.jsp" />
+	</definition>
+	
+	<!-- 系统管理 -->
+	<definition name="system/index" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/reader/index.jsp" />
+	</definition>
+	
+	<!-- 班次配置 -->
+	<definition name="admin/sys/restaurant/list" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/restaurant/list.jsp" /> 
+	</definition>
+	<definition name="admin/sys/restaurant/add" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/restaurant/add.jsp" /> 
+	</definition>
+	<definition name="admin/sys/restaurant/edit" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/restaurant/edit.jsp" /> 
+	</definition>
+	
+	<!-- 分馆管理 -->
+	<definition name="system/reader/libcode/libCodeIndex" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/reader/libcode/libCodeIndex.jsp"></put-attribute>
+	</definition>
+	<definition name="system/reader/libcode/libCodeAdd" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/reader/libcode/libCodeAdd.jsp"></put-attribute>
+	</definition>
+	<definition name="system/reader/libcode/libCodeEdit" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/reader/libcode/libCodeEdit.jsp"></put-attribute>
+	</definition>
+	
+	<!-- 读者流通类型 -->
+	<definition name="system/reader/readertype/readerTypeIndex" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/reader/index.jsp"></put-attribute>
+	</definition>
+	<definition name="system/reader/readertype/readerTypeAdd" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/reader/readertype/readerTypeAdd.jsp"></put-attribute>
+	</definition>
+	<definition name="system/reader/readertype/readerTypeEdit" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/reader/readertype/readerTypeEdit.jsp"></put-attribute>
+	</definition>
+	
+	<!-- ——————————————————————————————Demarcation Line—————————————————————————————— -->
+	
+	<!-- 资源管理界面 -->
+	<definition name="admin/sys/res/list" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/resource/list.jsp" /> 
+	</definition>
+	<definition name="admin/sys/res/add" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/resource/add.jsp" /> 
+	</definition>
+	<definition name="admin/sys/res/edit" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/resource/edit.jsp" /> 
+	</definition>
+	
+	<!-- 权限管理界面 -->
+	<definition name="admin/sys/compet/list" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/compet/list.jsp" /> 
+	</definition>
+	<definition name="admin/sys/compet/add" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/compet/add.jsp" /> 
+	</definition>
+	<definition name="admin/sys/compet/assign" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/compet/assign.jsp" /> 
+	</definition>
+	<definition name="admin/sys/compet/edit" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/compet/edit.jsp" /> 
+	</definition>
+	
+	<!-- 角色管理界面 -->
+	<definition name="admin/sys/role/list" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/role/list.jsp" /> 
+	</definition>
+	<definition name="admin/sys/role/add" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/role/add.jsp" /> 
+	</definition>
+	<definition name="admin/sys/role/assign" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/role/assign.jsp" /> 
+	</definition>
+	<definition name="admin/sys/role/edit" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/role/edit.jsp" /> 
+	</definition>
+	
+	<!-- 用户角色管理界面 -->
+	<definition name="admin/sys/readerRole/list" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/readerRole/list.jsp" /> 
+	</definition>
+	<definition name="admin/sys/readerRole/assign" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/readerRole/assign.jsp" /> 
+	</definition>
+	<definition name="admin/operator/add" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/operator/addOperator.jsp" /> 
+	</definition>
+	<definition name="admin/operator/edit" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/operator/editOperator.jsp" /> 
+	</definition>
+	<definition name="admin/operator/resetPasswd" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/operator/resetPassword.jsp" /> 
+	</definition>
+	
+	<!-- 费用类型管理界面 -->
+	<definition name="admin/sys/fintype/list" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/fintype/list.jsp" /> 
+	</definition>
+	<definition name="admin/sys/fintype/add" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/fintype/add.jsp" /> 
+	</definition>
+	<definition name="admin/sys/fintype/edit" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/fintype/edit.jsp" /> 
+	</definition>
+	
+		<!-- 充值类型管理界面 -->
+	<definition name="admin/sys/chargetype/list" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/chargetype/list.jsp" /> 
+	</definition>
+	<definition name="admin/sys/chargetype/add" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/chargetype/add.jsp" /> 
+	</definition>
+	<definition name="admin/sys/chargetype/edit" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/chargetype/edit.jsp" /> 
+	</definition>
+	
+	<!-- 费用应用管理界面 -->
+	<definition name="admin/sys/finapp/list" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/finapp/list.jsp" /> 
+	</definition>
+	<definition name="admin/sys/finapp/add" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/finapp/add.jsp" /> 
+	</definition>
+	<definition name="admin/sys/finapp/edit" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/finapp/edit.jsp" /> 
+	</definition>
+	
+	<!-- 授权控制界面 -->
+	<definition name="admin/sys/auth/list" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/auth/list.jsp" /> 
+	</definition>
+	<definition name="admin/sys/auth/add" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/auth/add.jsp" /> 
+	</definition>
+	<definition name="admin/sys/auth/edit" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/auth/edit.jsp" /> 
+	</definition>
+	<definition name="admin/sys/auth/apiInfo" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/auth/apiInfo.jsp" /> 
+	</definition>
+	
+	<!-- 结算管理界面 -->
+	<definition name="admin/sys/cirfinlog/list" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/cirfinlog/list.jsp" /> 
+	</definition>
+	<definition name="admin/sys/cirfinlog/personalList" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/cirfinlog/personalList.jsp" /> 
+	</definition>
+	<definition name="admin/sys/cirfinlog/statistics" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/cirfinlog/statistics.jsp" /> 
+	</definition>
+	<definition name="admin/sys/cirfinlog/statisticsResult" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/cirfinlog/statisticsResult.jsp" /> 
+	</definition>
+	<definition name="admin/sys/cirfinlog/chargeList" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/cirfinlog/chargeList.jsp" /> 
+	</definition>
+	<definition name="admin/sys/cirfinlog/monetaryList" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/cirfinlog/monetaryList.jsp"/>
+	</definition>
+	<definition name="admin/sys/cirfinlog/finSettlement" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/cirfinlog/finSettlement.jsp"/>
+	</definition>
+	<definition name="admin/sys/cirfinlog/autoStatistics" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/cirfinlog/autoStatistics.jsp" />
+	</definition>
+	<definition name="admin/sys/cirfinlog/moreLibFinSettle" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/cirfinlog/moreLibFinSettle.jsp" />
+	</definition>
+	<definition name="admin/sys/cirfinlog/moreLibFinSettleDetail" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/cirfinlog/moreLibFinSettleDetail.jsp" />
+	</definition>
+	<definition name="admin/sys/rdaccount/list" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/rdaccount/list.jsp" /> 
+	</definition>
+	<definition name="admin/sys/cirfinlog/cirfinlogList" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/cirfinlog/cirfinlogList.jsp" /> 
+	</definition>	
+	<definition name="admin/sys/cirfinlog/cirFinStatistics" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/cirfinlog/cirFinStatistics.jsp" /> 
+	</definition>
+	<definition name="admin/sys/cirfinlog/cirFinStatisticsResult" extends="base.definition">
+		<put-attribute name="page_title" value="流通财经统计报表" type="string" />
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/cirfinlog/cirFinStatisticsResult.jsp" /> 
+		<put-attribute name="page_footer" value="" />
+	</definition>
+	
+	<!-- 操作日志界面 -->
+	<definition name="admin/sys/logcir/list" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/logcir/list.jsp" />
+	</definition>
+	<!-- 1. 同步记录的操作日志 -->
+	<definition name="admin/sys/syncrecord/list" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/syncrecord/list.jsp" />
+	</definition>
+	<!-- 1. 同步失败的操作日志 -->
+	<definition name="admin/sys/logcir/syncFailurelist" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/logcir/syncFailurelist.jsp" />
+	</definition>
+	
+	<!-- 充值处理界面 -->
+	<definition name="admin/sys/rdaccount/charge" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/rdaccount/charge.jsp" /> 
+	</definition>
+	<definition name="admin/sys/rdaccount/refund" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/rdaccount/refund.jsp" /> 
+	</definition>
+	
+	<!-- 办证费用参数 -->
+	<definition name="admin/sys/readerfee/list" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/readerfee/list.jsp" /> 
+	</definition>
+	
+	<!-- 补助发放界面 -->
+	<definition name="admin/subsidy/grant" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/subsidy/grant/index.jsp" />
+	</definition>
+	<definition name="admin/subsidy/grant/add" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/subsidy/grant/add.jsp"></put-attribute>
+	</definition>
+	<definition name="admin/subsidy/grant/edit" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/subsidy/grant/edit.jsp"></put-attribute>
+	</definition>
+	<definition name="admin/subsidy/rule" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/subsidy/rule/index.jsp" />
+	</definition>
+	<definition name="admin/subsidy/group" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/subsidy/group/index.jsp" />
+	</definition>
+	<definition name="admin/subsidy/group/add" template="/jsp_tiles/layout/admin/custom_layout.jsp">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/subsidy/group/add.jsp" />
+	</definition>
+	<definition name="admin/subsidy/group/edit" template="/jsp_tiles/layout/admin/custom_layout.jsp">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/subsidy/group/edit.jsp" />
+	</definition>
+	<definition name="admin/subsidy/group/member" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/subsidy/group/member/member.jsp" />
+	</definition>
+	<definition name="admin/subsidy/group/member/add" template="/jsp_tiles/layout/admin/custom_layout.jsp">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/subsidy/group/member/add.jsp" />
+	</definition>
+	<definition name="admin/subsidy/grant/assign" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/subsidy/grant/assign/assign.jsp" />
+	</definition>
+	<definition name="admin/subsidy/grant/assign/add" template="/jsp_tiles/layout/admin/custom_layout.jsp">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/subsidy/grant/assign/add.jsp" />
+	</definition>
+	
+	<!-- 刷卡消费规则界面 -->
+	<definition name="admin/card/consumption/rule" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/card/consumption/ruleIndex.jsp" />
+	</definition>
+	<definition name="admin/card/consumption/rule/add" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/card/consumption/ruleAdd.jsp" />
+	</definition>
+	<definition name="admin/card/consumption/rule/edit" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/card/consumption/ruleEdit.jsp" />
+	</definition>
+	<definition name="admin/card/group" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/card/group/index.jsp" />
+	</definition>
+	<definition name="admin/card/group/add" template="/jsp_tiles/layout/admin/custom_layout.jsp">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/card/group/add.jsp" />
+	</definition>
+	<definition name="admin/card/group/edit" template="/jsp_tiles/layout/admin/custom_layout.jsp">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/card/group/edit.jsp" />
+	</definition>
+	<definition name="admin/card/group/member" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/card/group/member/member.jsp" />
+	</definition>
+	<definition name="admin/card/group/member/add" template="/jsp_tiles/layout/admin/custom_layout.jsp">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/card/group/member/add.jsp" />
+	</definition>
+	<definition name="admin/card/consumption/rule/detail" template="/jsp_tiles/layout/admin/custom_layout.jsp">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/card/consumption/ruleDetail.jsp" />
+	</definition>
+	<definition name="admin/card/consumption/rule/assign" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/card/consumption/assign/assign.jsp" />
+	</definition>
+	<definition name="admin/card/consumption/rule/assign/add" template="/jsp_tiles/layout/admin/custom_layout.jsp">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/card/consumption/assign/add.jsp" />
+	</definition>
+	
+	<!-- 公告 -->
+	<definition name="admin/sys/blackboard/list" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/blackboard/list.jsp" /> 
+	</definition>
+	<definition name="admin/sys/blackboard/list/one" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/blackboard/listone.jsp" /> 
+	</definition>
+	<definition name="admin/sys/blackboard/add" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/blackboard/add.jsp" /> 
+	</definition>
+	<definition name="admin/sys/blackboard/edit" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/blackboard/edit.jsp" /> 
+	</definition>
+	
+	<!-- 办事指南 -->
+	<definition name="admin/sys/guide/list" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/guide/list.jsp" /> 
+	</definition>
+	<definition name="admin/sys/guide/list/one" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/guide/listone.jsp" /> 
+	</definition>
+	<definition name="admin/sys/guide/add" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/guide/add.jsp" /> 
+	</definition>
+	<definition name="admin/sys/guide/edit" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/guide/edit.jsp" /> 
+	</definition>
+	
+	<!-- 用户登录界面模板 -->
+	<definition name="base.definition" template="/portal/layout/default_layout.jsp">
+		<!-- html header meta data -->
+		<put-attribute name="html_header" value="/jsp_tiles/include/html_header.jsp" />
+		<put-attribute name="page_title" value="统一用户管理" type="string" />
+		<put-attribute name="page_content" value="" />
+		<put-attribute name="page_footer" value="/jsp_tiles/include/admin/page_footer.jsp" />
+	</definition>
+	
+	<!-- login -->
+	<definition name="login" extends="base.definition">
+		<put-attribute name="page_content" value="/portal/login.jsp" /> 
+	</definition>
+	<!-- 电脑页面 -->
+	<!-- regist -->	
+	<definition name="agreement" template="/portal/agreement.jsp">
+	</definition>
+	<definition name="readerInfo" template="/portal/readerInfo.jsp">
+	</definition>
+	<definition name="register" template="/portal/register.jsp">
+	</definition>
+	<definition name="regresult" template="/portal/regresult.jsp">
+	</definition>
+	<!-- 手机页面 -->
+	<!-- regist -->	
+	<definition name="agreement_moble" template="/portal/moble/agreement_moble.jsp">
+	</definition>
+	<definition name="readerInfo_moble" template="/portal/moble/readerInfo_moble.jsp">
+	</definition>
+	<definition name="register_moble" template="/portal/moble/register_moble.jsp">
+	</definition>
+	<definition name="regresult_moble" template="/portal/moble/regresult_moble.jsp">
+	</definition>
+	
+	<definition name="onecardtointerlibSSO" template="/portal/onecardtointerlibSSO.jsp">
+	</definition>
+	<!-- 2017/10/20 modify add 取回密码功能 -->
+	<definition name="retrievePassword" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/reader/retrievePassword.jsp" />
+	</definition>
+	<definition name="doRetrievePassword" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/reader/doretrievePassword.jsp" />
+	</definition>
+	<definition name="oldPassword" extends="admin.base">
+		<put-attribute name="page_content" value="/jsp_tiles/admin/system/reader/oldPassword.jsp" />
+	</definition>
+	<!-- protal-index -->
+	<definition name="portal/index" extends="base.definition">
+		<put-attribute name="page_content" value="/portal/index.jsp" /> 
+	</definition>
+	<definition name="portal/doindex" extends="base.definition">
+		<put-attribute name="page_content" value="/portal/index.jsp" /> 
+	</definition>
+	<!-- 404和error页面 -->
+	 <definition name="page_not_found" extends="base.definition">
+		<put-attribute name="page_content" value="/jsp_tiles/error/page_not_found.jsp" /> 
+	</definition>
+	<definition name="uncaught_error" extends="base.definition">
+		<put-attribute name="page_content" value="/jsp_tiles/error/uncaught_error.jsp" /> 
+	</definition> 
+</tiles-definitions>

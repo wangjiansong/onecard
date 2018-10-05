@@ -1,0 +1,158 @@
+<!-- <!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" > -->
+ 
+ 
+<!-- 
+	<async-supported>true</async-supported>报错怎么解决
+   http://www.springmodules.org/schema/cache/springmodules-cache.xsd
+   http://www.springmodules.org/schema/cache/springmodules-ehcache.xsd  
+-->
+ 
+ 
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance 
+http://www.springmodules.org/schema/cache/springmodules-cache.xsd
+   http://www.springmodules.org/schema/cache/springmodules-ehcache.xsd "
+	xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	version="2.5">
+    <filter>
+		<filter-name>encodingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+		<init-param>
+			<param-name>forceEncoding</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>encodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	
+	
+
+	<servlet>
+		<servlet-name>spring</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>spring</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>/WEB-INF/spring-*.xml</param-value>
+		<!-- <param-value>/WEB-INF/spring-task.xml</param-value> -->
+	</context-param>
+
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	
+	<servlet>
+		<servlet-name>ConfigInit</servlet-name>
+		<servlet-class>com.interlib.sso.common.servlet.ConfigInit</servlet-class>
+		<init-param>
+			<param-name>config</param-name>
+			<param-value>/WEB-INF/classes/config.properties</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	<!-- Shiro filter-->
+	<!-- still can not good work with async features -->
+	<filter>
+	    <filter-name>shiroFilter</filter-name>
+	    <filter-class>
+	        org.springframework.web.filter.DelegatingFilterProxy    
+	    </filter-class>
+		<async-supported>true</async-supported>
+	    <init-param>
+        	<param-name>targetFilterLifecycle</param-name>
+	        <param-value>true</param-value>
+	    </init-param>
+	</filter>
+	<filter-mapping>
+	    <filter-name>shiroFilter</filter-name>
+	    <url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter>
+		<filter-name>authorityFilter</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+		<init-param>
+			<param-name>targetBeanName</param-name>
+			<param-value>authorityFilter</param-value>
+		</init-param>
+		<init-param>
+			<param-name>targetFilterLifecycle</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+	    <filter-name>authorityFilter</filter-name>
+	    <url-pattern>/api/*</url-pattern>
+	</filter-mapping>
+	
+	<servlet>
+		<servlet-name>CXFServlet</servlet-name>
+		<servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>CXFServlet</servlet-name>
+		<url-pattern>/webservice/*</url-pattern>
+	</servlet-mapping>
+	
+	<session-config>
+		<session-timeout>180</session-timeout>
+	</session-config>
+
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+	
+	<!--配置过滤器 通过过滤器过滤SQL注入特殊字符  -->
+    <filter>
+        <filter-name>InjectFilter</filter-name>
+        <filter-class>com.interlib.sso.common.InjectFilter</filter-class>
+    </filter>
+    <!--映射过滤器-->
+    <filter-mapping>
+      <filter-name>InjectFilter</filter-name>
+        <!--"/*"表示拦截所有的请求 -->
+       <url-pattern>/*</url-pattern>
+    </filter-mapping>
+	
+	<!--配置过滤器 跨站点脚本编制过滤 -->
+    
+    <filter>  
+        <filter-name>XssFilter</filter-name>  
+        <filter-class>com.interlib.sso.common.XssFilter</filter-class>  
+    </filter> 
+    <!--映射过滤器--> 
+    <filter-mapping>
+      <filter-name>XssFilter</filter-name>
+        <!--"/*"表示拦截所有的请求 -->
+        <url-pattern>/*</url-pattern>
+    </filter-mapping> 
+
+<!-- 错误页面 -->
+	<!-- <error-page>
+    指定当发生了什么异常跳转到该页面
+    <exception-type>java.lang.Exception</exception-type>
+    指定异常了，跳转的页面
+    <location>/jsp_tiles/error/page_not_found.jsp</location>
+	</error-page>
+	<error-page>
+    当服务器发生了404
+    <error-code>404</error-code>
+    指定异常了，跳转的页面
+    <location>/jsp_tiles/error/uncaught_error.jsp</location>
+	</error-page> -->
+</web-app>

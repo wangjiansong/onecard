@@ -1,0 +1,9 @@
+自定义认证密码方式cas配置：
+
+对应替换的路径：
+
+authentication文件夹: cas-server-tomcat-7.0.6\webapps\cas\WEB-INF\classes\org\jasig\cas
+
+deployerConfigContext.xml: cas-server-tomcat-7.0.6\webapps\cas\WEB-INF
+
+注意：deployerConfigContext.xml 里面对应的数据库用户名和密码修改成自己的

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ReaderFeeMapper">
+
+	<resultMap id="ReaderFee.resultMap" type="ReaderFee">
+		<result property="libcode" column="LIBCODE" />
+		<result property="cardfee" column="CARDFEE" />
+		<result property="renewfee" column="RENEWFEE" />
+		<result property="checkfee" column="CHECKFEE" />
+		<result property="lossfee" column="LOSSFEE" />
+		<result property="stopfee" column="STOPFEE" />
+		<result property="logoutfee" column="LOGOUTFEE" />
+		<result property="quitfee" column="QUITFEE" />
+		<result property="repairfee" column="REPAIRFEE" />
+		<result property="deferfee" column="DEFERFEE" />
+		<result property="changefee" column="CHANGEFEE" />
+	</resultMap>
+	
+	<sql id="ReaderFee.base_columns">
+		<![CDATA[
+		LIBCODE, CARDFEE, RENEWFEE, CHECKFEE, LOSSFEE, STOPFEE, LOGOUTFEE, QUITFEE, REPAIRFEE, DEFERFEE, CHANGEFEE
+		]]>
+	</sql>
+	
+	<insert id="ReaderFee.insert" parameterType="ReaderFee">
+		<![CDATA[
+		INSERT INTO READER_FEE  
+		(LIBCODE, CARDFEE, RENEWFEE, CHECKFEE, LOSSFEE, STOPFEE, LOGOUTFEE, QUITFEE, REPAIRFEE, DEFERFEE, CHANGEFEE) 
+		values 
+		(#{libcode}, #{cardfee}, #{renewfee}, #{checkfee}, #{lossfee}, #{stopfee}, #{logoutfee}, #{quitfee}, #{repairfee}, 
+		#{deferfee}, #{changefee})
+		]]>
+	</insert>
+
+	<update id="ReaderFee.update" parameterType="ReaderFee">
+		<![CDATA[
+		UPDATE READER_FEE 
+		SET 
+		CARDFEE=#{cardfee, jdbcType=VARCHAR},
+		RENEWFEE=#{renewfee, jdbcType=VARCHAR},
+		CHECKFEE=#{checkfee, jdbcType=VARCHAR},
+		LOSSFEE=#{lossfee, jdbcType=VARCHAR},
+		STOPFEE=#{stopfee, jdbcType=VARCHAR},
+		LOGOUTFEE=#{logoutfee, jdbcType=VARCHAR},
+		QUITFEE=#{quitfee, jdbcType=VARCHAR},
+		REPAIRFEE=#{repairfee, jdbcType=VARCHAR},
+		DEFERFEE=#{deferfee, jdbcType=VARCHAR},
+		CHANGEFEE=#{changefee, jdbcType=VARCHAR}
+		WHERE 
+		LIBCODE=#{libcode}
+		]]>
+	</update>
+	
+	<select id="ReaderFee.get" resultMap="ReaderFee.resultMap" parameterType="java.lang.String">
+		SELECT 
+		<include refid="ReaderFee.base_columns"/>
+		<![CDATA[
+		FROM 
+		READER_FEE  
+		WHERE 
+		LIBCODE=#{libcode}
+		]]>
+	</select>
+	
+	<select id="ReaderFee.getAllList" resultMap="ReaderFee.resultMap">
+		SELECT 
+		<include refid="ReaderFee.base_columns"/> 
+		<![CDATA[
+		FROM 
+		READER_FEE 
+		]]>
+	</select>
+	
+	<select id="ReaderFee.getTotalCount" resultType="java.lang.Integer">
+		<![CDATA[
+		SELECT  
+		count(*) as totalcount 
+		FROM 
+		READER_FEE 
+		]]>
+	</select>
+	
+	<sql id="ReaderFee.findPage.where">
+		<where>
+			<if test="@Ognl@isNotEmpty(libcode)">
+			 LIBCODE = #{libcode}
+			</if>
+		</where>
+	</sql>
+	
+	<select id="ReaderFee.findPage.count" resultType="java.lang.Long">
+		SELECT 
+		count(*) 
+		FROM 
+		READER_FEE  
+		<include refid="ReaderFee.findPage.where"/>
+	</select>
+	
+	<select id="ReaderFee.findPage" resultMap="ReaderFee.resultMap" parameterType="java.util.Map">
+		SELECT 
+		<include refid="ReaderFee.base_columns"/> 
+		FROM 
+		READER_FEE 
+		<include refid="ReaderFee.findPage.where"/>
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY sortColumns
+		</if>
+	</select>
+	
+	<select id="ReaderFee.queryPageList" parameterType="ReaderFee" resultType="Map">
+		SELECT 
+		<include refid="ReaderFee.base_columns"/> 
+		FROM 
+		READER_FEE
+		<include refid="ReaderFee.findPage.where"/>
+	</select>
+	
+</mapper>

@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="ChargeTypeMapper">
+
+	<resultMap id="ChargeType.resultMap" type="com.interlib.sso.domain.ChargeType">
+		<result property="feeType" column="FEETYPE" />
+		<result property="describe" column="DESCRIBE" />
+		<result property="appCode" column="APPCODE" />
+		<result property="appName" column="APPNAME" />
+		<result property="typefee" column="TYPEFEE"/>
+	</resultMap>
+	
+	<sql id="ChargeType.base_columns">
+		<![CDATA[
+		FEETYPE, DESCRIBE, APPCODE, APPNAME,TYPEFEE
+		]]>
+	</sql>
+	
+	<insert id="ChargeType.insert" parameterType="com.interlib.sso.domain.ChargeType">
+		<![CDATA[
+		INSERT INTO CHARGETYPE  
+		(FEETYPE, DESCRIBE, APPCODE, APPNAME) 
+		values 
+		(#{feeType}, #{describe, jdbc=VARCHAR}, #{appCode, jdbcType=VARCHAR}, 
+		#{appName, jdbcType=VARCHAR})
+		]]>
+	</insert>
+
+	<update id="ChargeType.update" parameterType="com.interlib.sso.domain.ChargeType">
+		<![CDATA[
+		UPDATE CHARGETYPE 
+		SET 
+		DESCRIBE=#{describe, jdbcType=VARCHAR},
+		APPCODE=#{appCode, jdbcType=VARCHAR},
+		APPNAME=#{appName, jdbcType=VARCHAR},
+		TYPEFEE=#{typefee, jdbcType=VARCHAR}
+		WHERE 
+		FEETYPE=#{feeType}
+		]]>
+	</update>
+	
+	<delete id="ChargeType.delete" parameterType="java.lang.String">
+		<![CDATA[
+		DELETE 
+		FROM 
+		CHARGETYPE 
+		WHERE 
+		FEETYPE=#{feeType}
+		]]>
+	</delete>
+	
+	<select id="ChargeType.get" resultMap="ChargeType.resultMap" parameterType="java.lang.String">
+		SELECT 
+		<include refid="ChargeType.base_columns"/>
+		<![CDATA[
+		FROM 
+		CHARGETYPE  
+		WHERE 
+		FEETYPE=#{feeType}
+		]]>
+	</select>
+	
+	<select id="ChargeType.getAllList" resultMap="ChargeType.resultMap">
+		SELECT 
+		<include refid="ChargeType.base_columns"/> 
+		<![CDATA[
+		FROM 
+		CHARGETYPE 
+		]]>
+		order by FEETYPE
+	</select>
+	
+	<select id="ChargeType.getAll" resultMap="ChargeType.resultMap">
+		SELECT 
+		T.FEETYPE, T.DESCRIBE, T.APPCODE, A.APPNAME
+		FROM 
+		CHARGETYPE T, AUTHORIZATION A
+		WHERE 
+		T.APPCODE = A.APPCODE 
+		order by FEETYPE
+	</select>
+	
+	<select id="ChargeType.getTotalCount" resultType="java.lang.Integer">
+		<![CDATA[
+		SELECT  
+		count(*) as totalcount 
+		FROM 
+		CHARGETYPE 
+		]]>
+	</select>
+	
+	<sql id="ChargeType.findPage.where">
+		<where>
+			<if test="@Ognl@isNotEmpty(describe)">
+			 DESCRIBE LIKE #{describe}
+			</if>
+		</where>
+	</sql>
+	
+	<select id="ChargeType.findPage.count" resultType="java.lang.Long">
+		SELECT 
+		count(*) 
+		FROM 
+		CHARGETYPE  
+		<include refid="ChargeType.findPage.where"/>
+	</select>
+	
+	<select id="ChargeType.findPage" resultMap="ChargeType.resultMap" parameterType="java.util.Map">
+		SELECT 
+		T.FEETYPE, T.DESCRIBE, T.APPCODE, A.APPNAME
+		FROM 
+		CHARGETYPE T, AUTHORIZATION A
+		<where>
+			<if test="@Ognl@isNotEmpty(describe)">
+			 DESCRIBE LIKE #{describe}
+			</if>
+			T.APPCODE = A.APPCODE
+		</where>
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+	</select>
+	
+	<select id="ChargeType.queryPageList" parameterType="ChargeType" resultType="Map">
+		SELECT 
+		T.FEETYPE, T.DESCRIBE, T.APPCODE, A.APPNAME
+		FROM 
+		CHARGETYPE T, AUTHORIZATION A
+		WHERE 1=1
+		<if test="@Ognl@isNotEmpty(describe)">
+			AND T.DESCRIBE LIKE '%'||#{describe}||'%' 
+		</if>
+		<if test="@Ognl@isNotEmpty(appCode)">
+			AND T.APPCODE LIKE '%'||#{appCode}||'%' 
+		</if>
+		AND T.APPCODE = A.APPCODE
+		ORDER BY FEETYPE
+	</select>
+	
+	<delete id="ChargeType.deleteByIds">
+		DELETE FROM CHARGETYPE WHERE FEETYPE IN
+		<foreach collection="array" item="idArray"  open="(" separator="," close=")">   
+       		#{idArray}   
+    	</foreach>
+	</delete>
+	
+	<select id="ChargeType.getAllChargeType" resultMap="ChargeType.resultMap" resultType="ChargeType">
+		SELECT
+<!-- 		<include refid="ChargeType.base_columns"/>  -->
+		FEETYPE, (DESCRIBE || '|' || APPNAME) AS DESCRIBE
+		<![CDATA[
+		FROM 
+		CHARGETYPE 
+		]]>
+	</select>
+	
+	<select id="ChargeType.searchChargeType" resultMap="ChargeType.resultMap" resultType="ChargeType">
+		SELECT 
+		FEETYPE,(DESCRIBE || '|' || APPNAME) AS DESCRIBE
+		FROM 
+		CHARGETYPE 
+		WHERE FEETYPE IN 
+		<foreach collection="array" item="feetypes"  open="(" separator="," close=")">   
+      			#{feetypes}   
+   		</foreach>
+    	order by feetype
+	</select>
+	
+	<select id="ChargeType.getChargeTypesByAppcodes" resultMap="ChargeType.resultMap" resultType="ChargeType">
+		SELECT 
+		FEETYPE, DESCRIBE, APPCODE, APPNAME
+		FROM 
+		CHARGETYPE 
+		WHERE APPCODE IN 
+		<foreach collection="array" item="appcodes"  open="(" separator="," close=")">   
+      			#{appcodes}   
+   		</foreach>
+	</select>
+	
+	<select id="ChargeType.getChargeTypeByMultiChargetype" resultMap="ChargeType.resultMap" resultType="ChargeType">
+		SELECT
+		<include refid="ChargeType.base_columns"/>
+		FROM 
+		CHARGETYPE 
+		WHERE FEETYPE IN 
+		<foreach collection="array" item="feetypes"  open="(" separator="," close=")">   
+      		#{feetypes}   
+   		</foreach>
+    	order by feetype
+	</select>
+	
+</mapper>

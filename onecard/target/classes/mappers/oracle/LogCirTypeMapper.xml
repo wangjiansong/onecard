@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="LogCirTypeMapper">
+
+	<resultMap id="LogCirType.resultMap" type="com.interlib.sso.domain.LogCirType">
+		<result property="logType" column="LOGTYPE" />
+		<result property="typeName" column="TYPENAME" />
+	</resultMap>
+	
+	<sql id="LogCirType.base_columns">
+		<![CDATA[
+		LOGTYPE, TYPENAME
+		]]>
+	</sql>
+	
+	<insert id="LogCirType.insert" parameterType="com.interlib.sso.domain.LogCirType">
+		<![CDATA[
+		INSERT INTO LOG_CIRTYPE  
+		(LOGTYPE, TYPENAME) 
+		values 
+		(#{logType}, #{typeName, jdbc=VARCHAR})
+		]]>
+	</insert>
+
+	<update id="LogCirType.update" parameterType="com.interlib.sso.domain.LogCirType">
+		<![CDATA[
+		UPDATE LOG_CIRTYPE 
+		SET 
+		TYPENAME=#{typeName, jdbc=VARCHAR}
+		WHERE 
+		LOGTYPE=#{logType}
+		]]>
+	</update>
+	
+	<delete id="LogCirType.delete" parameterType="java.lang.String">
+		<![CDATA[
+		DELETE 
+		FROM 
+		LOG_CIRTYPE 
+		WHERE 
+		LOGTYPE=#{logType}
+		]]>
+	</delete>
+	
+	<select id="LogCirType.get" resultMap="LogCirType.resultMap" parameterType="java.lang.String">
+		SELECT 
+		<include refid="LogCirType.base_columns"/>
+		<![CDATA[
+		FROM 
+		LOG_CIRTYPE  
+		WHERE 
+		LOGTYPE=#{logType}
+		]]>
+	</select>
+	
+	<select id="LogCirType.getAllList" resultMap="LogCirType.resultMap">
+		SELECT 
+		<include refid="LogCirType.base_columns"/> 
+		<![CDATA[
+		FROM 
+		LOG_CIRTYPE 
+		]]>
+		order by LOGTYPE
+	</select>
+	
+	<select id="LogCirType.getAll" resultMap="LogCirType.resultMap">
+		SELECT 
+		<include refid="LogCirType.base_columns"/> 
+		<![CDATA[
+		FROM 
+		LOG_CIRTYPE 
+		]]>
+		order by LOGTYPE
+	</select>
+	
+	<select id="LogCirType.getTotalCount" resultType="java.lang.Integer">
+		<![CDATA[
+		SELECT  
+		count(*) as totalcount 
+		FROM 
+		LOG_CIRTYPE 
+		]]>
+	</select>
+	
+	<sql id="LogCirType.findPage.where">
+	</sql>
+	
+	<select id="LogCirType.findPage.count" resultType="java.lang.Long">
+		SELECT 
+		count(*) 
+		FROM 
+		LOG_CIRTYPE  
+		<include refid="LogCirType.findPage.where"/>
+	</select>
+	
+	<select id="LogCirType.findPage" resultMap="LogCirType.resultMap" parameterType="java.util.Map">
+		SELECT 
+		LOGTYPE, TYPENAME 
+		FROM 
+		LOG_CIRTYPE
+		<where>
+			<if test="@Ognl@isNotEmpty(typeName)">
+			 TYPENAME LIKE #{typeName}
+			</if>
+		</where>
+		ORDER BY LOGTYPE
+	</select>
+	
+	<select id="LogCirType.queryPageList" parameterType="LogCirType" resultType="Map">
+		SELECT 
+		LOGTYPE, TYPENAME  
+		FROM 
+		LOG_CIRTYPE
+		WHERE 1=1
+		<if test="@Ognl@isNotEmpty(typeName)">
+		 TYPENAME LIKE #{typeName}
+		</if>
+		ORDER BY LOGTYPE
+	</select>
+	
+	<delete id="LogCirType.deleteByIds">
+	</delete>
+	
+	<select id="LogCirType.getAllFeeType" resultMap="LogCirType.resultMap" resultType="LogCirType">
+		SELECT
+		<include refid="LogCirType.base_columns"/> 
+		<![CDATA[
+		FROM 
+		LOG_CIRTYPE 
+		]]>
+	</select>
+	
+</mapper>

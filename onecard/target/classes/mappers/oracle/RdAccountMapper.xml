@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="RdAccountMapper">
+    
+	<resultMap id="RdAccount.resultMap" type="RdAccount">
+		<result property="rdid" column="RDID" />
+		<result property="deposit" column="DEPOSIT" />
+		<result property="prepay" column="PREPAY" />
+		<result property="arrearage" column="ARREARAGE" />
+		<result property="spDeposit" column="SPDEPOSIT" />
+		<result property="onecard" column="ONECARD" />
+		<result property="status" column="STATUS" />
+	</resultMap>
+	
+	<sql id="RdAccount.base_columns">
+		<![CDATA[
+		RDID, DEPOSIT, PREPAY, ARREARAGE, SPDEPOSIT, ONECARD, STATUS
+		]]>
+	</sql>
+	
+	<insert id="RdAccount.insert" parameterType="RdAccount">
+		<![CDATA[
+		INSERT INTO RDACCOUNT  
+		(RDID, DEPOSIT, PREPAY, ARREARAGE, SPDEPOSIT, ONECARD, STATUS) 
+		values 
+		(#{rdid, jdbcType=VARCHAR}, #{deposit, jdbcType=NUMERIC}, #{prepay, jdbcType=NUMERIC}, 
+		#{arrearage, jdbcType=NUMERIC}, #{spDeposit, jdbcType=NUMERIC}, #{onecard, jdbcType=NUMERIC}, 
+		#{status, jdbcType=NUMERIC})
+		]]>
+	</insert>
+
+	<update id="RdAccount.update" parameterType="RdAccount">
+		<![CDATA[
+		UPDATE RDACCOUNT 
+		SET 
+		DEPOSIT=#{deposit, jdbcType=NUMERIC},
+		PREPAY=#{prepay, jdbcType=NUMERIC},
+		ARREARAGE=#{arrearage, jdbcType=NUMERIC},
+		SPDEPOSIT=#{spDeposit, jdbcType=NUMERIC},
+		ONECARD=#{onecard, jdbcType=NUMERIC},
+		STATUS=#{status, jdbcType=NUMERIC}
+		WHERE 
+		RDID=#{rdid, jdbcType=VARCHAR}
+		]]>
+	</update>
+	
+	<delete id="RdAccount.delete" parameterType="java.lang.String">
+		<![CDATA[
+		DELETE 
+		FROM 
+		RDACCOUNT 
+		WHERE 
+		RDID=#{rdid, jdbcType=VARCHAR}
+		]]>
+	</delete>
+	
+	<select id="RdAccount.get" resultMap="RdAccount.resultMap" parameterType="java.lang.String">
+		SELECT 
+		<include refid="RdAccount.base_columns"/>
+		<![CDATA[
+		FROM 
+		RDACCOUNT  
+		WHERE 
+		RDID=#{rdid}
+		]]>
+	</select>
+	
+	<select id="RdAccount.getAllList" resultMap="RdAccount.resultMap">
+		SELECT 
+		<include refid="RdAccount.base_columns"/> 
+		<![CDATA[
+		FROM 
+		RDACCOUNT 
+		]]>
+	</select>
+	
+	<select id="RdAccount.getTotalCount" resultType="java.lang.Integer">
+		<![CDATA[
+		SELECT  
+		count(*) as totalcount 
+		FROM 
+		RDACCOUNT 
+		]]>
+	</select>
+	
+	<sql id="RdAccount.findPage.where">
+		<where>
+			<if test="@Ognl@isNotEmpty(rdid)">
+			 	RDID LIKE '%'||#{rdid}||'%'
+			</if>
+		</where>
+	</sql>
+	
+	<select id="RdAccount.findPage.count" resultType="java.lang.Long">
+		SELECT 
+		count(*) 
+		FROM 
+		RDACCOUNT  
+		<include refid="RdAccount.findPage.where"/>
+	</select>
+	
+	<select id="RdAccount.findPage" resultMap="RdAccount.resultMap" parameterType="java.util.Map">
+		SELECT 
+		<include refid="RdAccount.base_columns"/> 
+		FROM 
+		RDACCOUNT 
+		<include refid="RdAccount.findPage.where"/>
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+	</select>
+	
+	<select id="RdAccount.queryPageList" parameterType="RdAccount" resultType="RdAccount">
+		SELECT 
+		<include refid="RdAccount.base_columns"/> 
+		FROM 
+		RDACCOUNT
+		<include refid="RdAccount.findPage.where"/>
+	</select>
+	
+	<delete id="RdAccount.deleteByIds">
+		DELETE FROM RDACCOUNT WHERE RDID IN
+		<foreach collection="array" item="idArray"  open="(" separator="," close=")">   
+       		#{idArray}   
+    	</foreach>
+	</delete>
+	
+</mapper>

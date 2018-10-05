@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CardGroupMapper">
+	<insert id="insertGroup" parameterType="CardGroup">
+		<selectKey keyProperty="groupId" order="BEFORE" resultType="int">
+			SELECT SEQ_CARD_GROUP.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO CARD_GROUP (GROUPID,GROUPNAME,ISASSIGNED,CREATETIME,REMARK)
+		VALUES
+		(#{groupId,jdbcType=INTEGER},#{groupName,jdbcType=VARCHAR},'0',
+		SYSDATE,#{remark,jdbcType=VARCHAR})
+	</insert>
+	
+	<select id="queryGroupList" parameterType="CardGroup" resultType="Map">
+		SELECT GROUPID,GROUPNAME,ISASSIGNED,TO_CHAR(CREATETIME,'YYYY-MM-DD HH24:MI') CREATETIME,REMARK
+		FROM CARD_GROUP
+		<where>
+			<if test="groupName!=null and groupName!=''">
+				AND GROUPNAME LIKE '%'||TRIM(#{groupName})||'%'
+			</if>
+		</where>
+		ORDER BY GROUPID
+	</select>
+	
+	<select id="getGroupById" parameterType="int" resultType="CardGroup">
+		SELECT GROUPID,GROUPNAME,REMARK FROM CARD_GROUP WHERE GROUPID = #{groupId}
+	</select>
+	
+	<update id="updateGroup" parameterType="CardGroup">
+		UPDATE CARD_GROUP SET
+			GROUPNAME = #{groupName},
+			REMARK = #{remark}
+		WHERE GROUPID = #{groupId}
+	</update>
+	
+	<delete id="deleteGroup" parameterType="String">
+		DELETE FROM CARD_GROUP WHERE GROUPID IN
+		<foreach collection="array" item="idArray" index="index" open="(" separator="," close=")">
+			#{idArray}
+		</foreach>
+	</delete>
+	
+	<delete id="deleteGroupMember" parameterType="String">
+		DELETE FROM CARD_GROUP_MEMBER WHERE GROUPID IN
+		<foreach collection="array" item="idArray" index="index" open="(" separator="," close=")">
+			#{idArray}
+		</foreach>
+	</delete>
+	
+	<delete id="deleteGroupAssign" parameterType="String">
+		DELETE FROM CARD_GROUP_ASSIGN WHERE GROUPID IN
+		<foreach collection="array" item="idArray" index="index" open="(" separator="," close=")">
+			#{idArray}
+		</foreach>
+	</delete>
+	
+	<select id="queryNoGroupReaderList" resultType="Map" parameterType="Reader">
+		SELECT RDID,RDNAME,RDCERTIFY,RDCFSTATE,RDTYPE,RDLIB 
+		FROM READER 
+		<where>
+			RDID NOT IN (
+				SELECT RDID FROM CARD_GROUP_MEMBER
+			)
+			<if test="rdId!=null and rdId!=''">
+				AND RDID LIKE '%'||TRIM(#{rdId})||'%'
+			</if>
+			<if test="rdName!=null and rdName!=''">
+				AND RDNAME LIKE '%'||TRIM(#{rdName})||'%'
+			</if>
+		</where>
+		ORDER BY RDID
+	</select>
+	
+	<insert id="addMember" parameterType="List">
+		INSERT INTO CARD_GROUP_MEMBER (GROUPID,RDID) 
+		(
+		<foreach collection="list" item="item" index="index" separator="union all">
+			SELECT 
+				#{item.groupId, jdbcType=INTEGER},
+				#{item.rdId, jdbcType=VARCHAR}
+			FROM DUAL
+		</foreach>
+		)
+	</insert>
+	
+	<select id="queryGroupMemberList" parameterType="Reader" resultType="Map">		
+		SELECT RDID,RDNAME,RDCERTIFY,RDCFSTATE,RDTYPE,RDLIB 
+		FROM READER 
+		<where>
+			RDID IN (
+				SELECT RDID FROM CARD_GROUP_MEMBER WHERE GROUPID = #{groupId}
+			)
+			<if test="rdId!=null and rdId!=''">
+				AND RDID LIKE '%'||TRIM(#{rdId})||'%'
+			</if>
+			<if test="rdName!=null and rdName!=''">
+				AND RDNAME LIKE '%'||TRIM(#{rdName})||'%'
+			</if>
+		</where>
+		ORDER BY RDID
+	</select>
+	
+	<delete id="deleteMember" parameterType="Map">
+		DELETE FROM CARD_GROUP_MEMBER 
+		WHERE 
+		GROUPID = #{groupId} AND RDID IN 
+		<foreach collection="rdIdArray" item="rdIdArray" index="index" open="(" separator="," close=")">
+			#{rdIdArray}
+		</foreach>
+	</delete>
+	
+	<select id="getReaderType" resultType="Map">
+		SELECT READERTYPE,DESCRIPE FROM P_RCTYPE WHERE SIGN=1
+	</select>
+	
+	<select id="getLibType" resultType="Map">
+		SELECT LIBCODE,SIMPLENAME FROM P_LIBCODE
+	</select>
+</mapper>

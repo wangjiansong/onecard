@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="SyncRecordMapper">
+
+	<resultMap id="SyncRecord.resultMap" type="SyncRecord">
+		<result property="syncId" column="SYNC_ID" />
+		<result property="syncType" column="SYNC_TYPE" />
+		<result property="syncLib" column="SYNC_LIB" />
+		<result property="syncDate" column="SYNC_DATE" jdbcType="TIMESTAMP"/>
+		<result property="syncRdid" column="SYNC_RDID" />
+		<result property="syncStatus" column="SYNC_STATUS" />
+		<result property="syncCode" column="SYNC_CODE" />
+		<result property="syncOperator" column="SYNC_OPERATOR" />
+	</resultMap>
+	<sql id="SyncRecord.base_columns">
+		<![CDATA[
+		SYNC_ID, SYNC_TYPE, SYNC_LIB, SYNC_DATE, SYNC_RDID, SYNC_STATUS, SYNC_CODE, SYNC_OPERATOR
+		]]>
+	</sql>
+	
+	<insert id="SyncRecord.insert" parameterType="SyncRecord">
+		INSERT INTO SYNC_RECORD 
+		(SYNC_ID, SYNC_TYPE, SYNC_LIB, SYNC_DATE, SYNC_RDID, SYNC_STATUS, SYNC_CODE, SYNC_OPERATOR) 
+		values 
+		(#{syncId}, #{syncType, jdbcType=VARCHAR}, #{syncLib, jdbcType=VARCHAR}, 
+		#{syncDate, jdbcType=TIMESTAMP}, 
+		#{syncRdid, jdbcType=VARCHAR}, #{syncStatus, jdbcType=VARCHAR}, 
+		#{syncCode, jdbcType=VARCHAR}, #{syncOperator, jdbcType=VARCHAR})
+	</insert>
+
+	<update id="SyncRecord.update" parameterType="SyncRecord">
+		<![CDATA[
+		UPDATE SYNC_RECORD 
+		SET 
+		SYNC_TYPE=#{syncType, jdbcType=VARCHAR},
+		SYNC_LIB=#{syncLib, jdbcType=VARCHAR},
+		SYNC_DATE=#{syncDate, jdbcType=TIMESTAMP},
+		SYNC_RDID=#{syncRdid, jdbcType=VARCHAR},
+		SYNC_STATUS=#{syncStatus, jdbcType=VARCHAR}
+		WHERE 
+		SYNC_ID=#{syncId}
+		]]>
+	</update>
+	<delete id="SyncRecord.delete" parameterType="java.lang.String">
+		DELETE 
+		FROM 
+		SYNC_RECORD 
+		WHERE 
+		SYNC_ID=#{syncId}
+	</delete>
+	
+	<select id="SyncRecord.get" resultMap="SyncRecord.resultMap" parameterType="java.lang.String">
+		SELECT 
+		<include refid="SyncRecord.base_columns"/>
+		FROM 
+		SYNC_RECORD 
+		WHERE 
+		SYNC_ID=#{syncId}
+	</select>
+	
+	<select id="SyncRecord.getTotalCount" resultType="java.lang.Integer">
+		<![CDATA[
+		SELECT  
+		count(*) as totalcount 
+		FROM 
+		SYNC_RECORD
+		]]>
+	</select>
+	
+	<sql id="SyncRecord.findPage.where">
+		<where>
+			<if test="@Ognl@isNotEmpty(syncType)">
+			 SYNC_TYPE = #{syncType}
+			</if>
+			<if test="@Ognl@isNotEmpty(syncLib)">
+			 SYNC_LIB = #{syncLib}
+			</if>
+			<if test="@Ognl@isNotEmpty(syncStatus)">
+			 SYNC_STATUS = #{syncStatus}
+			</if>
+			<if test="@Ognl@isNotEmpty(startDate)">
+			 to_char(SYNC_DATE, 'YYYY-MM-DD HH:MI:SS') <![CDATA[>=]]> #{startDate}
+			</if>
+			<if test="@Ognl@isNotEmpty(endDate)">
+			 to_char(SYNC_DATE, 'YYYY-MM-DD HH:MI:SS') <![CDATA[>=]]> #{endDate}
+			</if>
+		</where>
+	</sql>
+	
+	<select id="SyncRecord.findPage.count" resultType="java.lang.Long">
+		SELECT 
+		count(*) 
+		FROM 
+		SYNC_RECORD 
+		<include refid="SyncRecord.findPage.where"/>
+	</select>
+	
+	<select id="SyncRecord.findPage" resultMap="SyncRecord.resultMap">
+		SELECT 
+		<include refid="SyncRecord.base_columns"/> 
+		FROM 
+		SYNC_RECORD 
+		<include refid="SyncRecord.findPage.where" />
+		<if test="@Ognl@isNotEmpty(sortColumn)">
+			ORDER BY #{sortColumn}
+		</if>
+		<if test="@Ognl@isNotEmpty(sortType)">
+			#{sortType}
+		</if>
+	</select>
+	
+	<select id="SyncRecord.queryPageList" parameterType="SyncRecord" 
+			resultMap="SyncRecord.resultMap">
+		SELECT 
+		T.TYPENAME as SYNC_TYPE, SYNC_ID, SYNC_LIB, SYNC_DATE, SYNC_RDID, SYNC_STATUS, SYNC_CODE, SYNC_OPERATOR
+		FROM 
+		SYNC_RECORD S, LOG_CIRTYPE T
+		where 1=1
+		<if test="@Ognl@isNotEmpty(syncType)">
+			 AND SYNC_TYPE = #{syncType}
+		</if>
+		<if test="@Ognl@isNotEmpty(syncLib)">
+			 AND SYNC_LIB = #{syncLib}
+		</if>
+		<if test="@Ognl@isNotEmpty(syncStatus)">
+			 AND SYNC_STATUS = #{syncStatus}
+		</if>
+		<if test="@Ognl@isNotEmpty(startDate)">
+			 AND to_char(SYNC_DATE, 'YYYY-MM-DD HH:MI:SS') <![CDATA[>=]]> #{startDate}
+		</if>
+		<if test="@Ognl@isNotEmpty(endDate)">
+			 AND to_char(SYNC_DATE, 'YYYY-MM-DD HH:MI:SS') <![CDATA[<=]]> #{endDate}
+		</if>
+		AND S.SYNC_TYPE=T.LOGTYPE
+		ORDER BY SYNC_DATE
+
+	</select>
+	
+</mapper>

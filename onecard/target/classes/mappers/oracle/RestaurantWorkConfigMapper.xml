@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="RestaurantWorkConfigMapper">
+    
+	<resultMap id="RestaurantWorkConfig.resultMap" type="RestaurantWorkConfig">
+		<result property="id" column="ID" />
+		<result property="breakfastStartTime" column="BREAKFAST_STARTTIME" />
+		<result property="breakfastEndTime" column="BREAKFAST_ENDTIME" />
+		<result property="lunchStartTime" column="LUNCH_STARTTIME" />
+		<result property="lunchEndTime" column="LUNCH_ENDTIME" />
+		<result property="dinnerStartTime" column="DINNER_STARTTIME" />
+		<result property="dinnerEndTime" column="DINNER_ENDTIME" />
+		<result property="supperStartTime" column="SUPPER_STARTTIME" />
+		<result property="supperEndTime" column="SUPPER_ENDTIME" />
+	</resultMap>
+	
+	<sql id="RestaurantWorkConfig.base_columns">
+		<![CDATA[
+		BREAKFAST_STARTTIME, BREAKFAST_ENDTIME, LUNCH_STARTTIME, LUNCH_ENDTIME, DINNER_STARTTIME, DINNER_ENDTIME, SUPPER_STARTTIME, SUPPER_ENDTIME
+		]]>
+	</sql>
+	
+	<update id="RestaurantWorkConfig.update" parameterType="RestaurantWorkConfig">
+		<![CDATA[
+		UPDATE RESTAURANTWORKCONFIG 
+		SET 
+		BREAKFAST_STARTTIME= #{breakfastStartTime, jdbcType=VARCHAR}, 
+		BREAKFAST_ENDTIME=#{breakfastEndTime, jdbcType=VARCHAR}, 
+		LUNCH_STARTTIME= #{lunchStartTime, jdbcType=VARCHAR}, 
+		LUNCH_ENDTIME=#{lunchEndTime, jdbcType=VARCHAR}, 
+		DINNER_STARTTIME=#{dinnerStartTime, jdbcType=VARCHAR}, 
+		DINNER_ENDTIME=#{dinnerEndTime, jdbcType=VARCHAR}, 
+		SUPPER_STARTTIME=#{supperStartTime, jdbcType=VARCHAR}, 
+		SUPPER_ENDTIME= #{supperEndTime, jdbcType=VARCHAR}
+		WHERE 
+		ID=#{id}
+		]]>
+	</update>
+	
+	
+	<delete id="RestaurantWorkConfig.delete" parameterType="java.lang.Integer">
+		<![CDATA[
+		DELETE 
+		FROM 
+		RESTAURANTWORKCONFIG 
+		WHERE 
+		ID=#{id}
+		]]>
+	</delete>
+	
+	<select id="RestaurantWorkConfig.get" resultMap="RestaurantWorkConfig.resultMap" parameterType="java.lang.Integer">
+		SELECT 
+		<include refid="RestaurantWorkConfig.base_columns"/>
+		<![CDATA[
+		FROM 
+		RESTAURANTWORKCONFIG  
+		WHERE 
+		ID=#{id}
+		]]>
+	</select>
+	
+	<select id="RestaurantWorkConfig.getAllList" resultMap="RestaurantWorkConfig.resultMap">
+		SELECT 
+		<include refid="RestaurantWorkConfig.base_columns"/> 
+		<![CDATA[
+		FROM 
+		RESTAURANTWORKCONFIG 
+		]]>
+	</select>
+	
+	<select id="RestaurantWorkConfig.getTotalCount" resultType="java.lang.Integer">
+		<![CDATA[
+		SELECT  
+		count(*) as totalcount 
+		FROM 
+		RESTAURANTWORKCONFIG 
+		]]>
+	</select>
+	
+	
+	<select id="RestaurantWorkConfig.findPage.count" resultType="java.lang.Long">
+		SELECT 
+		count(*) 
+		FROM 
+		RESTAURANTWORKCONFIG  
+	</select>
+	
+	<select id="RestaurantWorkConfig.findPage" resultMap="RestaurantWorkConfig.resultMap" parameterType="java.util.Map">
+		SELECT 
+		<include refid="RestaurantWorkConfig.base_columns"/> 
+		FROM 
+		RESTAURANTWORKCONFIG 
+	</select>
+	
+	<select id="RestaurantWorkConfig.queryPageList" parameterType="RestaurantWorkConfig" resultMap="RestaurantWorkConfig.resultMap">
+		SELECT 
+		ID, <include refid="RestaurantWorkConfig.base_columns"/> 
+		FROM 
+		RESTAURANTWORKCONFIG
+	</select>
+	
+</mapper>

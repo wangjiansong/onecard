@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xmlns:cxf="http://cxf.apache.org/core"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:cache="http://www.springframework.org/schema/cache"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:lang="http://www.springframework.org/schema/lang"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
+        http://www.springframework.org/schema/cache
+        http://www.springframework.org/schema/cache/spring-cache-3.1.xsd
+        http://www.springframework.org/schema/util
+		http://www.springframework.org/schema/util/spring-util-3.1.xsd
+		http://www.springframework.org/schema/tx
+		http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+		http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/lang
+		http://www.springframework.org/schema/lang/spring-lang-3.1.xsd
+		http://cxf.apache.org/jaxws
+		http://cxf.apache.org/schemas/jaxws.xsd
+		http://cxf.apache.org/core
+		http://cxf.apache.org/schemas/core.xsd">
+		
+	<import resource="classpath:META-INF/cxf/cxf.xml"/>
+	<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml"/>
+	<import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
+	<context:component-scan base-package="com.interlib.sso" >
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+	</context:component-scan>
+	
+	<bean id="readerWebservice" class="com.interlib.sso.webservice.impl.ReaderWebserviceImpl">
+	</bean>
+	
+	<jaxws:endpoint implementor="#readerWebservice"
+		implementorClass="com.interlib.sso.webservice.ReaderWebservice" address="/readerWebservice" />
+		
+	<!-- add p_libcode and p_rctype  webservice	start -->
+	<bean id="libcodeRcTypeWebservice" class="com.interlib.sso.webservice.impl.LibcodeRcTypeWebserviceImpl">
+	</bean>
+	
+	<jaxws:endpoint implementor="#libcodeRcTypeWebservice"
+		implementorClass="com.interlib.sso.webservice.LibcodeRcTypeWebService" address="/libcodeRcTypeWebservice" />
+	<!-- add p_libcode and p_rctype  webservice	 end -->
+		
+	
+	<bean id="nativeJdbcExtractor" class="org.springframework.jdbc.support.nativejdbc.CommonsDbcpNativeJdbcExtractor" /> 
+	<bean id="oracleLobHandler" class="org.springframework.jdbc.support.lob.OracleLobHandler" lazy-init="true"> 
+		<property name="nativeJdbcExtractor"> 
+			<ref bean="nativeJdbcExtractor" /> 
+		</property> 
+	</bean>
+	
+	<!-- <bean id="multiPartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/> -->
+	
+	<!-- Local Apache Commons DBCP DataSource that refers to a combined database -->
+	<!-- (see dataAccessContext-jta.xml for an alternative) -->
+	<!-- The placeholders are resolved from jdbc.properties through -->
+	<!-- the PropertyPlaceholderConfigurer in applicationContext.xml -->
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:jdbc.properties</value>
+				<value>classpath:sysConfig.properties</value>
+			</list>
+		</property>
+	</bean>
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driverClassName}"/>
+		<property name="url" value="${jdbc.url}"/>
+		<property name="username" value="${jdbc.username}"/>
+		<property name="password" value="${jdbc.password}"/>
+		<property name="maxActive" value="${jdbc.maxActive}"/>
+		<property name="maxIdle" value="${jdbc.maxIdle}"/>
+		<property name="maxWait" value="${jdbc.maxWait}"/>
+		<property name="removeAbandoned" value="${jdbc.removeAbandoned}"/>
+		<property name="removeAbandonedTimeout" value="${jdbc.removeAbandonedTimeout}"/>
+		<property name="testOnBorrow" value="${jdbc.testOnBorrow}"/>
+		<property name="logAbandoned" value="${jdbc.logAbandoned}"/>
+	</bean>
+	
+	<!-- Transaction manager for a single JDBC DataSource -->
+	<!-- (see dataAccessContext-jta.xml for an alternative) -->
+	<bean id="transactionManager" 
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+	
+	<!-- use MyBatis-Spring-Integeration -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:myBatisConfiguration.xml" />
+		<property name="mapperLocations" value="classpath*:mappers/oracle/**/*.xml" />
+	</bean>
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg index="0" ref="sqlSessionFactory" />
+	</bean>
+	
+	<!-- jdbcTemplate bean -->
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate" >
+		<constructor-arg name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<!-- jdbcTemplate bean -->
+	<bean id="namedParameterJdbcTemplate" 
+		class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate" >
+		<constructor-arg name="dataSource" ref="dataSource" />
+	</bean>	
+	
+	<!-- jsp with tiles -->
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+		<property name="viewClass">
+			<value>org.springframework.web.servlet.view.tiles2.TilesView</value>
+		</property>
+	</bean>
+	<bean id="tilesConfigurer"
+		class="org.springframework.web.servlet.view.tiles2.TilesConfigurer">
+		<property name="definitions">
+			<list>
+				<value>/WEB-INF/tiles.xml</value>
+			</list>
+		</property>
+	</bean>
+	
+
+	
+	<!-- 項目自定义的Realm -->
+	<bean id="shiroDbRealm" class="com.interlib.sso.commonservice.shiro.MyRealm">
+	</bean>
+	
+	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+		<property name="securityManager" ref="securityManager" />
+	 	<property name="loginUrl" value="/portal/login" /> 
+<!--		<property name="loginUrl" value="${casUrl}login?service=${ssoUrl}portal/login" />-->
+		<property name="successUrl" value="/portal/login" />
+	 	<property name="unauthorizedUrl" value="/portal/login" /> 
+<!--		<property name="unauthorizedUrl" value="${casUrl}login?service=${ssoUrl}portal/login" />-->
+		<property name="filterChainDefinitions">
+			<value>
+			    /admin/** = authc
+			    /portal/index = authc
+			    /portal/ = authc
+		    	/system/** = authc
+		    	/** = anon
+		    	/cirfinlog/ = anon
+		 	</value>
+		</property>
+	</bean>
+	<!-- Shiro Filter 
+	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+		<property name="securityManager" ref="securityManager" />
+		<property name="loginUrl" value="/portal/login" />
+		<property name="successUrl" value="/admin" />
+		<property name="unauthorizedUrl" value="/portal/login" />
+		<property name="filterChainDefinitions">
+			<value>
+			    /admin/** = authc
+			    /portal/index = authc
+			    /portal/ = authc
+		    		/** = anon
+				/cirfinlog/ = anon
+		 	</value>
+		</property>
+	</bean>
+	-->
+	<bean id="casFilter" class="org.apache.shiro.cas.CasFilter">  
+        <!-- 配置验证错误时的失败页面  -->  
+        <property name="failureUrl" value="/error.jsp"/>  
+    </bean>  
+	
+	<bean id="authorityFilter" class="com.interlib.sso.filter.AuthorityFilter">
+	</bean>
+	
+	<!-- 用户授权信息Cache -->
+	<bean id="cacheManagerForShiro" class="org.apache.shiro.cache.MemoryConstrainedCacheManager" />
+	
+	<!-- 保证实现了Shiro内部lifecycle函数的bean执行 -->
+	<bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
+	
+	<!-- AOP式方法级权限检查  -->
+	<bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" 
+		depends-on="lifecycleBeanPostProcessor">
+		<property name="proxyTargetClass" value="true" />
+	</bean>
+	
+	<bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+    	<property name="securityManager" ref="securityManager"/>
+	</bean>
+	
+	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <property name="realms">
+            <list>
+                <ref bean="shiroDbRealm" />
+            </list>
+        </property>
+        <property name="cacheManager" ref="cacheManagerForShiro" />
+    </bean>
+	
+	<aop:aspectj-autoproxy />
+	
+	<bean id="cacheThreadPool" class="java.util.concurrent.Executors" factory-method="newCachedThreadPool"> 
+	</bean> 
+	
+	<bean id="exceptionHandler" class="com.interlib.sso.handle.MyExceptionHandler"/>
+	<!-- <jaxws:client id="client" serviceClass="com.interlib.opac.webservice.ReaderWebservice"   
+        address="http://192.168.0.62:7788/opac3/webservice/readerWebservice" />
+	 -->
+</beans>

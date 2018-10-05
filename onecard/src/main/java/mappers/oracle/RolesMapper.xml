@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="RolesMapper">
+
+	<resultMap id="Roles.resultMap" type="com.interlib.sso.domain.Roles">
+		<result property="roleId" column="ROLEID" />
+		<result property="roleName" column="ROLENAME" />
+		<result property="libcode" column="LIBCODE" />
+		<result property="describe" column="DESCRIBE" />
+	</resultMap>
+	
+	<sql id="Roles.base_columns">
+		<![CDATA[
+		ROLEID, ROLENAME, LIBCODE, DESCRIBE
+		]]>
+	</sql>
+	
+	<insert id="Roles.insert" parameterType="com.interlib.sso.domain.Roles">
+	    <selectKey resultType="int"  keyProperty="roleId" order="BEFORE">   
+        	<![CDATA[SELECT SEQ_ROLES.NEXTVAL AS ROLEID FROM DUAL]]>
+        </selectKey>
+		<![CDATA[
+		INSERT INTO U_ROLES  
+		(ROLEID, ROLENAME, LIBCODE, DESCRIBE) 
+		values 
+		(#{roleId}, #{roleName, jdbc=VARCHAR}, #{libcode, jdbcType=VARCHAR}, #{describe, jdbcType=VARCHAR})
+		]]>
+	</insert>
+
+	<update id="Roles.update" parameterType="com.interlib.sso.domain.Roles">
+		<![CDATA[
+		UPDATE u_roles 
+		SET 
+		ROLENAME=#{roleName, jdbcType=VARCHAR},
+		LIBCODE=#{libcode, jdbcType=VARCHAR},
+		DESCRIBE=#{describe, jdbcType=VARCHAR}
+		WHERE 
+		ROLEID=#{roleId}
+		]]>
+	</update>
+	
+	<insert id="Roles.insertRoleComp" parameterType="com.interlib.sso.domain.URole_Compet">
+	    <![CDATA[
+		INSERT INTO U_ROLE_COMPET 
+		(ROLEID, COMPETID) 
+		values 
+		(#{roleId}, #{competId})
+		]]>
+	</insert>
+
+	<update id="Roles.updateRoleComp" parameterType="java.util.Map">
+	    <![CDATA[
+	    UPDATE U_ROLE_COMPET
+	    set 
+	    COMPETID=#{comId} 
+	    WHERE
+	    ROLEID=#{roleId} 
+	    ]]>
+	</update>
+	
+	<delete id="Roles.deleteRoleComp" parameterType="java.lang.Integer">
+	    <![CDATA[
+		DELETE 
+		FROM 
+		U_ROLE_COMPET 
+		WHERE 
+		ROLEID=#{roleId}
+		]]>
+	</delete>
+	
+	<delete id="Roles.delete" parameterType="java.lang.Integer">
+		<![CDATA[
+		DELETE 
+		FROM 
+		U_ROLES 
+		WHERE 
+		ROLEID=#{roleId}
+		]]>
+	</delete>
+	
+	<select id="Roles.get" resultMap="Roles.resultMap" parameterType="java.lang.Integer">
+		SELECT 
+		<include refid="Roles.base_columns"/>
+		<![CDATA[
+		FROM 
+		U_ROLES  
+		WHERE 
+		ROLEID=#{roleId}
+		]]>
+	</select>
+	
+	<select id="Roles.getAllList" resultMap="Roles.resultMap">
+		SELECT 
+		<include refid="Roles.base_columns"/> 
+		<![CDATA[
+		FROM 
+		U_ROLES 
+		]]>
+		order by ROLEID
+	</select>
+	
+	<select id="Roles.getRoleCompet" resultType="com.interlib.sso.domain.Compets" parameterType="java.lang.Integer">
+	    SELECT 
+	    c.COMPETID, c.COMPETNAME 
+	    <![CDATA[
+	    FROM 
+	    U_ROLE_COMPET rc, U_COMPETS c
+	    ]]>
+	    WHERE 
+	    rc.COMPETID = c.COMPETID AND ROLEID=#{roleId}
+	</select>
+	
+	<select id="Roles.getRoleCompetId" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+	    SELECT 
+	    c.COMPETID
+	    <![CDATA[
+	    FROM 
+	    U_ROLE_COMPET rc, U_COMPETS c
+	    ]]>
+	    WHERE 
+	    rc.COMPETID = c.COMPETID AND ROLEID=#{roleId}
+	</select>
+	
+	<select id="Roles.getOtherCompet" resultType="com.interlib.sso.domain.Compets" parameterType="java.lang.Integer">
+	    SELECT 
+	    c.COMPETID, c.COMPETNAME 
+	    <![CDATA[
+	    FROM 
+	    U_COMPETS c
+	    ]]>
+	    WHERE 
+	    c.COMPETID NOT IN 
+	    (SELECT 
+	    c.COMPETID 
+	    <![CDATA[
+	    FROM 
+	    U_ROLE_COMPET rc, U_COMPETS c
+	    ]]>
+	    WHERE 
+	    rc.COMPETID = c.COMPETID AND ROLEID=#{roleId}) 
+	</select>
+	
+	<select id="Roles.getTotalCount" resultType="java.lang.Integer">
+		<![CDATA[
+		SELECT  
+		count(*) as totalcount 
+		FROM 
+		U_ROLES 
+		]]>
+	</select>
+	
+	<sql id="Roles.findPage.where">
+		<where>
+			<if test="@Ognl@isNotEmpty(roleName)">
+			 ROLENAME LIKE '%'||#{roleName}||'%'
+			</if>
+		</where>
+	</sql>
+	
+	<select id="Roles.findPage.count" resultType="java.lang.Long">
+		SELECT 
+		count(*) 
+		FROM 
+		U_ROLES  
+		<include refid="Roles.findPage.where"/>
+	</select>
+	
+	<select id="Roles.findPage" resultMap="Roles.resultMap" parameterType="java.util.Map">
+		SELECT 
+		<include refid="Roles.base_columns"/> 
+		FROM 
+		U_ROLES 
+		<include refid="Roles.findPage.where"/>
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY sortColumns
+		</if>
+	</select>
+	
+	<select id="Roles.queryPageList" parameterType="Roles" resultType="Map">
+		SELECT 
+		<include refid="Roles.base_columns"/> 
+		FROM 
+		U_ROLES
+		<include refid="Roles.findPage.where"/>
+		ORDER BY ROLEID
+	</select>
+	
+	<delete id="Roles.deleteByIds">
+		DELETE FROM U_ROLES WHERE ROLEID IN
+		<foreach collection="array" item="idArray"  open="(" separator="," close=")">   
+       		#{idArray}   
+    	</foreach>
+	</delete>
+	
+</mapper>

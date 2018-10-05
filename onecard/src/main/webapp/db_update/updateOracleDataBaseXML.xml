@@ -1,0 +1,1362 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--	
+	method support 5 methods:
+		1. createTable  create table
+		2. deleteContent delete content of table
+		3. InsertContent add records to table
+		4. modifySubFieldContent modify column content
+		5. addSubField    add column
+		6. modifySubField modify column
+-->
+<updateOracleDataBaseContent>
+
+	<content>
+		<time>2013年09月20日</time>
+		<comment>自定义资源表</comment>
+		<method>1</method>
+		<tableName>U_RESOURCES</tableName>
+		<sql>
+			CREATE TABLE U_RESOURCES
+			(
+				RESOURCEID NVARCHAR2(50) not null PRIMARY KEY,
+				SUBSYS NVARCHAR2(50),
+				RESOURCENAME NVARCHAR2(50),
+				RESOURCEURL NVARCHAR2(100),
+				ISMENU NUMBER(2),
+				DESCRIBE NVARCHAR2(100),
+				constraint PK_RESOURCEID primary key (RESOURCEID)				
+			)
+		</sql>
+	</content>
+	
+	<content>
+		<time>2013年09月20日</time>
+		<comment>自定义权限表</comment>
+		<method>1</method>
+		<tableName>U_COMPETS</tableName>
+		<sql>
+			CREATE TABLE U_COMPETS
+			(
+				COMPETID NUMBER(10) not null PRIMARY KEY,
+				COMPETNAME NVARCHAR2(50),
+				DESCRIBE NVARCHAR2(100)
+			)
+		</sql>
+	</content>
+	
+	<content>
+		<time>2013年09月20日</time>
+		<comment>自定义角色表</comment>
+		<method>1</method>
+		<tableName>U_ROLES</tableName>
+		<sql>
+			CREATE TABLE U_ROLES
+			(
+				ROLEID NUMBER(10) not null PRIMARY KEY,
+				ROLENAME NVARCHAR2(50),
+				LIBCODE NVARCHAR2(50),
+				DESCRIBE NVARCHAR2(100)
+			)
+		</sql>
+	</content>
+	
+	<content>
+		<time>2013年09月20日</time>
+		<comment>自定义用户角色对应表</comment>
+		<method>1</method>
+		<tableName>U_READER_ROLE</tableName>
+		<sql>
+			create table U_READER_ROLE
+			(
+			  RDID   NVARCHAR2(100) not null,
+			  ROLEID NUMBER(20) not null
+			)
+		</sql>
+	</content>
+	
+	<content>
+		<time>2013年09月20日</time>
+		<comment>资源权限对应表</comment>
+		<method>1</method>
+		<tableName>U_COMPET_RESOURCE</tableName>
+		<sql>
+			CREATE TABLE U_COMPET_RESOURCE
+			(
+				RESOURCEID NVARCHAR2(50),
+				COMPETID NUMBER(10)
+			)
+		</sql>
+	</content>
+	
+	<content>
+		<time>2013年09月20日</time>
+		<comment>权限角色对应表</comment>
+		<method>1</method>
+		<tableName>U_ROLE_COMPET</tableName>
+		<sql>
+			CREATE TABLE U_ROLE_COMPET
+			(
+				ROLEID NUMBER(10),
+				COMPETID NUMBER(10)
+			)
+		</sql>
+	</content>
+	
+	<content>
+		<time>2013年09月20日</time>
+		<comment>权限表序列</comment>
+		<method>1</method>
+		<tableName>SEQ_COMPETS</tableName>
+		<sql>
+			create sequence SEQ_COMPETS
+			minvalue 1
+			maxvalue 9999999999999999999999
+			start with 1
+			increment by 1
+			cache 20
+		</sql>
+	</content>
+	
+	<content>
+		<time>2013年09月20日</time>
+		<comment>角色表序列</comment>
+		<method>1</method>
+		<tableName>SEQ_ROLES</tableName>
+		<sql>
+			create sequence SEQ_ROLES
+			minvalue 1
+			maxvalue 9999999999999999999999
+			start with 1
+			increment by 1
+			cache 20
+		</sql>
+	</content>
+	
+	<content>
+		<time>2013年09月20日</time>
+		<comment>自定义临时读者表</comment>
+		<method>1</method>
+		<tableName>NETREADER</tableName>
+		<sql>
+		    create table NETREADER  (
+		    	READERID 	NVARCHAR2(32)	not null,
+   				READERNAME 	NVARCHAR2(32)	not null,
+				READERPASSWORD	NVARCHAR2(32)	not null,
+				READERTYPE	NVARCHAR2(32)	not null,
+				READERCARDSTATE	SMALLINT	not null,
+				READERLIB	NVARCHAR2(32)	not null,
+				READERHANDLEDATE	DATE	not null,
+				READERSTARTDATE	DATE	not null,
+				READERENDDATE	DATE	not null,
+				CHECKSTATE	SMALLINT	not null,
+				READERGENDER	SMALLINT,
+				READERCERTIFY	NVARCHAR2(32),
+				READERMOBILE	NVARCHAR2(16),
+				READEREMAIL	NVARCHAR2(32),
+				READERNATIVE	NVARCHAR2(32),
+				READERADDRESS	NVARCHAR2(128),
+				READERSORT1	NVARCHAR2(32),
+				READERSORT2	NVARCHAR2(32),
+				READERSORT3	NVARCHAR2(32),
+				READERSORT4	NVARCHAR2(32),
+				READERSORT5	NVARCHAR2(32),
+				REMARK	NVARCHAR2(256),
+				constraint PK_NETREADER primary key (READERID)
+			)
+		</sql>
+	</content>
+	
+	<content>
+		<time>2013年09月20日</time>
+		<comment>财经日志表</comment>
+		<method>1</method>
+		<tableName>CIR_FIN_LOG</tableName>
+		<sql>
+		    create table CIR_FIN_LOG
+			(
+			  ID		 INTEGER,
+			  RDID       NVARCHAR2(30) not null,
+			  FEETYPE    CHAR(3),
+			  FEE        NUMBER(18,2),
+			  REGTIME    TIMESTAMP(6),
+			  REGMAN     NVARCHAR2(20),
+			  REGLIB     NVARCHAR2(20),
+			  ORGLIB     NVARCHAR2(20),
+			  PAYSIGN    NUMBER,
+			  FEEMEMO    NVARCHAR2(500),
+			  TRANID     NVARCHAR2(32),
+			  FEEAPPCODE NVARCHAR2(30),
+			  constraint PK_CIR_FIN_LOG primary key (ID)
+			)
+		</sql>
+	</content>
+	<content>
+		<time>2013年09月20日</time>
+		<comment>应用信息表</comment>
+		<method>1</method>
+		<tableName>FIN_APP</tableName>
+		<sql>
+		    create table FIN_APP
+			(
+			  APPCODE    NVARCHAR2(30) not null,
+			  APPNAME    NVARCHAR2(30),
+			  DESCRIBE   NVARCHAR2(30),
+			  REGTIME    TIMESTAMP(6),
+			  SERVICEURL NVARCHAR2(100),
+			  constraint PK_FIN_APP primary key (APPCODE)
+			)
+		</sql>
+	</content>
+	<content>
+		<time>2013年09月20日</time>
+		<comment>财经类型表</comment>
+		<method>1</method>
+		<tableName>FIN_TYPE</tableName>
+		<sql>
+		    create table FIN_TYPE
+			(
+			  FEETYPE  CHAR(3) not null,
+			  DESCRIBE NVARCHAR2(30),
+			  APPCODE  NVARCHAR2(30),
+			  APPNAME  NVARCHAR2(30),
+			  constraint PK_FIN_TYPE primary key (FEETYPE)
+			)
+		</sql>
+	</content>
+	<content>
+		<time>2013年09月20日</time>
+		<comment>系统日志</comment>
+		<method>1</method>
+		<tableName>LOG_CIR</tableName>
+		<sql>
+		    create table LOG_CIR
+			(
+			  ID		  INTEGER,
+			  LOGTYPE     VARCHAR2(5 CHAR) not null,
+			  LIBCODE     VARCHAR2(20 CHAR),
+			  USERID      VARCHAR2(20 CHAR),
+			  IPADDR      VARCHAR2(20 CHAR),
+			  TABLENAME   VARCHAR2(30 CHAR),
+			  DATA1       NUMBER(19),
+			  DATA2       VARCHAR2(30 CHAR),
+			  DATA3       VARCHAR2(30 CHAR),
+			  DATA4       VARCHAR2(30 CHAR),
+			  REGTIME     TIMESTAMP(6),
+			  LOAN_TIME   DATE,
+			  RETURN_TIME DATE,
+			  DATA5       VARCHAR2(30 CHAR),
+			  constraint PK_LOG_CIR primary key (ID)
+			)
+		</sql>
+	</content>
+	<content>
+		<time>2013年09月20日</time>
+		<comment>系统日志类型</comment>
+		<method>1</method>
+		<tableName>LOG_CIRTYPE</tableName>
+		<sql>
+		    create table LOG_CIRTYPE
+			(
+			  LOGTYPE  VARCHAR2(5 CHAR),
+			  TYPENAME VARCHAR2(20 CHAR),
+			  constraint PK_LOG_CIRTYPE primary key (LOGTYPE)
+			)
+		</sql>
+	</content>
+	<content>
+		<time>2013年09月20日</time>
+		<comment>读者账户表</comment>
+		<method>1</method>
+		<tableName>RDACCOUNT</tableName>
+		<sql>
+		    create table RDACCOUNT
+			(
+			  RDID      NVARCHAR2(30) not null,
+			  DEPOSIT   NUMBER(8,2) default 0,
+			  PREPAY    NUMBER(8,2) default 0,
+			  ARREARAGE NUMBER(8,2) default 0,
+			  SPDEPOSIT NUMBER(8,2) default 0,
+			  STATUS    NUMBER(1),
+			  ONECARD   NUMBER(8,2),
+			  constraint PK_RDACCOUNT primary key (RDID)
+			)
+		</sql>
+	</content>
+	<content>
+		<time>2013年09月20日</time>
+		<comment>读者信息表</comment>
+		<method>1</method>
+		<tableName>READER</tableName>
+		<sql>
+		    create table READER
+			(
+			  RDID                  NVARCHAR2(30) not null,
+			  RDLOGINID             NVARCHAR2(20),
+			  RDPASSWD              NVARCHAR2(20),
+			  RDNAME                NVARCHAR2(50) not null,
+			  RDCERTIFY             NVARCHAR2(30),
+			  RDBORNDATE            DATE,
+			  RDSEX                 NUMBER(1),
+			  RDCFSTATE             NUMBER(2) default 1 not null,
+			  RDTYPE                NVARCHAR2(20) not null,
+			  RDGLOBAL              NUMBER(1),
+			  RDLIBTYPE             NVARCHAR2(20),
+			  RDLIB                 NVARCHAR2(20) not null,
+			  RDSTARTDATE           DATE default SYSDATE not null,
+			  RDENDDATE             DATE not null,
+			  RDADDRESS             NVARCHAR2(200),
+			  RDPOSTCODE            NVARCHAR2(8),
+			  RDEMAIL               NVARCHAR2(100),
+			  RDPHONE               NVARCHAR2(50),
+			  RDUNIT                NVARCHAR2(200),
+			  RDREMARK              NVARCHAR2(300),
+			  RDINTEREST            NVARCHAR2(100),
+			  RDSPECIALTY           NVARCHAR2(100),
+			  RDSORT1               NVARCHAR2(50),
+			  RDSORT2               NVARCHAR2(50),
+			  RDSORT3               NVARCHAR2(50),
+			  RDSORT4               NVARCHAR2(50),
+			  RDSORT5               NVARCHAR2(50),
+			  RDNATION              NVARCHAR2(20),
+			  RDNATIVE              NVARCHAR2(30),
+			  RDINTIME              DATE default SYSDATE,
+			  RDSCORE               NUMBER(6),
+			  TOTALLOANNUM          NUMBER(6),
+			  TOTALRESNUM           NUMBER(6),
+			  TOTALRENEWNUM         NUMBER(6),
+			  TOTALINTERLIBNUM      NUMBER(6),
+			  TOTALPECCANCY         NUMBER(6),
+			  OPERATOR              NVARCHAR2(20),
+			  DUETIME               TIMESTAMP(6),
+			  SPRULE                NVARCHAR2(1000),
+			  RDCENTER              NUMBER(1),
+			  CENTERRULE            NVARCHAR2(30),
+			  RDREGISTERNAME        NVARCHAR2(50),
+			  NOTGETBOOKNUM         NUMBER(2),
+			  GRADE                 NVARCHAR2(50),
+			  PERIOD                NVARCHAR2(50),
+			  ELEREADINGNOCONTROL   NUMBER(1) default 0,
+			  DEPARTMANT            NVARCHAR2(50),
+			  ONLINESECONDS         INTEGER,
+			  SSORDSCORE            INTEGER,
+			  WORKCARDNO            NVARCHAR2(50),
+			  OTHERCARDNO           NVARCHAR2(50),
+			  SMS_SYNC_FLAG         NUMBER(1) default 0,
+			  RECEIVEMOBILENOTIFIES NUMBER(1) default 0,
+			  ISSHOWREMARK          NUMBER(1) default 0,
+			  CHILDNUM              NUMBER(10) default 0,
+			  RDCUSTOMREMARK        NVARCHAR2(500),
+			  ISSHOWCUSTOMREMARK    NUMBER(1) default 0,
+			  RDPHOTO               NVARCHAR2(100),
+			  LIBUSER               NUMBER(1),
+			  constraint PK_READER primary key (RDID)
+			)
+		</sql>
+	</content>
+	<content>
+		<time>2013年09月20日</time>
+		<comment>办证费用参数表</comment>
+		<method>1</method>
+		<tableName>READER_FEE</tableName>
+		<sql>
+		    create table READER_FEE
+			(
+			  LIBCODE   VARCHAR2(20 CHAR) not null,
+			  CARDFEE   VARCHAR2(10 CHAR),
+			  RENEWFEE  VARCHAR2(10 CHAR),
+			  CHECKFEE  VARCHAR2(10 CHAR),
+			  LOSSFEE   VARCHAR2(10 CHAR),
+			  STOPFEE   VARCHAR2(10 CHAR),
+			  LOGOUTFEE VARCHAR2(10 CHAR),
+			  QUITFEE   VARCHAR2(10 CHAR),
+			  REPAIRFEE VARCHAR2(10 CHAR),
+			  DEFERFEE  VARCHAR2(10 CHAR),
+			  CHANGEFEE VARCHAR2(10 CHAR),
+			  constraint PK_READER_FEE primary key (LIBCODE)
+			)
+		</sql>
+	</content>
+	<content>
+		<time>2013年12月03日</time>
+		<comment>授权控制表</comment>
+		<method>1</method>
+		<tableName>AUTHORIZATION</tableName>
+		<sql>
+		    create table AUTHORIZATION
+			(
+			  ID            INTEGER not null,
+			  APPCODE       NVARCHAR2(50) not null,
+			  APPNAME       NVARCHAR2(50) not null,
+			  IPADDRESS     NVARCHAR2(100),
+			  STATICCODE    NVARCHAR2(50) not null,
+			  AUTHORIZEAPI  NVARCHAR2(100),
+			  ENDDATE       TIMESTAMP(6),
+			  BINDINGUSERID NVARCHAR2(50) not null,
+			  ENCODERULE    NVARCHAR2(100),
+			  constraint PK_AUTHORIZATION primary key (ID)
+			)
+		</sql>
+	</content>
+	<content>
+		<time>2013年12月03日</time>
+		<comment>授权表序列</comment>
+		<method>1</method>
+		<tableName>SEQ_AUTHORIZATION</tableName>
+		<sql>
+			create sequence SEQ_AUTHORIZATION
+			minvalue 1
+			maxvalue 9999999999999999999999
+			start with 1
+			increment by 1
+			cache 20
+		</sql>
+	</content>
+	<content>
+		<time>2013年12月03日</time>
+		<comment>财经日志表序列</comment>
+		<method>1</method>
+		<tableName>SEQ_CIRFINLOG</tableName>
+		<sql>
+			create sequence SEQ_CIRFINLOG
+			minvalue 1
+			maxvalue 9999999999999999999999
+			start with 1
+			increment by 1
+			cache 20
+		</sql>
+	</content>
+	<content>
+		<time>2013年12月03日</time>
+		<comment>操作日志表序列</comment>
+		<method>1</method>
+		<tableName>SEQ_LOGCIR</tableName>
+		<sql>
+			create sequence SEQ_LOGCIR
+			minvalue 1
+			maxvalue 9999999999999999999999
+			start with 1
+			increment by 1
+			cache 20
+		</sql>
+	</content>
+	<content>
+		<time>2013年12月03日</time>
+		<comment>读者卡号信息</comment>
+		<method>1</method>
+		<tableName>READER_CARDINFO</tableName>
+		<sql>
+			create table READER_CARDINFO
+			(
+			  RDID         NVARCHAR2(60) not null,
+			  CARDID       NVARCHAR2(60) not null,
+			  CARDTYPE     NUMBER(4) not null,
+			  TRANSACTTIME DATE not null,
+			  LASTUSETIME DATE,
+			  ISUSABLE     NUMBER(1),
+			  TOTALOFUSED  NUMBER(4),
+			  constraint PK_READER_CARDINFO primary key (RDID)
+			)
+		</sql>
+	</content>
+	<content>
+		<time>2013年12月03日</time>
+		<comment>账户状态类型</comment>
+		<method>1</method>
+		<tableName>ACCOUNT_STATUS</tableName>
+		<sql>
+			create table ACCOUNT_STATUS
+			(
+			  ACCOUNTSTATUS NVARCHAR2(10) not null,
+			  STATUSDESC    NVARCHAR2(10) not null
+			)
+		</sql>
+	</content>
+	
+	<content>
+		<time>2013年12月18日</time>
+		<comment>添加字段</comment>
+		<method>5</method>
+		<tableName>P_LIBCODE</tableName>
+		<sql>
+			alter table P_LIBCODE add(
+				DEFAULTRDPASSWD   NVARCHAR2(20),
+				WEBSERVICEURL     NVARCHAR2(100)
+			)
+		</sql>
+	</content>
+	<content>
+		<time>2013年12月17日</time>
+		<comment>新建办事指南表</comment>
+		<method>1</method>
+		<tableName>GUIDE</tableName>
+		<sql>
+			create table GUIDE(
+			ID NUMBER(10) not null PRIMARY KEY,
+			TITLE NVARCHAR2(100),
+			CONTENT NVARCHAR2(1000),
+			CREATETIME TIMESTAMP(0) default SYSTIMESTAMP
+			)
+		</sql>
+	</content>
+	<content>
+		<time>2013年12月17日</time>
+		<comment>新建公告表</comment>
+		<method>1</method>
+		<tableName>BLACKBOARD</tableName>
+		<sql>
+			create table BLACKBOARD
+			(
+			  ID         INTEGER not null,
+			  TITLE      NVARCHAR2(100) not null,
+			  CONTENT    NVARCHAR2(1000),
+			  CREATETIME TIMESTAMP(0)
+			)
+		</sql>
+	</content>
+	<content>
+		<time>2013年12月17日</time>
+		<comment>办事指南表序列</comment>
+		<method>1</method>
+		<tableName>SEQ_GUIDE</tableName>
+		<sql>
+			create sequence SEQ_GUIDE
+			minvalue 1
+			maxvalue 9999999999999999999999
+			start with 1
+			increment by 1
+			cache 20
+		</sql>
+	</content>
+	<content>
+		<time>2013年12月16日</time>
+		<comment>公告表序列</comment>
+		<method>1</method>
+		<tableName>SEQ_BLACKBOARD</tableName>
+		<sql>
+			create sequence SEQ_BLACKBOARD
+			minvalue 1
+			maxvalue 9999999999999999999999
+			start with 1
+			increment by 1
+			cache 20
+		</sql>
+	</content>
+	<content>
+		<time>2014年02月28日</time>
+		<comment>补助发放表序列</comment>
+		<method>1</method>
+		<tableName>SEQ_SUBSIDY_GRANT</tableName>
+		<sql>
+			create sequence SEQ_SUBSIDY_GRANT
+			increment by 1
+			start with 1
+			nomaxvalue
+			minvalue 1
+			nocycle
+			cache 20
+			noorder
+		</sql>
+	</content>
+	<content>
+		<time>2014年02月28日</time>
+		<comment>补助发放表</comment>
+		<method>1</method>
+		<tableName>SUBSIDY_GRANT</tableName>
+		<sql>
+			create table SUBSIDY_GRANT  (
+			   GRANTID              INTEGER                         not null,
+			   GRANTTITLE           NVARCHAR2(32)                   not null,
+			   GRANTAMOUNT          NUMBER(10,2)                    not null,
+			   ISAUTOGRANT          CHAR(1)                         not null
+			      constraint CKC_ISAUTOGRANT_SUBSIDY_GRANT check (ISAUTOGRANT in ('0','1')),
+			   CREATETIME           DATE                            not null,
+			   LASTMODIFYTIME       DATE                            not null,
+			   REMARK               NVARCHAR2(1024),
+			   constraint PK_SUBSIDY_GRANT primary key (GRANTID)
+			)
+		</sql>
+	</content>
+	<content>
+		<time>2014年02月28日</time>
+		<comment>发放时间表</comment>
+		<method>1</method>
+		<tableName>DATE_GRANT</tableName>
+		<sql>
+			create table DATE_GRANT  (
+			   GRANTID              INTEGER                         not null,
+			   GRANTDATE            DATE                            not null,
+			   constraint PK_DATE_GRANT primary key (GRANTID, GRANTDATE)
+			)
+		</sql>
+	</content>
+	<content>
+		<time>2014年02月28日</time>
+		<comment>用户分组表</comment>
+		<method>1</method>
+		<tableName>GROUP_GRANT</tableName>
+		<sql>
+			create table GROUP_GRANT  (
+			   GROUPID              INTEGER                         not null,
+			   GROUPNAME            NVARCHAR2(32)                   not null,
+			   CREATETIME           DATE                            not null,
+			   REMARK               NVARCHAR2(128),
+			   constraint PK_GROUP_GRANT primary key (GROUPID)
+			)
+		</sql>
+	</content>
+	<content>
+		<time>2014年02月28日</time>
+		<comment>用户分组表序列</comment>
+		<method>1</method>
+		<tableName>SEQ_GROUP_GRANT</tableName>
+		<sql>
+			create sequence SEQ_GROUP_GRANT
+			increment by 1
+			start with 1
+			nomaxvalue
+			minvalue 1
+			nocycle
+			cache 20
+			noorder
+		</sql>
+	</content>
+	<content>
+		<time>2014年02月28日</time>
+		<comment>读者账户表新增用户分组ID字段：GROUPID</comment>
+		<method>5</method>
+		<tableName>RDACCOUNT</tableName>
+		<subField>
+			<subFieldName>GROUPID</subFieldName>
+			<subFieldType>INTEGER</subFieldType>
+			<subFieldSize>5</subFieldSize>
+		</subField>
+		<sql>
+			ALTER TABLE RDACCOUNT ADD GROUPID INTEGER NULL
+		</sql>
+	</content> 
+	<content>
+		<time>2014年03月02日</time>
+		<comment>指派分组表</comment>
+		<method>1</method>
+		<tableName>ASSIGN_GRANT</tableName>
+		<sql>
+			create table ASSIGN_GRANT  (
+			   GRANTID              INTEGER                         not null,
+			   GROUPID              INTEGER                         not null,
+			   constraint PK_ASSIGN_GRANT primary key (GRANTID, GROUPID)
+			)
+		</sql>
+	</content>
+	<content>
+		<time>2014年03月08日</time>
+		<comment>刷卡消费分组表</comment>
+		<method>1</method>
+		<tableName>CARD_GROUP</tableName>
+		<sql>
+			create table CARD_GROUP  (
+			   GROUPID              INTEGER                         not null,
+			   GROUPNAME            NVARCHAR2(32)                   not null,
+			   ISASSIGNED           CHAR(1)                         not null,
+			   CREATETIME           DATE                            not null,
+			   REMARK               NVARCHAR2(1024),
+			   constraint PK_CARD_GROUP primary key (GROUPID)
+			)
+		</sql>
+	</content>
+	<content>
+		<time>2014年03月08日</time>
+		<comment>刷卡消费分组表序列</comment>
+		<method>1</method>
+		<tableName>SEQ_CARD_GROUP</tableName>
+		<sql>
+			create sequence SEQ_CARD_GROUP
+			increment by 1
+			start with 1
+			nomaxvalue
+			minvalue 1
+			nocycle
+			cache 20
+			noorder
+		</sql>
+	</content>
+	<content>
+		<time>2014年03月08日</time>
+		<comment>刷卡消费分组成员表</comment>
+		<method>1</method>
+		<tableName>CARD_GROUP_MEMBER</tableName>
+		<sql>
+			create table CARD_GROUP_MEMBER  (
+			   GROUPID              INTEGER                         not null,
+			   RDID                 NVARCHAR2(20)                   not null,
+			   constraint PK_CARD_GROUP_MEMBER primary key (GROUPID, RDID)
+			)
+		</sql>
+	</content>
+	<content>
+		<time>2014年03月08日</time>
+		<comment>刷卡消费规则表</comment>
+		<method>1</method>
+		<tableName>CARD_RULE</tableName>
+		<sql>
+			create table CARD_RULE  (
+			   RULEID               INTEGER                         not null,
+			   RULETITLE            NVARCHAR2(32)                   not null,
+			   CREATETIME           DATE                            not null,
+			   LASTMODIFYTIME       DATE                            not null,
+			   REMARK               NVARCHAR2(1024),
+			   constraint PK_CARD_RULE primary key (RULEID)
+			)
+		</sql>
+	</content>
+	<content>
+		<time>2014年03月08日</time>
+		<comment>刷卡消费规则表序列</comment>
+		<method>1</method>
+		<tableName>SEQ_CARD_RULE</tableName>
+		<sql>
+			create sequence SEQ_CARD_RULE
+			increment by 1
+			start with 1
+			nomaxvalue
+			minvalue 1
+			nocycle
+			cache 20
+			noorder
+		</sql>
+	</content>
+	<content>
+		<time>2014年03月08日</time>
+		<comment>刷卡消费明细表</comment>
+		<method>1</method>
+		<tableName>CARD_RULE_DETAIL</tableName>
+		<sql>
+			create table CARD_RULE_DETAIL  (
+			   RULEID               INTEGER                         not null,
+			   STARTTIME            VARCHAR2(8)                     not null,
+			   ENDTIME              VARCHAR2(8)                     not null,
+			   SALEPRICE            NUMBER(8,2)                     not null,
+			   COSTPRICE            NUMBER(8,2)                     not null,
+			   TIMEFLAG             CHAR(1)                         not null
+			)
+		</sql>
+	</content>
+	<content>
+		<time>2014年03月08日</time>
+		<comment>刷卡消费规则分组指定表</comment>
+		<method>1</method>
+		<tableName>CARD_GROUP_ASSIGN</tableName>
+		<sql>
+			create table CARD_GROUP_ASSIGN  (
+			   RULEID               INTEGER                         not null,
+			   GROUPID              INTEGER                         not null,
+			   constraint PK_CARD_GROUP_ASSIGN primary key (GROUPID, RULEID)
+			)
+		</sql>
+	</content>
+	<content>
+		<time>2014年03月21日</time>
+		<comment>CIR_FIN_LOG表添加消费原价字段：COST</comment>
+		<method>5</method>
+		<tableName>CIR_FIN_LOG</tableName>
+		<subField>
+			<subFieldName>COST</subFieldName>
+			<subFieldType>NUMBER</subFieldType>
+			<subFieldSize>5</subFieldSize>
+		</subField>
+		<sql>
+			ALTER TABLE CIR_FIN_LOG ADD COST NUMBER(10,2);
+		</sql>
+	</content>
+	<content>
+		<time>2014年04月09日</time>
+		<comment>CARD_RULE表添加每月消费多少顿以内为折扣价的字段：SUBSIDIZETIMES</comment>
+		<method>5</method>
+		<tableName>CARD_RULE</tableName>
+		<subField>
+			<subFieldName>SUBSIDIZETIMES</subFieldName>
+			<subFieldType>VARCHAR2</subFieldType>
+			<subFieldSize>5</subFieldSize>
+		</subField>
+		<sql>
+			ALTER TABLE CARD_RULE ADD SUBSIDIZETIMES VARCHAR2(5);
+		</sql>
+	</content>
+	<content>
+		<time>2014年04月29日</time>
+		<comment>CIR_FIN_LOG表属于分组的字段：groupID</comment>
+		<method>5</method>
+		<tableName>CIR_FIN_LOG</tableName>
+		<subField>
+			<subFieldName>GROUPID</subFieldName>
+			<subFieldType>number</subFieldType>
+			<subFieldSize>38</subFieldSize>
+		</subField>
+		<sql>
+			alter table CIR_FIN_LOG add GROUPID number(38);
+		</sql>
+	</content>
+	<content>
+		<time>2014年04月29日</time>
+		<comment>批量修改cir_fin_log原来关联的分组的ID</comment>
+		<method>4</method>
+		<tableName>cir_fin_log</tableName>
+		<sql>
+			update cir_fin_log set GROUPID=(SELECT groupid from card_group_member where cir_fin_log.rdid=card_group_member.rdid)
+		</sql>
+	</content>
+	<content>
+		<time>2014年05月07日</time>
+		<comment>批量修改cir_fin_log fee 退款,退押金的记录为负数</comment>
+		<method>4</method>
+		<tableName>cir_fin_log</tableName>
+		<sql>
+			update cir_fin_log set fee=-fee  where feetype in ('108','110','205') and fee >0
+		</sql>
+	</content>
+	<content>
+		<time>2014年05月13日</time>
+		<comment>reader表添加同步是否成功标识字段：SYNSTATUS;默认是同步成功</comment>
+		<method>5</method>
+		<tableName>reader</tableName>
+		<subField>
+			<subFieldName>SYNSTATUS</subFieldName>
+			<subFieldType>number</subFieldType>
+			<subFieldSize>1</subFieldSize>
+		</subField>
+		<sql>
+			alter table reader add SYNSTATUS number(1) default '1'
+		</sql>
+	</content>
+	<content>
+		<time>2014年05月13日</time>
+		<comment>reader表添加保存旧密码字段：OLDRDPASSWD</comment>
+		<method>5</method>
+		<tableName>reader</tableName>
+		<subField>
+			<subFieldName>OLDRDPASSWD</subFieldName>
+			<subFieldType>NVARCHAR2</subFieldType>
+			<subFieldSize>50</subFieldSize>
+		</subField>
+		<sql>
+			alter table reader add OLDRDPASSWD NVARCHAR2(50)
+		</sql>
+	</content>
+	<content>
+		<time>2014年05月13日</time>
+		<comment>更新旧密码，默认更新现在的密码</comment>
+		<method>4</method>
+		<tableName>reader</tableName>
+		<sql>
+			update reader set OLDRDPASSWD=RDPASSWD
+		</sql>
+	</content>
+	<content>
+		<time>2014年05月13日</time>
+		<comment>P_LIBCODE表添加全局馆编码字段：LIBRARYID</comment>
+		<method>5</method>
+		<tableName>P_LIBCODE</tableName>
+		<subField>
+			<subFieldName>LIBRARYID</subFieldName>
+			<subFieldType>NVARCHAR2</subFieldType>
+			<subFieldSize>50</subFieldSize>
+		</subField>
+		<sql>
+			alter table P_LIBCODE add LIBRARYID NVARCHAR2(50)
+		</sql>
+	</content>
+	<content>
+		<time>2014年05月13日</time>
+		<comment>cir_fin_log表添加交付类型（1.纸币，2.IC卡）字段：paytype</comment>
+		<method>5</method>
+		<tableName>CIR_FIN_LOG</tableName>
+		<subField>
+			<subFieldName>PAYTYPE</subFieldName>
+			<subFieldType>NUMBER</subFieldType>
+			<subFieldSize>1</subFieldSize>
+		</subField>
+		<sql>
+			alter table CIR_FIN_LOG add PAYTYPE NUMBER(1)
+		</sql>
+	</content>
+	<content>
+		<time>2014年6月26日</time>
+		<comment>添加纪录到U_RESOURCES表</comment>
+		<method>3</method>
+		<tableName>U_RESOURCES</tableName>
+	    <sql>
+			insert into U_RESOURCES 
+			(RESOURCEID, SUBSYS, RESOURCENAME, RESOURCEURL, ISMENU) 
+			values('cirfin:rule','cirfin','刷卡消费管理', '/admin/card/consumption/rule', 0)
+		</sql>
+	</content>
+	<content>
+		<time>2014年6月26日</time>
+		<comment>添加纪录到U_RESOURCES表</comment>
+		<method>3</method>
+		<tableName>U_RESOURCES</tableName>
+	    <sql>
+			insert into U_RESOURCES 
+			(RESOURCEID, SUBSYS, RESOURCENAME, RESOURCEURL, ISMENU) 
+			values('cirfin:monetaryList','cirfin','财经金额统计', '/admin/sys/cirfinlog/monetaryList', 0)
+		</sql>
+	</content>
+	<content>
+		<time>2014年6月26日</time>
+		<comment>添加纪录到U_RESOURCES表</comment>
+		<method>3</method>
+		<tableName>U_RESOURCES</tableName>
+	    <sql>
+			insert into U_RESOURCES 
+			(RESOURCEID, SUBSYS, RESOURCENAME, RESOURCEURL, ISMENU) 
+			values('reader:pay','reader','读者欠款查询', '/admin/sys/readerPay/detail', 0)
+		</sql>
+	</content>
+	<content>
+		<time>2014年6月26日</time>
+		<comment>添加新的资源：U_RESOURCES</comment>
+		<method>3</method>
+		<tableName>U_RESOURCES</tableName>
+		<sqls>
+			<sql>
+				INSERT INTO U_RESOURCES 
+				(RESOURCEID, SUBSYS, RESOURCENAME, RESOURCEURL, ISMENU, DESCRIBE) 
+				values('reader:readerUnSynList', 'reader', '读者未同步列表', '/admin/reader/readerUnSynList', 0, '同步不成功的读者信息列表')
+			</sql>
+			<sql>
+				INSERT INTO U_RESOURCES 
+				(RESOURCEID, SUBSYS, RESOURCENAME, RESOURCEURL, ISMENU, DESCRIBE) 
+				values('cirfin:autoStatistics', 'cirfin', '多馆自动结算', '/admin/sys/cirfinlog/autoStatistics', 0, '馆与馆之间自动结算功能')
+			</sql>
+			<sql>
+				INSERT INTO U_RESOURCES 
+				(RESOURCEID, SUBSYS, RESOURCENAME, RESOURCEURL, ISMENU, DESCRIBE) 
+				values('cirfin:moreLibFinSettle', 'cirfin', '多馆财经结算', '/admin/sys/cirfinlog/moreLibFinSettle', 0, '馆与馆之间自动结算功能')
+			</sql>
+			<sql>
+				INSERT INTO U_RESOURCES 
+				(RESOURCEID, SUBSYS, RESOURCENAME, RESOURCEURL, ISMENU, DESCRIBE) 
+				values('cirfin:moreLibFinSettleDetail', 'cirfin', '多馆财经明细', '/admin/sys/cirfinlog/moreLibFinSettleDetail', 0,'馆与馆之间自动结算功能明细')
+			</sql>
+		</sqls>
+	</content>
+	<content>
+		<time>2014年06月24日</time>
+		<comment>reader添加多馆权限字段：LIBASSIGN</comment>
+		<method>5</method>
+		<tableName>reader</tableName>
+		<subField>
+			<subFieldName>LIBASSIGN</subFieldName>
+			<subFieldType>NVARCHAR2</subFieldType>
+			<subFieldSize>255</subFieldSize>
+		</subField>
+		<sql>
+			alter table reader add LIBASSIGN NVARCHAR2(255)
+		</sql>
+	</content>
+	<content>
+		<time>2014年10月31日</time>
+		<comment>添加字段：opac密钥</comment>
+		<method>5</method>
+		<tableName>P_LIBCODE</tableName>
+		<subField>
+			<subFieldName>opackey</subFieldName>
+			<subFieldType>NVARCHAR2</subFieldType>
+			<subFieldSize>100</subFieldSize>
+		</subField>
+		<sql>
+			alter table P_LIBCODE add OPACKEY NVARCHAR2(100)
+		</sql>
+	</content>
+	<content>
+		<time>2014年10月31日</time>
+		<comment>修改字段：READERPASSWORD</comment>
+		<method>6</method>
+		<tableName>NETREADER</tableName>
+		<subField>
+			<subFieldName>READERPASSWORD</subFieldName>
+			<subFieldType>NVARCHAR2</subFieldType>
+			<subFieldSize>50</subFieldSize>
+		</subField>
+		<sql>
+			alter table NETREADER modify(READERPASSWORD NVARCHAR2(50))
+		</sql>
+	</content>
+	<content>
+		<time>2014年11月06日</time>
+		<comment>添加字段：单位</comment>
+		<method>5</method>
+		<tableName>NETREADER</tableName>
+		<subField>
+			<subFieldName>READERUNIT</subFieldName>
+			<subFieldType>NVARCHAR2</subFieldType>
+			<subFieldSize>100</subFieldSize>
+		</subField>
+		<sql>
+			alter table NETREADER add READERUNIT NVARCHAR2(100)
+		</sql>
+	</content>
+	<content>
+		<time>2014年11月06日</time>
+		<comment>添加字段：出生日期</comment>
+		<method>5</method>
+		<tableName>NETREADER</tableName>
+		<subField>
+			<subFieldName>READERBORNDATE</subFieldName>
+			<subFieldType>date</subFieldType>
+		</subField>
+		<sql>
+			alter table NETREADER add READERBORNDATE date
+		</sql>
+	</content>
+	<content>
+		<time>2014年12月30日</time>
+		<comment>U_RESOURCES</comment>
+		<method>3</method>
+		<tableName>U_RESOURCES</tableName>
+		<sqls>
+			<sql>
+				INSERT INTO U_RESOURCES VALUES ('reader:deduction', 'reader', '读者扣费', 'admin/reader/deduction', '0', '读者扣费页面')
+			</sql>
+		</sqls>
+	</content>
+	<content>
+		<time>2014年12月30日</time>
+		<comment>添加新操作日志类型：LOG_CIRTYPE</comment>
+		<method>3</method>
+		<tableName>LOG_CIRTYPE</tableName>
+		<sql>
+			INSERT INTO LOG_CIRTYPE VALUES ('30219', '读者扣费')
+		</sql>
+	</content>
+	<content>
+		<time>2015年1月8日</time>
+		<comment>U_RESOURCES</comment>
+		<method>3</method>
+		<tableName>U_RESOURCES</tableName>
+		<sqls>
+			<sql>
+				INSERT INTO U_RESOURCES VALUES ('logcir:syncFailurelist', 'logcir', '同步失败日志', '/admin/sys/logcir/syncFailurelist', '0', '同步失败日志')
+			</sql>
+		</sqls>
+	</content>
+	<content>
+		<time>2015年1月15日</time>
+		<comment>添加字段：ACSIP</comment>
+		<method>5</method>
+		<tableName>P_LIBCODE</tableName>
+		<subField>
+			<subFieldName>ACSIP</subFieldName>
+			<subFieldType>NVARCHAR2</subFieldType>
+			<subFieldSize>20</subFieldSize>
+		</subField>
+		<sql>
+			alter table P_LIBCODE add ACSIP NVARCHAR2(20)
+		</sql>
+	</content>
+	<content>
+		<time>2015年1月15日</time>
+		<comment>添加字段：ACSPORT</comment>
+		<method>5</method>
+		<tableName>P_LIBCODE</tableName>
+		<subField>
+			<subFieldName>ACSPORT</subFieldName>
+			<subFieldType>NVARCHAR2</subFieldType>
+			<subFieldSize>10</subFieldSize>
+		</subField>
+		<sql>
+			alter table P_LIBCODE add ACSPORT NVARCHAR2(10)
+		</sql>
+	</content>
+	<content>
+		<time>2015年1月8日</time>
+		<comment>U_RESOURCES</comment>
+		<method>3</method>
+		<tableName>U_RESOURCES</tableName>
+		<sqls>
+			<sql>
+				INSERT INTO U_RESOURCES VALUES ('logcir:list', 'logcir', '操作日志', '/admin/sys/logcir/list', '0', '同步失败日志')
+			</sql>
+		</sqls>
+	</content>
+	<content>
+		<time>2015年3月17日</time>
+		<comment>添加字段：typefee</comment>
+		<method>5</method>
+		<tableName>fin_type</tableName>
+		<subField>
+			<subFieldName>typefee</subFieldName>
+			<subFieldType>NVARCHAR2</subFieldType>
+			<subFieldSize>255</subFieldSize>
+		</subField>
+		<sql>
+			alter table fin_type add typefee varchar(255)
+		</sql>
+	</content>
+	<content>
+		<time>2015年4月19日</time>
+		<comment>添加字段：paraminfo</comment>
+		<method>5</method>
+		<tableName>fin_app</tableName>
+		<subField>
+			<subFieldName>paraminfo</subFieldName>
+			<subFieldType>NVARCHAR2</subFieldType>
+			<subFieldSize>255</subFieldSize>
+		</subField>
+		<sql>
+			add alter table fin_app add paraminfo varchar(255)
+		</sql>
+	</content>
+	<content>
+		<time>2015年04月9日</time>
+		<comment>更新fin_type</comment>
+		<method>4</method>
+		<tableName>FIN_TYPE</tableName>
+		<sql>
+			update FIN_TYPE f set APPNAME=(select appname from "AUTHORIZATION" a where a.APPCODE=f.APPCODE )
+		</sql>
+	</content>
+	<content>
+		<time>2015年4月15日</time>
+		<comment>U_RESOURCES</comment>
+		<method>3</method>
+		<tableName>U_RESOURCES</tableName>
+		<sqls>
+			<sql>
+				INSERT INTO U_RESOURCES VALUES ('cirfin:cirFinStatistics', 'cirfin', '流通财经统计', '/admin/sys/cirfinlog/cirFinStatistics', '0', '流通财经统计')
+			</sql>
+		</sqls>
+	</content>
+	<content>
+		<time>2015年5月4日</time>
+		<comment>U_RESOURCES</comment>
+		<method>3</method>
+		<tableName>U_RESOURCES</tableName>
+		<sqls>
+			<sql>
+				INSERT INTO U_RESOURCES VALUES ('cirfin:personalList', 'cirfin', '个人财经明细', '/admin/sys/cirfinlog/personalList', '0', '个人财经明细')
+			</sql>
+		</sqls>
+	</content>
+	<content>
+		<time>2015年10月19日</time>
+		<comment>添加代金券字段：coupon</comment>
+		<method>5</method>
+		<tableName>rdaccount</tableName>
+		<subField>
+			<subFieldName>coupon</subFieldName>
+			<subFieldType>NUMBER</subFieldType>
+		</subField>
+		<sql>
+			ALTER TABLE RDACCOUNT ADD COUPON NUMBER(8,2)
+		</sql>
+	</content>
+	<content>
+		<time>2016年04月12日</time>
+		<comment>添加同步操作日志表</comment>
+		<method>1</method>
+		<tableName>SYNC_RECORD</tableName>
+		<sql>
+			CREATE TABLE SYNC_RECORD (
+				SYNC_ID VARCHAR2(100) NOT NULL ,
+				SYNC_TYPE VARCHAR2(20) NULL ,
+				SYNC_LIB VARCHAR2(20) NULL ,
+				SYNC_DATE TIMESTAMP(8)  NULL ,
+				SYNC_RDID VARCHAR2(20) NULL ,
+				SYNC_STATUS VARCHAR2(2) NULL ,
+				SYNC_CODE VARCHAR2(500) NULL ,
+				SYNC_OPERATOR VARCHAR2(40) NULL, 
+				constraint PK_SYNC_RECORD primary key (SYNC_ID)
+			)
+		</sql>
+	</content>
+	<content>
+		<time>2016年04月12日</time>
+		<comment>U_RESOURCES</comment>
+		<method>3</method>
+		<tableName>U_RESOURCES</tableName>
+		<sqls>
+			<sql>
+				INSERT INTO U_RESOURCES VALUES ('logcir:syncRecord_list', 'logcir', '同步日志', '/admin/sys/syncrecord/list', '0', '同步日志')
+			</sql>
+		</sqls>
+	</content>
+	
+	<content>
+		<time>2016年04月12日</time>
+		<comment>修改字段：DATA1</comment>
+		<method>6</method>
+		<tableName>LOG_CIR</tableName>
+		<subField>
+			<subFieldName>DATA1</subFieldName>
+			<subFieldType>VARCHAR2</subFieldType>
+			<subFieldSize>50</subFieldSize>
+		</subField>
+		<sql>
+			alter table LOG_CIR modify(DATA1 VARCHAR2(50))
+		</sql>
+	</content>
+	<content>
+		<time>2016年04月12日</time>
+		<comment>修改字段：SYNC_CODE</comment>
+		<method>6</method>
+		<tableName>SYNC_RECORD</tableName>
+		<subField>
+			<subFieldName>SYNC_CODE</subFieldName>
+			<subFieldType>VARCHAR2</subFieldType>
+			<subFieldSize>500</subFieldSize>
+		</subField>
+		<sql>
+			alter table SYNC_RECORD modify(SYNC_CODE VARCHAR2(500))
+		</sql>
+	</content>
+	<content>
+		<time>2016年04月12日</time>
+		<comment>增加字段：RDLOGINID_BAK</comment>
+		<method>5</method>
+		<tableName>READER</tableName>
+		<subField>
+			<subFieldName>RDLOGINID_BAK</subFieldName>
+			<subFieldType>NVARCHAR2</subFieldType>
+			<subFieldSize>50</subFieldSize>
+		</subField>
+		<sql>
+			alter table READER add(RDLOGINID_BAK NVARCHAR2(50))
+		</sql>
+	</content>
+	<content>
+		<time>2016年04月12日</time>
+		<comment>更新字段：RDLOGINID</comment>
+		<method>4</method>
+		<tableName>READER</tableName>
+		<sql>
+			update READER set RDLOGINID_BAK=RDLOGINID,RDLOGINID=null
+		</sql>
+	</content>
+	
+	<content>
+		<time>2016年04月12日</time>
+		<comment>修改字段：RDLOGINID</comment>
+		<method>6</method>
+		<tableName>READER</tableName>
+		<subField>
+			<subFieldName>RDLOGINID</subFieldName>
+			<subFieldType>NVARCHAR2</subFieldType>
+			<subFieldSize>50</subFieldSize>
+		</subField>
+		<sql>
+			alter table READER MODIFY(RDLOGINID NVARCHAR2(50))
+		</sql>
+	</content>
+	
+	<content>
+		<time>2017年05月22日</time>
+		<comment>cir_fin_log表添加交易订单号字段：payId</comment>
+		<method>5</method>
+		<tableName>CIR_FIN_LOG</tableName>
+		<subField>
+			<subFieldName>PAYID</subFieldName>
+			<subFieldType>NVARCHAR2</subFieldType>
+			<subFieldSize>32</subFieldSize>
+		</subField>
+		<sql>
+			alter table CIR_FIN_LOG add PAYID NVARCHAR2(32)
+		</sql>
+	</content>
+	<content>
+		<time>2017年09月25日</time>
+		<comment>充值类型表</comment>
+		<method>1</method>
+		<tableName>CHARGETYPE</tableName>
+		<sql>
+		    create table CHARGETYPE
+			(
+			  FEETYPE  CHAR(3) not null,
+			  DESCRIBE NVARCHAR2(30),
+			  APPCODE  NVARCHAR2(30),
+			  APPNAME  NVARCHAR2(30),
+			  constraint PK_FIN_TYPE primary key (FEETYPE)
+			)
+		</sql>
+	</content>
+	<content>
+		<time>2017年09月27日</time>
+		<comment>添加纪录到U_RESOURCES表</comment>
+		<method>3</method>
+		<tableName>U_RESOURCES</tableName>
+	    <sql>
+			insert into U_RESOURCES 
+			(RESOURCEID, SUBSYS, RESOURCENAME, RESOURCEURL, ISMENU) 
+			values('chargeType:list','cirfin','充值类型管理', '/admin/sys/chargetype/list', 0)
+		</sql>
+	</content>
+	<content>
+		<time>2017年10月22日</time>
+		<comment>READER表添加取回密码key值字段：RETRIEVEPASSWORDKEY</comment>
+		<method>5</method>
+		<tableName>READER</tableName>
+		<subField>
+			<subFieldName>RETRIEVEPASSWORDKEY</subFieldName>
+			<subFieldType>NVARCHAR2</subFieldType>
+			<subFieldSize>50</subFieldSize>
+		</subField>
+		<sql>
+			alter table READER add RETRIEVEPASSWORDKEY NVARCHAR2(50)
+		</sql>
+	</content>
+	<content>
+		<time>2017年10月23日</time>
+		<comment>READER表添加取回密码时间字段：RETRIEVEPASSWORDDATE</comment>
+		<method>5</method>
+		<tableName>READER</tableName>
+		<subField>
+			<subFieldName>RETRIEVEPASSWORDDATE</subFieldName>
+			<subFieldType>TIMESTAMP</subFieldType>
+			<subFieldSize>6</subFieldSize>
+		</subField>
+		<sql>
+			alter table READER add RETRIEVEPASSWORDDATE TIMESTAMP(6)
+		</sql>
+	</content>
+	
+	<content>
+		<time>2017年10月30日</time>
+		<comment>账号定义表</comment>
+		<method>1</method>
+		<tableName>NUM</tableName>
+		<sql>
+			CREATE TABLE NUM
+			(
+				ID NUMBER(10) not null PRIMARY KEY,
+				NUM NUMBER(10)
+			)
+		</sql>
+	</content>
+	<!-- <content>
+		<time>2018年01月02日</time>
+		<comment>短信记录表</comment>
+		<method>1</method>
+		<tableName>SMS_SEND</tableName>
+		<sql>
+			CREATE TABLE SMS_SEND
+			(
+				phone_number  char(11) not null PRIMARY KEY,
+				sms_send_num int not null,
+				last_send_time varchar(20) not null
+			)
+		</sql>
+	</content> -->
+	<content>
+		<time>2018年5月9日</time>
+		<comment>READER表添加是否上传国图标识字段：ISAUTHOR</comment>
+		<method>5</method>
+		<tableName>READER</tableName>
+		<subField>
+			<subFieldName>ISAUTHOR</subFieldName>
+			<subFieldType>NUMBER</subFieldType>
+			<subFieldSize>1</subFieldSize>
+		</subField>
+		<sql>
+			alter table READER add ISAUTHOR NUMBER(1)
+		</sql>
+	</content>
+</updateOracleDataBaseContent>

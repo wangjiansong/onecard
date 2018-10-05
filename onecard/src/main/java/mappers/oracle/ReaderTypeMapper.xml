@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ReaderTypeMapper">
+	<select id="queryReaderTypeList" parameterType="ReaderType" resultType="Map">
+		SELECT READERTYPE,LIBCODE,CASE WHEN SIGN=1 THEN '是' ELSE '否' END SIGN,
+			CASE WHEN LIBSIGN=1 THEN '是' ELSE '否' END LIBSIGN,DESCRIPE, 
+			DEPOSITY, SERVICEFEE, CHECKFEE, IDFEE, VALDATE
+		FROM P_RCTYPE
+		WHERE 1=1
+		<if test="readerType!=null and readerType!=''">
+			AND READERTYPE LIKE '%'||LTRIM(RTRIM(#{readerType}))||'%'
+		</if>
+		ORDER BY SIGN DESC,READERTYPE
+	</select>
+
+	<select id="getLibCode" resultType="Map">
+		SELECT LIBCODE,LIBCODE||' | '||SIMPLENAME SHOWLIBTYPE FROM P_LIBCODE ORDER BY LIBCODE
+	</select>
+	
+	<select id="checkReaderType" parameterType="String" resultType="String">
+		SELECT COUNT(0) FROM P_RCTYPE WHERE READERTYPE=#{readerType}
+	</select>
+	
+	<select id="checkReaderTypeEdit" parameterType="Map" resultType="String">
+		SELECT COUNT(0) FROM P_RCTYPE WHERE READERTYPE=#{readerType} AND READERTYPE!=#{readerType_old}
+	</select>
+	
+	<insert id="addReaderType" parameterType="ReaderType" keyColumn="readerType">
+		INSERT INTO P_RCTYPE (READERTYPE,LIBCODE,SIGN,LIBSIGN,DESCRIPE,DEPOSITY, SERVICEFEE, CHECKFEE, IDFEE, VALDATE)
+		VALUES
+		(#{readerType},#{libCode},#{sign},#{libSign},#{descripe},#{deposity},#{servicefee},#{checkfee},#{idfee},#{valdate})
+	</insert>
+	
+	<select id="getReaderType" parameterType="String" resultType="ReaderType">
+		SELECT READERTYPE,LIBCODE,SIGN,LIBSIGN,DESCRIPE, DEPOSITY, SERVICEFEE, CHECKFEE, IDFEE, VALDATE FROM P_RCTYPE
+			WHERE READERTYPE=#{readerType}
+	</select>
+	
+	<update id="editReaderType" parameterType="Map">
+		UPDATE P_RCTYPE SET 
+			READERTYPE=#{readerType_new},
+			LIBCODE=#{libCode},
+			SIGN=#{sign},
+			LIBSIGN=#{libSign},
+			DESCRIPE=#{descripe},
+			DEPOSITY = #{deposity},
+			SERVICEFEE=#{servicefee},
+			CHECKFEE = #{checkfee},
+			IDFEE = #{idfee},
+			VALDATE = #{valdate}
+		WHERE READERTYPE=#{readerType_old}
+	</update>
+	
+	<delete id="deleteReaderType" parameterType="String">
+		DELETE FROM P_RCTYPE WHERE READERTYPE=#{readerType}
+	</delete>
+</mapper>

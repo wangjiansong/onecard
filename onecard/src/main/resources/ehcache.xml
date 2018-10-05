@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="ehcache.xsd" updateCheck="false"
+	monitoring="autodetect" dynamicConfig="true">
+	
+	<diskStore path="java.io.tmpdir"/>
+	
+	<defaultCache maxElementsInMemory="10000" eternal="false"
+		timeToIdleSeconds="120" timeToLiveSeconds="120" overflowToDisk="true"
+		diskSpoolBufferSizeMB="30" maxElementsOnDisk="10000000"
+		diskPersistent="false" diskExpiryThreadIntervalSeconds="120"
+		memoryStoreEvictionPolicy="LRU" />
+	
+	<!-- DEFAULT CACHE -->
+	<cache name="DEFAULT_CACHE" maxElementsInMemory="10000" maxElementsOnDisk="10000"
+		eternal="false" timeToIdleSeconds="60" timeToLiveSeconds="60"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	
+	<cache name="books" maxElementsInMemory="1000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="120" timeToLiveSeconds="360"
+		memoryStoreEvictionPolicy="LFU">
+		<!--terracotta/ -->
+	</cache>
+	
+	<cache name="solrQueryResponse" maxElementsInMemory="1000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="120" timeToLiveSeconds="360"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	
+	<!-- 书目浏览各项分类数量缓存 -->
+	<cache name="browseCount" maxElementsInMemory="10000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="120" timeToLiveSeconds="360"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+
+	<cache name="hotbooks" maxElementsInMemory="1000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="120" timeToLiveSeconds="360"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	<cache name="recommendedBooks" maxElementsInMemory="1000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="120" timeToLiveSeconds="360"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	<cache name="newPublications" maxElementsInMemory="1000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="120" timeToLiveSeconds="360"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	<cache name="hotSearchKeywords" maxElementsInMemory="1000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="120" timeToLiveSeconds="360"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	<cache name="hotSearchKeywordsSuggestCache" maxElementsInMemory="10000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="120" timeToLiveSeconds="120"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	<cache name="localMap" maxElementsInMemory="1000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="120" timeToLiveSeconds="360"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	<cache name="allLocalList" maxElementsInMemory="1000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="360" timeToLiveSeconds="360"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	<cache name="booktypeMap" maxElementsInMemory="1000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="120" timeToLiveSeconds="360"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	<cache name="libcodeMap" maxElementsInMemory="1000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="120" timeToLiveSeconds="360"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	<cache name="libcodeSimpleInfoList" maxElementsInMemory="1000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="60" timeToLiveSeconds="60"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	<cache name="finInfoMap" maxElementsInMemory="1000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="120" timeToLiveSeconds="360"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	<cache name="rdtypeMap" maxElementsInMemory="1000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="120" timeToLiveSeconds="360"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	<cache name="cirtypeMap" maxElementsInMemory="1000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="120" timeToLiveSeconds="360"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	<cache name="readerLoanRank" maxElementsInMemory="1000" maxElementsOnDisk="1000"
+		eternal="false" diskPersistent="true" timeToIdleSeconds="259200" timeToLiveSeconds="259200"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	<cache name="bookLoanRank" maxElementsInMemory="1000" maxElementsOnDisk="1000"
+		eternal="false" diskPersistent="true" timeToIdleSeconds="259200" timeToLiveSeconds="259200"  
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	<cache name="bookHotRank" maxElementsInMemory="1000" maxElementsOnDisk="1000"
+		eternal="false" diskPersistent="true" timeToIdleSeconds="259200" timeToLiveSeconds="259200"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	<cache name="dayLoanCalc" maxElementsInMemory="10000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="36000" timeToLiveSeconds="36000"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	<cache name="monthLoanCalc" maxElementsInMemory="10000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="36000" timeToLiveSeconds="36000"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	<cache name="yearLoanCalc" maxElementsInMemory="10000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="36000" timeToLiveSeconds="36000"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	<cache name="totalLoanCalc" maxElementsInMemory="10000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="36000" timeToLiveSeconds="36000"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	
+	<cache name="pageClicksExpireFlagCache" maxElementsInMemory="10000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="60" timeToLiveSeconds="60"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	<cache name="hotSearchKeywordExpireFlagCache" maxElementsInMemory="10000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="60" timeToLiveSeconds="60"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	<cache name="readerActionAnalysisCache" maxElementsInMemory="10000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="60" timeToLiveSeconds="60"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	<cache name="readerActionSessionIdCache" maxElementsInMemory="10000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="10" timeToLiveSeconds="10"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	<!-- 图书分类名称 -->
+	<cache name="bookStatName2DescMap" maxElementsInMemory="1000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="3600" timeToLiveSeconds="3600"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	<cache name="bookSciName2DescMap" maxElementsInMemory="1000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="3600" timeToLiveSeconds="3600"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	
+	<!-- wiki items -->
+	<cache name="wikiCache" maxElementsInMemory="1000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="3600" timeToLiveSeconds="3600"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	
+	<!-- 门户RSS订阅的缓存 -->
+	<cache name="rssCache" maxElementsInMemory="1000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="3600" timeToLiveSeconds="3600"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	<!-- 期刊目次的缓存 -->
+	<cache name="currentContentCache" maxElementsInMemory="1000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="3600" timeToLiveSeconds="3600"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	
+	<!-- Map<libcode, List<Local>> -->
+	<cache name="libcodeToLocalListMap" maxElementsInMemory="1000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="60" timeToLiveSeconds="60"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	
+	<cache name="booktypeIconBlob" maxElementsInMemory="1000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="60" timeToLiveSeconds="60"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	
+	<cache name="bsCoverBlob" maxElementsInMemory="1000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="60" timeToLiveSeconds="60"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	
+	<cache name="resourceLinkIconBlob" maxElementsInMemory="1000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="60" timeToLiveSeconds="60"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	
+	<cache name="resourceLinkList" maxElementsInMemory="1000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="60" timeToLiveSeconds="60"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	
+	<cache name="totalVisitedCount" maxElementsInMemory="10000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="300" timeToLiveSeconds="300"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	
+	<!-- opac_system_options cache -->
+	<cache name="systemOptionNameValueMap" maxElementsInMemory="100" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="60" timeToLiveSeconds="60"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	<cache name="systemOptionMap" maxElementsInMemory="100" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="60" timeToLiveSeconds="60"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	
+	<!-- BarcodeStruct cache -->
+	<cache name="barcodeStructCache" maxElementsInMemory="100" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="60" timeToLiveSeconds="60"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	<!-- holdingLoanTrendStatistics cache -->
+	<cache name="holdingLoanTrendStatistics" maxElementsInMemory="1000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="3600" timeToLiveSeconds="3600"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	<!-- public notice cache-->
+	<cache name="bookOverdueList" maxElementsInMemory="1000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="1800" timeToLiveSeconds="1800"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	<cache name="prelendInformList" maxElementsInMemory="1000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="60" timeToLiveSeconds="60"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+		<cache name="reservationInLibList" maxElementsInMemory="1000" maxElementsOnDisk="0"
+		eternal="false" timeToIdleSeconds="60" timeToLiveSeconds="60"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	
+	<cache name="DEFAULT_CACHE_5_MIN" maxElementsInMemory="100000" maxElementsOnDisk="100000"
+		eternal="false" timeToIdleSeconds="300" timeToLiveSeconds="300"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	
+	<cache name="READER_VALIDATE_EMAIL_APPLY_HISTORY" maxElementsInMemory="100000" maxElementsOnDisk="100000"
+		eternal="false" timeToIdleSeconds="300" timeToLiveSeconds="3600"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	
+	<cache name="VALIDATE_EMAIL_READER" maxElementsInMemory="100000" maxElementsOnDisk="100000"
+		eternal="false" timeToIdleSeconds="300" timeToLiveSeconds="3600"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	
+	<!-- weixin  -->
+	<cache name="WeixinUserLastCommand" maxElementsInMemory="100000" maxElementsOnDisk="100000"
+		eternal="false" timeToIdleSeconds="300" timeToLiveSeconds="1800"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	
+	<cache name="PMarcDefinition" maxElementsOnDisk="0" maxElementsInMemory="1000" 
+		eternal="false" timeToIdleSeconds="1800" timeToLiveSeconds="1800"
+		memoryStoreEvictionPolicy="LFU"/>
+	
+	<!-- api access token -->
+	<cache name="apiAccessToken" maxElementsInMemory="100000" maxElementsOnDisk="100000"
+		eternal="false" timeToIdleSeconds="300" timeToLiveSeconds="86400"
+		memoryStoreEvictionPolicy="LFU">
+	</cache>
+	
+	<!--terracottaConfig url="localhost:9510"/ -->
+</ehcache>

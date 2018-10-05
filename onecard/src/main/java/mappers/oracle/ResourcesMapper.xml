@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ResourcesMapper">
+
+	<resultMap id="Resources.resultMap" type="com.interlib.sso.domain.Resources">
+		<result property="resourceId" column="RESOURCEID" />
+		<result property="subsys" column="SUBSYS" />
+		<result property="resourceName" column="RESOURCENAME" />
+		<result property="resourceUrl" column="RESOURCEURL" />
+		<result property="isMenu" column="ISMENU" />
+		<result property="describe" column="DESCRIBE" />
+	</resultMap>
+	
+	<sql id="Resources.base_columns">
+		<![CDATA[
+		RESOURCEID, SUBSYS, RESOURCENAME, RESOURCEURL, ISMENU, DESCRIBE
+		]]>
+	</sql>
+	
+	<insert id="Resources.insert" parameterType="com.interlib.sso.domain.Resources">
+		<![CDATA[
+		INSERT INTO U_RESOURCES 
+		(RESOURCEID, SUBSYS, RESOURCENAME, RESOURCEURL, ISMENU, DESCRIBE) 
+		values 
+		(#{resourceId}, #{subsys, jdbcType=VARCHAR}, #{resourceName, jdbcType=VARCHAR}, 
+		#{resourceUrl, jdbcType=VARCHAR}, #{isMenu, jdbcType=INTEGER}, #{describe, jdbcType=VARCHAR})
+		]]>
+	</insert>
+
+	<update id="Resources.update" parameterType="com.interlib.sso.domain.Resources">
+		<![CDATA[
+		UPDATE U_RESOURCES 
+		SET 
+		SUBSYS=#{subsys, jdbcType=VARCHAR}, 
+		RESOURCENAME=#{resourceName, jdbcType=VARCHAR}, 
+		RESOURCEURL=#{resourceUrl, jdbcType=VARCHAR}, 
+		ISMENU=#{isMenu, jdbcType=INTEGER},
+		DESCRIBE=#{describe, jdbcType=VARCHAR} 
+		WHERE 
+		RESOURCEID=#{resourceId}
+		]]>
+	</update>
+
+	<select id="Resources.getCompRes" resultType="java.lang.Integer" parameterType="java.lang.String">
+	    <![CDATA[
+	    SELECT 
+	    COMPETID 
+	    FROM 
+	    U_COMPET_RESOURCE 
+	    WHERE RESOURCEID=#{resourceId}
+	    ]]>
+	</select>
+	
+	<delete id="Resources.deleteCompRes" parameterType="java.lang.String">
+	    <![CDATA[
+	    DELETE 
+	    FROM
+	    U_COMPET_RESOURCE 
+	    WHERE 
+	    RESOURCEID=#{resourceId}
+	    ]]>
+	</delete>
+	
+	<delete id="Resources.delete" parameterType="java.lang.String">
+		<![CDATA[
+		DELETE 
+		FROM 
+		U_RESOURCES 
+		WHERE 
+		RESOURCEID=#{resourceId}
+		]]>
+	</delete>
+	
+	<select id="Resources.get" resultMap="Resources.resultMap" parameterType="java.lang.String">
+		SELECT 
+		<include refid="Resources.base_columns"/>
+		<![CDATA[
+		FROM 
+		U_RESOURCES 
+		]]>
+		WHERE 
+		RESOURCEID=#{resourceId}
+	</select>
+	
+	<select id="Resources.getBySubsys" resultMap="Resources.resultMap" parameterType="java.lang.String">
+		SELECT 
+		<include refid="Resources.base_columns"/>
+		<![CDATA[
+		FROM 
+		U_RESOURCES 
+		]]>
+		WHERE 
+		SUBSYS=#{subsys}
+	</select>
+	
+	<select id="Resources.getAllList" resultMap="Resources.resultMap">
+		SELECT 
+		<include refid="Resources.base_columns"/> 
+		<![CDATA[
+		FROM 
+		U_RESOURCES
+		]]>
+		order by ISMENU DESC
+	</select>
+	
+	<select id="Resources.getTotalCount" resultType="java.lang.Integer">
+		<![CDATA[
+		SELECT  
+		count(*) as totalcount 
+		FROM 
+		U_RESOURCES
+		]]>
+	</select>
+	
+	<sql id="Resources.findPage.where">
+		<where>
+			<if test="@Ognl@isNotEmpty(resourceName)">
+			 RESOURCENAME LIKE '%'||#{resourceName}||'%'
+			</if>
+		</where>
+	</sql>
+	<select id="Resources.findPage.count" resultType="java.lang.Integer">
+		SELECT 
+		count(*) 
+		FROM 
+		U_RESOURCES 
+		<include refid="Resources.findPage.where"/>
+	</select>
+	
+	<select id="Resources.findPage" resultMap="Resources.resultMap">
+		SELECT 
+		<include refid="Resources.base_columns"/> 
+		FROM 
+		U_RESOURCES 
+		<include refid="Resources.findPage.where"/>
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+	</select>
+	
+	<select id="Resources.queryPageList" parameterType="Resources" resultType="Map">
+		SELECT 
+		<include refid="Resources.base_columns"/> 
+		FROM 
+		U_RESOURCES
+		<include refid="Resources.findPage.where"/>
+		ORDER BY RESOURCEID
+	</select>
+	
+	<select id="Resources.listSubsys" resultType="java.lang.String">
+	    SELECT 
+	    SUBSYS
+	    FROM 
+	    U_RESOURCES
+	    GROUP BY SUBSYS
+	</select>
+	
+	<delete id="Resources.deleteByIds">
+		DELETE FROM U_RESOURCES WHERE RESOURCEID IN
+		<foreach collection="array" item="idArray"  open="(" separator="," close=")">   
+       		#{idArray}   
+    	</foreach>
+	</delete>
+	
+</mapper>

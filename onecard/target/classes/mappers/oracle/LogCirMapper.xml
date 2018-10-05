@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="LogCirMapper">
+
+	<resultMap id="LogCir.resultMap" type="LogCir">
+		<result property="id" column="ID" />
+		<result property="logType" column="LOGTYPE" />
+		<result property="libcode" column="LIBCODE" />
+		<result property="userId" column="USERID" />
+		<result property="ipAddr" column="IPADDR" />
+		<result property="tableName" column="TABLENAME" />
+		<result property="data1" column="DATA1" />
+		<result property="data2" column="DATA2" />
+		<result property="data3" column="DATA3" />
+		<result property="data4" column="DATA4" />
+		<result property="data5" column="DATA5" />
+		<result property="regtime" column="REGTIME" />
+		<result property="loanTime" column="LOAN_TIME" />
+		<result property="returnTime" column="RETURN_TIME" />
+	</resultMap>
+	
+	<sql id="LogCir.base_columns">
+		<![CDATA[
+		ID, LOGTYPE, LIBCODE, USERID, IPADDR, TABLENAME, DATA1, DATA2, DATA3, DATA4, DATA5, REGTIME, LOAN_TIME, RETURN_TIME
+		]]>
+	</sql>
+	
+	<insert id="LogCir.insert" parameterType="LogCir">
+	    <selectKey resultType="int"  keyProperty="id" order="BEFORE">   
+        	<![CDATA[SELECT SEQ_LOGCIR.NEXTVAL AS ID FROM DUAL]]>
+        </selectKey>
+		<![CDATA[
+		INSERT INTO LOG_CIR  
+		(ID, LOGTYPE, LIBCODE, USERID, IPADDR, TABLENAME, DATA1, DATA2, DATA3, DATA4, DATA5, REGTIME, LOAN_TIME, RETURN_TIME) 
+		values 
+		(#{id}, #{logType}, #{libcode, jdbcType=VARCHAR}, #{userId, jdbcType=VARCHAR}, #{ipAddr, jdbcType=VARCHAR}, #{tableName, jdbcType=VARCHAR}, 
+		#{data1, jdbcType=VARCHAR}, #{data2, jdbcType=VARCHAR}, #{data3, jdbcType=VARCHAR}, #{data4, jdbcType=VARCHAR}, 
+		#{data5, jdbcType=VARCHAR}, SYSDATE, #{loanTime, jdbcType=TIMESTAMP}, #{returnTime, jdbcType=TIMESTAMP})
+		]]>
+	</insert>
+
+	<update id="LogCir.update" parameterType="LogCir">
+		<![CDATA[
+		]]>
+	</update>
+	
+	<update id="LogCir.batchUpdate" parameterType="Map">
+		UPDATE LOG_CIR SET DATA5=${logCir.data5}
+		WHERE ID IN
+		<foreach collection="list" item="id" index="index" open="(" close=")" separator=",">
+           #{id}
+        </foreach>
+	</update>
+	
+	<select id="LogCir.get" resultMap="LogCir.resultMap" parameterType="java.lang.Integer">
+		SELECT 
+		<include refid="LogCir.base_columns"/>
+		<![CDATA[
+		FROM 
+		LOG_CIR  
+		WHERE 
+		ID=#{id}
+		]]>
+	</select>
+	
+	<select id="LogCir.getAllList" resultMap="LogCir.resultMap">
+		SELECT 
+		<include refid="LogCir.base_columns"/> 
+		<![CDATA[
+		FROM 
+		LOG_CIR 
+		]]>
+	</select>
+	
+	<select id="LogCir.getTotalCount" resultType="java.lang.Integer">
+		<![CDATA[
+		SELECT  
+		count(*) as totalcount 
+		FROM 
+		LOG_CIR 
+		]]>
+	</select>
+	
+	<!-- 明细 按照条件查找的总数-->
+	<select id="LogCir.getLogCirCount" parameterType="LogCir" resultType="java.lang.Integer">
+	    SELECT 
+	    count(*) 
+		FROM 
+		LOG_CIR L, LOG_CIRTYPE T
+		where 1=1
+		<if test="@Ognl@isNotEmpty(logType)">
+			AND LOGTYPE = #{logType}
+		</if>
+		<if test="@Ognl@isNotEmpty(libcode)">
+		 	AND LIBCODE = #{libcode}
+		</if>
+		<if test="@Ognl@isNotEmpty(data1)">
+		 	AND DATA1 = #{data1}
+		</if>
+		<if test="@Ognl@isNotEmpty(data2)">
+			AND DATA2 = #{data2}
+		</if>
+		<if test="@Ognl@isNotEmpty(data3)">
+		 	AND DATA3 = #{data3}
+		</if>
+		<if test="@Ognl@isNotEmpty(data4)">
+			AND DATA4 = #{data4}
+		</if>
+		<if test="@Ognl@isNotEmpty(data5)">
+		 	AND DATA5 = #{data5}
+		</if>
+		<if test="@Ognl@isNotEmpty(startTime)">
+		 	AND to_char(REGTIME, 'YYYY-MM-DD') <![CDATA[>=]]> #{startTime}
+		</if>
+		<if test="@Ognl@isNotEmpty(endTime)">
+		 	AND to_char(REGTIME, 'YYYY-MM-DD') <![CDATA[<=]]> #{endTime}
+		</if>
+		<if test="@Ognl@isNotEmpty(userId)">
+		 	AND USERID = #{userId}
+		</if>
+		AND L.LOGTYPE=T.LOGTYPE
+		ORDER BY REGTIME desc
+	</select>
+	
+	<sql id="LogCir.findPage.where">
+		<where>
+			<if test="@Ognl@isNotEmpty(logType)">
+			 LOGTYPE = #{logType}
+			</if>
+			<if test="@Ognl@isNotEmpty(libcode)">
+			 LIBCODE = #{libcode}
+			</if>
+			<if test="@Ognl@isNotEmpty(data1)">
+			 DATA1 = #{data1}
+			</if>
+			<if test="@Ognl@isNotEmpty(data2)">
+			 DATA2 = #{data2}
+			</if>
+			<if test="@Ognl@isNotEmpty(data3)">
+			 DATA3 = #{data3}
+			</if>
+			<if test="@Ognl@isNotEmpty(data4)">
+			 DATA4 = #{data4}
+			</if>
+			<if test="@Ognl@isNotEmpty(data5)">
+			 DATA5 = #{data5}
+			</if>
+			<if test="@Ognl@isNotEmpty(regtime)">
+			 REGTIME >= #{regtime}
+			</if>
+			<if test="@Ognl@isNotEmpty(userId)">
+			 USERID = #{userId}
+			</if>
+		</where>
+	</sql>
+	
+	<select id="LogCir.findPage.count" resultType="java.lang.Long">
+		SELECT 
+		count(*) 
+		FROM 
+		LOG_CIR  
+		<include refid="LogCir.findPage.where"/>
+	</select>
+	
+	<select id="LogCir.findPage" resultMap="LogCir.resultMap" parameterType="java.util.Map">
+		SELECT 
+		<include refid="LogCir.base_columns"/> 
+		FROM 
+		LOG_CIR 
+		<include refid="LogCir.findPage.where"/>
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY sortColumns desc
+		</if>
+	</select>
+	
+	<select id="LogCir.queryPageList" parameterType="LogCir" resultType="LogCir">
+		SELECT 
+		ID, T.TYPENAME AS LOGTYPE, LIBCODE, USERID, IPADDR, TABLENAME, DATA1, DATA2, DATA3, DATA4, DATA5, REGTIME, LOAN_TIME, RETURN_TIME
+		FROM 
+		LOG_CIR L, LOG_CIRTYPE T
+		where 1=1
+		<if test="@Ognl@isNotEmpty(logType)">
+			AND LOGTYPE = #{logType}
+		</if>
+		<if test="@Ognl@isNotEmpty(libcode)">
+		 	AND LIBCODE = #{libcode}
+		</if>
+		<if test="@Ognl@isNotEmpty(data1)">
+		 	AND DATA1 = #{data1}
+		</if>
+		<if test="@Ognl@isNotEmpty(data2)">
+			AND DATA2 = #{data2}
+		</if>
+		<if test="@Ognl@isNotEmpty(data3)">
+		 	AND DATA3 = #{data3}
+		</if>
+		<if test="@Ognl@isNotEmpty(data4)">
+			AND DATA4 = #{data4}
+		</if>
+		<if test="@Ognl@isNotEmpty(data5)">
+		 	AND DATA5 = #{data5}
+		</if>
+		<if test="@Ognl@isNotEmpty(startTime)">
+		 	AND to_char(REGTIME, 'YYYY-MM-DD') <![CDATA[>=]]> #{startTime}
+		</if>
+		<if test="@Ognl@isNotEmpty(endTime)">
+		 	AND to_char(REGTIME, 'YYYY-MM-DD') <![CDATA[<=]]> #{endTime}
+		</if>
+		<if test="@Ognl@isNotEmpty(userId)">
+		 	AND USERID = #{userId}
+		</if>
+		AND L.LOGTYPE=T.LOGTYPE
+		ORDER BY REGTIME desc
+	</select>
+	
+</mapper>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context.xsd"    
+		default-lazy-init="false"> 
+    <!-- 读者扫描sqlsession  service and dao -->
+    <bean id="scanNetReaderTaskService" class="com.interlib.sso.service.impl.ScanNetReaderTaskServiceImpl">
+		<property name="scanNetReaderTaskDao" ref="scanNetReaderTaskDao" />
+	</bean>
+	
+	<bean id="scanNetReaderTaskDao" class="com.interlib.sso.dao.impl.ScanNetReaderTaskDaoImpl">
+		<property name="sqlSession" ref="sqlSession" />
+	</bean>
+	    <!-- 补助发放sqlsession  service and dao -->
+	<bean id="subsidyGrantTaskService" class="com.interlib.sso.service.impl.SubsidyGrantTaskServiceImpl">
+		<property name="subsidyGrantTaskDao" ref="subsidyGrantTaskDao" />
+	</bean>
+	
+	<bean id="subsidyGrantTaskDao" class="com.interlib.sso.dao.impl.SubsidyGrantTaskDaoImpl">
+		<property name="sqlSession" ref="sqlSession" />
+	</bean>
+	<!-- Spring定时任务 -->
+    <!-- 读者扫描定时任务 -->
+    <bean id="myJob" class="com.interlib.sso.task.ScanNetReaderTask"></bean>  
+    <bean id="jobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">  
+        <property name="targetObject" ref="myJob"/>  
+        <property name="targetMethod" value="execute"/>  
+        <property name="concurrent" value="false"/>  
+    </bean> 
+    <!-- 批量注册读者回收定时任务 -->
+    <bean id="mybatchDeleteNetReadersJob" class="com.interlib.sso.task.ScanNetReaderTask"></bean>  
+    <bean id="batchDeleteNetReadersjobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">  
+        <property name="targetObject" ref="mybatchDeleteNetReadersJob"/>  
+        <property name="targetMethod" value="batchDeleteNetReaders"/>  
+        <property name="concurrent" value="false"/>  
+    </bean>
+    
+    <!-- 补助发放定时任务 -->
+	<bean name="subsidyGrantJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass" value="com.interlib.sso.task.SubsidyGrantTask" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="subsidyGrantTaskService">
+					<ref bean="subsidyGrantTaskService" />
+				</entry>
+			</map>
+		</property>
+	</bean> 
+	<!-- 读者扫描触发的调度任务 -->
+    <bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">  
+        <property name="jobDetail" ref="jobDetail"/>  
+        <property name="cronExpression" value="59 59 23 * * ?"/>  <!-- 每天23点59分59秒触发 -->
+    </bean>
+    
+    <!-- 批量注册读者回收触发的调度任务 -->
+    <bean id="batchDeleteNetReaderscronTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">  
+        <property name="jobDetail" ref="batchDeleteNetReadersjobDetail"/>  
+        <property name="cronExpression" value="0/5 * * * * ?"/>  <!-- 每五秒触发 -->
+    </bean>
+    
+	<!-- 补助发放调度任务 -->
+    <!-- 在指定时间触发的调度任务 -->
+	<bean id="cronByTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<!-- 补助发放定时任务触发器 -->
+		<property name="jobDetail" ref="subsidyGrantJob" />
+		<!-- 每天03:00运行一次 -->
+		<property name="cronExpression" value="0 0 3 * * ?" />
+	</bean>
+
+	<!-- 按频度触发的调度任务 -->
+	<bean id="subsidyGrantTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="subsidyGrantJob" />
+		<property name="startDelay" value="60000" /><!-- 调度工厂实例化后，经过60秒开始执行调度 -->
+		<property name="repeatInterval" value="30000" /><!-- 每30秒调度一次 --> 
+	</bean>
+      
+    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">  
+        <property name="triggers">  
+            <list>  
+               <!--  <ref bean="cronTrigger"/> --><!-- 扫描虚拟读者调度器 -->
+                <ref bean="cronByTrigger"/><!-- 补助发放在指定时间触发调度器 -->
+                
+               <!--  <ref bean="batchDeleteNetReaderscronTrigger"/> --><!-- 回收批量注册读者触发调度器 -->
+			<!-- <ref bean="subsidyGrantTrigger" /> -->  
+            </list>  
+        </property>  
+    </bean>
+</beans>  

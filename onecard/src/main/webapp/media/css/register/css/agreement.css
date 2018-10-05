@@ -1,0 +1,34 @@
+@CHARSET "UTF-8";
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+h2,h3{
+	text-align: center;
+}
+body{
+	background: #0ca3d2;
+}
+.container{
+	width: 71%;
+	margin: 20px auto;
+	border: 1px solid #cacaca;
+	border-radius: 12px;
+	padding:10px;
+	color: #696969;
+	background: #f0f1f2;
+}
+.footer{
+	text-align: center;
+	width: 100%;
+}

@@ -1,0 +1,858 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ReaderMapper">
+	<resultMap id="Reader.resultMap" type="Reader">
+		<result property="rdId" column="RDID" javaType="string"/>
+		<result property="rdCFState" column="RDCFSTATE" jdbcType="NUMERIC"/>
+		<result property="rdType" column="RDTYPE" javaType="string"/>
+		<result property="rdGlobal" column="RDGLOBAL" jdbcType="NUMERIC"/>
+		<result property="rdLibType" column="RDLIBTYPE" javaType="string"/>
+		<result property="rdStartDate" column="RDSTARTDATE" javaType="Date"/>
+		<result property="rdEndDate" column="RDENDDATE" javaType="Date"/>
+		<result property="rdInTime" column="RDINTIME" javaType="Date"/>
+		<result property="rdLib" column="RDLIB" javaType="string"/>
+		<result property="rdSort1" column="RDSORT1" javaType="string"/>
+		<result property="rdSort2" column="RDSORT2" javaType="string"/>
+		<result property="rdSort3" column="RDSORT3" javaType="string"/>
+		<result property="rdSort4" column="RDSORT4" javaType="string"/>
+		<result property="rdSort5" column="RDSORT5" javaType="string"/>
+		<result property="rdName" column="RDNAME" javaType="string"/>
+		<result property="rdPasswd" column="RDPASSWD" javaType="string"/>
+		<result property="rdCertify" column="RDCERTIFY" javaType="string"/>
+		<result property="rdSex" column="RDSEX" jdbcType="NUMERIC"/>
+		<result property="rdNation" column="RDNATION" javaType="string"/>
+		<result property="rdBornDate" column="RDBORNDATE" javaType="string"/>
+		<result property="rdLoginId" column="RDLOGINID" javaType="string"/>
+		<result property="rdPhone" column="RDPHONE" javaType="string"/>
+		<result property="rdUnit" column="RDUNIT" javaType="string"/>
+		<result property="rdAddress" column="RDADDRESS" javaType="string"/>
+		<result property="rdPostCode" column="RDPOSTCODE" javaType="string"/>
+		<result property="rdEmail" column="RDEMAIL" javaType="string"/>
+		<result property="rdNative" column="RDNATIVE" javaType="string"/>
+		<result property="rdInterest" column="RDINTEREST" javaType="string"/>
+		<result property="rdRemark" column="RDREMARK" javaType="string"/>
+		<result property="libUser" column="LIBUSER" jdbcType="NUMERIC"/>
+		<result property="dueTime" column="DUETIME" javaType="Date" />
+		<result property="oldRdpasswd" column="OLDRDPASSWD" javaType="string"/>
+		<result property="synStatus" column="SYNSTATUS" jdbcType="NUMERIC" />
+		<result property="retrievePasswordkey" column="RETRIEVEPASSWORDKEY" javaType="string"/>
+		<result property="retrievePasswordDate" column="RETRIEVEPASSWORDDATE" javaType="Date" />
+		<result property="isAuthor" column="ISAUTHOR" jdbcType="NUMERIC" />
+	</resultMap>
+	
+	<sql id="Reader.base_columns">
+		<![CDATA[
+			RDID,RDCFSTATE,RDTYPE,
+			RDSTARTDATE,RDENDDATE,RDINTIME,RDLIB,
+			RDNAME,RDPASSWD,RDLOGINID,RDPHONE,
+			RDEMAIL,LIBUSER,DUETIME
+		]]>
+	</sql>
+	
+	<select id="getReaderType" resultType="Map">
+		SELECT READERTYPE,DESCRIPE FROM P_RCTYPE WHERE SIGN=1 ORDER BY READERTYPE
+	</select>
+	
+	<select id="getGlobalReaderType" resultType="Map">
+		SELECT READERTYPE,LIBCODE,DESCRIPE,READERTYPE||' | '||DESCRIPE SHOWREADERTYPE FROM P_RCTYPE WHERE SIGN=1 AND LIBSIGN=1 ORDER BY READERTYPE
+	</select>
+	
+	<select id="getThisGlobalReaderType" parameterType="Map" resultType="Map">
+		SELECT READERTYPE,LIBCODE,DESCRIPE,READERTYPE||' | '||DESCRIPE SHOWREADERTYPE 
+		FROM P_RCTYPE 
+		<where>
+			SIGN=1 AND LIBSIGN=1 
+			<if test="libCode!=null and libCode!=''">
+				AND LIBCODE=TRIM(#{libCode})
+			</if>
+		</where>
+		ORDER BY READERTYPE
+	</select>
+	
+	<select id="getLibCode" resultType="Map">
+		SELECT LIBCODE,SIMPLENAME,LIBCODE||' | '||SIMPLENAME SHOWLIBTYPE 
+		FROM P_LIBCODE 
+		ORDER BY NLSSORT(SIMPLENAME,'NLS_SORT = SCHINESE_PINYIN_M')
+	</select>
+	
+	<select id="getValDate" parameterType="String" resultType="int">
+		SELECT VALDATE FROM P_RCTYPE WHERE READERTYPE=#{rdType}
+	</select>
+	
+	<select id="getLibReaderType" parameterType="Map" resultType="Map">
+		SELECT READERTYPE,LIBCODE,DESCRIPE,READERTYPE||' | '||DESCRIPE SHOWREADERTYPE 
+		FROM P_RCTYPE 
+		<where>
+			SIGN=1
+			<if test="libCode!=null and libCode!=''">
+				AND LIBCODE=TRIM(#{libCode})
+			</if>
+		</where>
+		ORDER BY READERTYPE
+	</select>
+	
+	<select id="checkRdIdExist" parameterType="String" resultType="String">
+		SELECT COUNT(0) FROM READER WHERE RDID=LTRIM(RTRIM(#{rdId}))
+	</select>
+	
+	<resultMap type="Reader" id="avatarResult">
+		<result column="rdPhoto" property="rdPhoto" jdbcType="BLOB" />
+	</resultMap>
+	
+	<select id="getAvatar" parameterType="String" resultMap="avatarResult">
+		SELECT RDPHOTO FROM READER WHERE RDID=#{rdId}
+	</select>
+	
+	<insert id="addReader" parameterType="Reader" keyColumn="rdId">
+		INSERT INTO READER (RDID,RDCFSTATE,RDTYPE,RDGLOBAL,RDLIBTYPE,
+			RDSTARTDATE,RDENDDATE,RDINTIME,RDLIB,RDSORT1,RDSORT2,RDSORT3,RDSORT4,RDSORT5,
+			RDNAME,RDPASSWD,RDCERTIFY,RDSEX,RDNATION,RDBORNDATE,RDLOGINID,RDPHONE,RDUNIT,
+			RDADDRESS,RDPOSTCODE,RDEMAIL,RDNATIVE,RDINTEREST,RDREMARK,LIBUSER,RDPHOTO,
+			DUETIME,OLDRDPASSWD,SYNSTATUS,RETRIEVEPASSWORDDATE,RETRIEVEPASSWORDKEY)
+		VALUES
+		(#{rdId},#{rdCFState},#{rdType},#{rdGlobal},#{rdLibType, jdbcType=VARCHAR},#{rdStartDate},#{rdEndDate},
+		#{rdInTime,jdbcType=TIMESTAMP},#{rdLib},#{rdSort1, jdbcType=VARCHAR},#{rdSort2, jdbcType=VARCHAR},
+		#{rdSort3, jdbcType=VARCHAR},#{rdSort4, jdbcType=VARCHAR},#{rdSort5, jdbcType=VARCHAR},#{rdName},
+		#{rdPasswd, jdbcType=VARCHAR},#{rdCertify, jdbcType=VARCHAR},#{rdSex},#{rdNation, jdbcType=VARCHAR},#{rdBornDate, jdbcType=TIMESTAMP},
+		#{rdLoginId, jdbcType=VARCHAR},
+		#{rdPhone, jdbcType=VARCHAR},#{rdUnit, jdbcType=VARCHAR},#{rdAddress, jdbcType=VARCHAR},#{rdPostCode, jdbcType=VARCHAR},
+		#{rdEmail, jdbcType=VARCHAR},#{rdNative, jdbcType=VARCHAR},#{rdInterest, jdbcType=VARCHAR},#{rdRemark, jdbcType=VARCHAR}, 
+		#{libUser},#{rdPhoto, javaType=byte[], jdbcType=BLOB, typeHandler=org.apache.ibatis.type.BlobTypeHandler},
+		SYSDATE,#{oldRdpasswd,jdbcType=VARCHAR},#{synStatus},#{retrievePasswordDate, jdbcType=TIMESTAMP},#{retrievePasswordkey, jdbcType=VARCHAR})
+	</insert>
+	
+	<insert id="addReaderAsOperator" parameterType="Reader" keyColumn="rdId">
+		INSERT INTO READER (RDID,RDCFSTATE,RDTYPE,
+			RDSTARTDATE,RDENDDATE,RDINTIME,RDLIB,
+			RDNAME,RDPASSWD,RDLOGINID,RDPHONE,
+			RDEMAIL,LIBUSER,DUETIME)
+		VALUES
+		(#{rdId},#{rdCFState},#{rdType, jdbcType=VARCHAR},
+		#{rdStartDate, jdbcType=TIMESTAMP},
+		#{rdEndDate, jdbcType=TIMESTAMP},
+		#{rdInTime, jdbcType=TIMESTAMP},
+		#{rdLib},
+		#{rdName},
+		#{rdPasswd, jdbcType=VARCHAR},
+		#{rdLoginId, jdbcType=VARCHAR},
+		#{rdPhone, jdbcType=VARCHAR},
+		#{rdEmail, jdbcType=VARCHAR}, 
+		1,
+		SYSDATE)
+	</insert>
+	
+	<select id="getReader" parameterType="String" resultType="Reader">
+		SELECT RDID,RDCFSTATE,RDTYPE,RDGLOBAL,RDLIBTYPE,RDSTARTDATE,RDPASSWD,
+			RDENDDATE,RDINTIME,B.SIMPLENAME, RDLIB,RDLIB RDLIBCODE,RDSORT1,RDSORT2,RDSORT3,RDSORT4,RDSORT5,
+			RDNAME,RDCERTIFY,RDSEX,RDNATION,RDBORNDATE,RDLOGINID,RDPHONE,RDUNIT,RDADDRESS,RDPOSTCODE,
+			RDEMAIL,RDNATIVE,RDINTEREST,RDREMARK,LIBUSER, RDPHOTO,OLDRDPASSWD,SYNSTATUS,LIBASSIGN,ISAUTHOR
+		FROM READER LEFT JOIN P_LIBCODE B ON RDLIB=B.LIBCODE WHERE RDID=#{rdId}
+	</select>
+	<!-- 用来登录的时候判断使用 -->
+	<select id="getReaderByRdCertify" parameterType="String" resultType="Reader">  
+        SELECT * FROM READER
+        WHERE RDCERTIFY=#{rdId} 
+    </select>
+    
+	<select id="getReaderByRdLoginId" parameterType="String" resultType="Reader">  
+        SELECT * FROM READER
+        WHERE RDLOGINID =#{rdId} 
+    </select>
+    <!-- 虚拟读者注册时判断 -->
+    <select id="getReaderListByRdLoginId" parameterType="Reader" resultType="Reader">  
+        SELECT * FROM READER
+        WHERE RDLOGINID=#{rdLoginId} 
+    </select>
+    <!-- 用来福建省图找回信息的时候判断使用 -->
+	<select id="getReaderListByRdCertify" parameterType="Map" resultType="Reader">  
+        SELECT * FROM READER
+        where  RDCERTIFY=#{rdCertify} AND RDNAME=#{rdName}
+    </select>
+    <!-- 用来福建省图重置密码信息的时候判断使用 -->
+	<select id="getReaderByRdIdAndRdCertify" parameterType="Map"  resultType="Reader">  
+        SELECT * FROM READER LEFT JOIN P_LIBCODE B ON RDLIB=B.LIBCODE 
+        WHERE RDID=#{rdId} AND RDCERTIFY=#{rdCertify}
+    </select>
+    
+<select id="Reader.getByRdId" resultMap="Reader.resultMap" parameterType="java.lang.String">
+		SELECT 
+		<include refid="Reader.base_columns"/>
+		<![CDATA[
+		FROM 
+		READER 
+		WHERE 
+		RDID=#{rdId}
+		]]>
+	</select>
+	
+	<update id="updateReaderAvatar" parameterType="Map">
+		UPDATE READER SET RDPHOTO=#{rdPhoto, javaType=byte[], jdbcType=BLOB, typeHandler=org.apache.ibatis.type.BlobTypeHandler}
+		WHERE RDID=#{rdId}
+	</update>
+	
+	<select id="queryReaderList" parameterType="Reader" resultType="Reader">
+		SELECT A.RDID,A.RDCFSTATE,A.RDNAME,B.NAME RDLIB, A.RDUNIT, A.RDEMAIL, A.RDLOGINID,A.SYNSTATUS FROM READER A
+		LEFT JOIN READER_CARDINFO C ON A.RDID=C.RDID LEFT JOIN P_LIBCODE B ON A.RDLIB=B.LIBCODE
+		<where>
+			<if test="rdCFState!=null and rdCFState!=0">
+				A.RDCFSTATE=#{rdCFState}
+			</if>
+			<if test="rdType!=null and rdType!=''">
+				AND A.RDTYPE=#{rdType}
+			</if>
+			<if test="rdLib!=null and rdLib!=''">
+				AND A.RDLIB=#{rdLib}
+			</if>
+			<if test="rdId!=null and rdId!=''">
+				AND A.RDID LIKE '%'||#{rdId}||'%'
+			</if>
+			<if test="cardId!=null and cardId!=''">
+				AND C.CARDID=#{cardId}
+			</if>
+			<if test="rdName!=null and rdName!=''">
+				AND A.RDNAME LIKE '%'||#{rdName}||'%'
+			</if>
+			<if test="rdCertify!=null and rdCertify!=''">
+				AND A.RDCERTIFY LIKE '%'||#{rdCertify}||'%'
+			</if>
+			<if test="rdStartDate!=null and rdStartDate!=''">
+				AND A.RDSTARTDATE = #{rdStartDate}
+			</if>
+			<if test="rdEndDate!=null and rdEndDate!=''">
+				AND A.RDENDDATE = #{rdEndDate}
+			</if>
+			<if test="rdInTime!=null and rdInTime!=''">
+				AND A.RDINTIME = #{rdInTime}
+			</if>
+			<if test="rdBornDate!=null and rdBornDate!=''">
+				AND A.RDBORNDATE = #{rdBornDate}
+			</if>
+			<if test="rdLoginId!=null and rdLoginId!=''">
+				AND A.RDLOGINID LIKE '%'||#{rdLoginId}||'%'
+			</if>
+			<if test="rdNative!=null and rdNative!=''">
+				AND A.RDNATIVE LIKE '%'||#{rdNative}||'%'
+			</if>
+			<if test="rdAddress!=null and rdAddress!=''">
+				AND A.RDADDRESS LIKE '%'||#{rdAddress}||'%'
+			</if>
+			<if test="rdNation!=null and rdNation!=''">
+				AND A.RDNATION LIKE '%'||#{rdNation}||'%'
+			</if>
+			<if test="rdUnit!=null and rdUnit!=''">
+				AND A.RDUNIT LIKE '%'||#{rdUnit}||'%'
+			</if>
+			<if test="rdPhone!=null and rdPhone!=''">
+				AND A.RDPHONE LIKE '%'||#{rdPhone}||'%'
+			</if>
+			<if test="rdPostCode!=null and rdPostCode!=''">
+				AND A.RDPOSTCODE LIKE '%'||#{rdPostCode}||'%'
+			</if>
+			<if test="rdSort1!=null and rdSort1!=''">
+				AND A.RDSORT1 LIKE '%'||#{rdSort1}||'%'
+			</if>
+			<if test="rdSort2!=null and rdSort2!=''">
+				AND A.RDSORT2 LIKE '%'||#{rdSort2}||'%'
+			</if>
+			<if test="rdSort3!=null and rdSort3!=''">
+				AND A.RDSORT3 LIKE '%'||#{rdSort3}||'%'
+			</if>
+			<if test="rdSort4!=null and rdSort4!=''">
+				AND A.RDSORT4 LIKE '%'||#{rdSort4}||'%'
+			</if>
+			<if test="rdSort5!=null and rdSort5!=''">
+				AND A.RDSORT5 LIKE '%'||#{rdSort5}||'%'
+			</if>
+			<if test="rdSex!=null and rdSex!=''">
+				AND A.RDSEX = #{rdSex}
+			</if>
+			<if test="rdGlobal!=null and rdGlobal!=''">
+				AND A.RDGLOBAL = #{rdGlobal}
+			</if>
+			<if test="libUser!=null">
+				AND A.LIBUSER =#{libUser}
+			</if>
+		</where>
+		<choose>
+			<when test="ordertype!=null and ordertype!=''">
+				<choose>       <!-- concat('%', #{condition}, '%') concat('%', #{ordertype}, '%') -->
+					<when test="condition!=null and condition!=''">
+						ORDER BY ${condition} ${ordertype}
+					</when>
+					<otherwise>
+						ORDER BY A.RDINTIME ${ordertype}
+					</otherwise>
+				</choose>
+			</when>
+			<otherwise>
+				ORDER BY A.RDINTIME,A.RDCFSTATE,A.RDID
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="exportReaderData" parameterType="Reader" resultType="Reader">
+		SELECT A.RDID,A.RDPASSWD,A.RDCFSTATE,A.RDNAME,B.NAME RDLIB,A.RDLOGINID,A.RDCERTIFY,A.RDBORNDATE,
+			A.RDSEX,A.RDTYPE,A.RDGLOBAL,A.RDLIBTYPE,A.RDSTARTDATE,A.RDENDDATE,
+			A.RDADDRESS,A.RDPOSTCODE,A.RDEMAIL,A.RDPHONE,A.RDUNIT,A.RDINTEREST,A.RDINTIME,
+			A.RDSORT1,A.RDSORT2,A.RDSORT3,A.RDSORT4,A.RDSORT5,A.RDNATION,A.RDNATIVE
+		FROM READER A
+		LEFT JOIN P_LIBCODE B ON A.RDLIB=B.LIBCODE
+		<where>
+			<if test="rdCFState!=null and rdCFState!=0">
+				A.RDCFSTATE=#{rdCFState}
+			</if>
+			<if test="rdType!=null and rdType!=''">
+				AND A.RDTYPE=#{rdType}
+			</if>
+			<if test="rdLib!=null and rdLib!=''">
+				AND A.RDLIB=#{rdLib}
+			</if>
+			<if test="rdId!=null and rdId!=''">
+				AND A.RDID LIKE '%'||#{rdId}||'%'
+			</if>
+			<if test="rdName!=null and rdName!=''">
+				AND A.RDNAME LIKE '%'||#{rdName}||'%'
+			</if>
+			<if test="rdCertify!=null and rdCertify!=''">
+				AND A.RDCERTIFY LIKE '%'||#{rdCertify}||'%'
+			</if>
+			<if test="rdStartDate!=null and rdStartDate!=''">
+				AND A.RDSTARTDATE = #{rdStartDate}
+			</if>
+			<if test="rdEndDate!=null and rdEndDate!=''">
+				AND A.RDENDDATE = #{rdEndDate}
+			</if>
+			<if test="rdInTime!=null and rdInTime!=''">
+				AND A.RDINTIME = #{rdInTime}
+			</if>
+			<if test="rdBornDate!=null and rdBornDate!=''">
+				AND A.RDBORNDATE = #{rdBornDate}
+			</if>
+			<if test="rdLoginId!=null and rdLoginId!=''">
+				AND A.RDLOGINID LIKE '%'||#{rdLoginId}||'%'
+			</if>
+			<if test="rdNative!=null and rdNative!=''">
+				AND A.RDNATIVE LIKE '%'||#{rdNative}||'%'
+			</if>
+			<if test="rdAddress!=null and rdAddress!=''">
+				AND A.RDADDRESS LIKE '%'||#{rdAddress}||'%'
+			</if>
+			<if test="rdNation!=null and rdNation!=''">
+				AND A.RDNATION LIKE '%'||#{rdNation}||'%'
+			</if>
+			<if test="rdUnit!=null and rdUnit!=''">
+				AND A.RDUNIT LIKE '%'||#{rdUnit}||'%'
+			</if>
+			<if test="rdPhone!=null and rdPhone!=''">
+				AND A.RDPHONE LIKE '%'||#{rdPhone}||'%'
+			</if>
+			<if test="rdPostCode!=null and rdPostCode!=''">
+				AND A.RDPOSTCODE LIKE '%'||#{rdPostCode}||'%'
+			</if>
+			<if test="rdSort1!=null and rdSort1!=''">
+				AND A.RDSORT1 LIKE '%'||#{rdSort1}||'%'
+			</if>
+			<if test="rdSort2!=null and rdSort2!=''">
+				AND A.RDSORT2 LIKE '%'||#{rdSort2}||'%'
+			</if>
+			<if test="rdSort3!=null and rdSort3!=''">
+				AND A.RDSORT3 LIKE '%'||#{rdSort3}||'%'
+			</if>
+			<if test="rdSort4!=null and rdSort4!=''">
+				AND A.RDSORT4 LIKE '%'||#{rdSort4}||'%'
+			</if>
+			<if test="rdSort5!=null and rdSort5!=''">
+				AND A.RDSORT5 LIKE '%'||#{rdSort5}||'%'
+			</if>
+			<if test="rdSex!=null and rdSex!=''">
+				AND A.RDSEX = #{rdSex}
+			</if>
+			<if test="rdGlobal!=null and rdGlobal!=''">
+				AND A.RDGLOBAL = #{rdGlobal}
+			</if>
+		</where>
+		<choose>
+			<when test="ordertype!=null and ordertype!=''">
+				<choose>
+					<when test="condition!=null and condition!=''">
+						ORDER BY ${condition} ${ordertype}
+					</when>
+					<otherwise>
+						ORDER BY A.RDID ${ordertype}
+					</otherwise>
+				</choose>
+			</when>
+			<otherwise>
+				ORDER BY A.RDCFSTATE,A.RDID,A.RDNAME
+			</otherwise>
+		</choose>
+	</select>
+	
+	<update id="deleteReader" parameterType="String">
+		DELETE FROM READER WHERE RDID=#{rdId}
+	</update>
+	
+	<select id="getRealPassword" parameterType="String" resultType="String">
+		SELECT RDPASSWD FROM READER WHERE RDID=#{rdId}
+	</select>
+	
+	<select id="getReaderWebServiceUrl" parameterType="String" resultType="String">
+		SELECT 	NVL(WEBSERVICEURL,'') FROM READER R LEFT JOIN P_LIBCODE LIB ON R.RDLIB=LIB.LIBCODE WHERE R.RDID=#{rdid}
+	</select>
+	
+	<update id="updatePassword" parameterType="Map">
+		UPDATE READER SET RDPASSWD=#{newPassword},DUETIME=SYSDATE WHERE RDID=#{rdId}
+	</update>
+	
+	<update id="updateIsAuthor" parameterType="Reader">
+		UPDATE READER SET ISAUTHOR=#{isAuthor} WHERE RDID=#{rdId}
+	</update>
+	
+	<update id="updateOldPasswordAndSynStatus" parameterType="Map">
+		UPDATE READER SET OLDRDPASSWD=#{newPasswd},SYNSTATUS=#{synStatus} WHERE RDID=#{rdId}
+	</update>
+	
+	<update id="updateSynStatus" parameterType="Map">
+		UPDATE READER SET SYNSTATUS=#{synStatus} WHERE RDID=#{rdId}
+	</update>
+	
+	<update id="updateLibAssign" parameterType="Reader">
+		UPDATE READER SET libassign=#{libAsSign} WHERE RDID=#{rdId}
+	</update>
+	
+	<update id="updateLibUser" parameterType="Reader">
+		UPDATE READER SET LIBUSER=#{libUser} WHERE RDID=#{rdId}
+	</update>
+	
+	<update id="updateReader" parameterType="Reader">
+		UPDATE READER SET
+			<if test="oldRdpasswd!=null and oldRdpasswd!=''">
+				OLDRDPASSWD=#{oldRdpasswd},
+			</if>
+			RDPASSWD=#{rdPasswd, jdbcType=VARCHAR},
+			RDCFSTATE=#{rdCFState, jdbcType=INTEGER},
+			RDTYPE=#{rdType, jdbcType=VARCHAR},
+			RDGLOBAL=#{rdGlobal, jdbcType=INTEGER},
+			RDLIBTYPE=#{rdLibType, jdbcType=VARCHAR},
+			RDSTARTDATE=#{rdStartDate, jdbcType=TIMESTAMP},
+			RDENDDATE=#{rdEndDate, jdbcType=TIMESTAMP},
+			RDINTIME=#{rdInTime,jdbcType=TIMESTAMP},
+			RDLIB=#{rdLib, jdbcType=VARCHAR},
+			RDNAME=#{rdName, jdbcType=VARCHAR},
+			RDCERTIFY=#{rdCertify, jdbcType=VARCHAR},
+			RDSEX=#{rdSex, jdbcType=INTEGER},
+			RDNATION=#{rdNation, jdbcType=VARCHAR},
+			RDBORNDATE=#{rdBornDate, jdbcType=TIMESTAMP},
+			RDLOGINID=#{rdLoginId, jdbcType=VARCHAR},
+			RDADDRESS=#{rdAddress, jdbcType=VARCHAR},
+			RDNATIVE=#{rdNative, jdbcType=VARCHAR},
+			RDEMAIL=#{rdEmail, jdbcType=VARCHAR},
+			RDUNIT=#{rdUnit, jdbcType=VARCHAR},
+			RDPHONE=#{rdPhone, jdbcType=VARCHAR},
+			<if test="rdPhoto!=null">
+				RDPHOTO=#{rdPhoto, javaType=byte[], jdbcType=BLOB, typeHandler=org.apache.ibatis.type.BlobTypeHandler},
+			</if>
+			RDPOSTCODE=#{rdPostCode, jdbcType=VARCHAR},
+			RDSORT1=#{rdSort1, jdbcType=VARCHAR},
+			RDSORT2=#{rdSort2, jdbcType=VARCHAR},
+			RDSORT3=#{rdSort3, jdbcType=VARCHAR},
+			RDSORT4=#{rdSort4, jdbcType=VARCHAR},
+			RDSORT5=#{rdSort5, jdbcType=VARCHAR},
+			RDINTEREST=#{rdInterest, jdbcType=VARCHAR},
+			RDREMARK = #{rdRemark, jdbcType=VARCHAR},
+			LIBUSER = #{libUser, jdbcType=INTEGER},
+			SYNSTATUS = #{synStatus, jdbcType=INTEGER},
+			DUETIME=SYSDATE
+		WHERE RDID=#{rdId}
+	</update>
+	
+	<update id="updateReaderAsOperator" parameterType="Map">
+		UPDATE READER SET
+			RDID=#{newReader.rdId},
+			RDLIB=#{inputReader.rdLib},
+			RDNAME=#{inputReader.rdName},
+			RDLOGINID=#{inputReader.rdLoginId, jdbcType=VARCHAR},
+			RDEMAIL=#{inputReader.rdEmail, jdbcType=VARCHAR},
+			RDPHONE=#{inputReader.rdPhone, jdbcType=VARCHAR},
+			DUETIME=SYSDATE
+		WHERE RDID=#{inputReader.rdId}
+	</update>
+	
+	<update id="updatePhotoName" parameterType="Reader">
+		UPDATE READER SET RDPHOTO=#{rdPhoto} WHERE RDID=#{rdId}
+	</update>
+	
+	<select id="getPhotoName" parameterType="String" resultType="String">
+		SELECT RDPHOTO FROM READER WHERE RDID=#{rdId}
+	</select>
+	
+	<select id="searchReader" parameterType="Map" resultType="Reader">
+		SELECT  a.RDID,RDCFSTATE,RDTYPE,RDGLOBAL,RDLIBTYPE,
+			TO_CHAR(RDSTARTDATE,'YYYY-MM-DD') RDSTARTDATESTR,
+			TO_CHAR(RDENDDATE,'YYYY-MM-DD') RDENDDATESTR,
+			TO_CHAR(RDINTIME,'YYYY-MM-DD') RDINTIMESTR,
+			TO_CHAR(RDBORNDATE,'YYYY-MM-DD') RDBORNDATESTR,
+			RDLIB,RDSORT1,RDSORT2,RDSORT3,RDSORT4,RDSORT5,
+			RDNAME,RDCERTIFY,RDSEX,RDNATION,RDLOGINID,RDPHONE,
+			RDUNIT,RDADDRESS,RDPOSTCODE,RDEMAIL,RDNATIVE,RDINTEREST,
+			LIBUSER,b.DEPOSIT as rdDeposit ,RDREMARK,
+			RDPASSWD,OLDRDPASSWD,SYNSTATUS,c.CARDID as CARDID
+		FROM READER a LEFT JOIN RDACCOUNT b on a.rdid=b.RDID
+		LEFT JOIN READER_CARDINFO c on a.rdid=c.rdid
+		<where>
+			1 = 1
+			<if test="fieldName == 'rdId'">
+				AND a.RDID=#{fieldValue} 
+			</if>
+			<if test="fieldName == 'rdName'">
+				AND a.RDNAME=#{fieldValue}
+			</if>
+			<if test="fieldName == 'rdCertify'">
+				AND a.RDCERTIFY=#{fieldValue}
+			</if>
+			<if test="fieldName == 'cardId'">
+				AND c.CARDID=#{fieldValue} AND c.ISUSABLE=1
+			</if>
+		</where>
+	</select>
+	
+	<insert id="addDeposit" parameterType="Map">
+		INSERT INTO RDACCOUNT (RDID,DEPOSIT,STATUS,ONECARD) VALUES (#{rdId},#{deposit},1,0)
+	</insert>
+	
+	<update id="updateDeposit" parameterType="Map">
+		UPDATE RDACCOUNT SET DEPOSIT=#{deposit} WHERE RDID=#{rdId}
+	</update>
+	
+	
+	
+	<!-- ======================================= cache / ======================================= -->
+	<resultMap id="resultMap" type="Reader">
+		<result column="RDPHOTO" property="rdPhoto" javaType="byte[]" jdbcType="BLOB" typeHandler="org.apache.ibatis.type.BlobTypeHandler" /> 
+	</resultMap>
+
+	<sql id="base_columns">
+		<![CDATA[
+		RDID,RDLOGINID,RDPASSWD,OLDRDPASSWD,SYNSTATUS
+		]]>
+	</sql>
+	
+	<sql id="simple_columns">
+		<![CDATA[
+		RDID,RDPASSWD,RDNAME,RDLIB,RDCFSTATE, RDTYPE, RDGLOBAL, RDLIBTYPE, LIBUSER,OLDRDPASSWD,SYNSTATUS
+		]]>
+	</sql>
+
+	<sql id="all_columns">
+	    <![CDATA[
+		RDID,RDLOGINID,RDPASSWD,RDNAME,RDCERTIFY,RDBORNDATE,RDSEX,RDCFSTATE,RDTYPE,RDGLOBAL,RDLIBTYPE,RDLIB,RDSTARTDATE,RDENDDATE,RDADDRESS,RDPOSTCODE,RDEMAIL,RDPHONE,RDUNIT,RDREMARK,RDINTEREST,RDSPECIALTY,RDSORT1,RDSORT2,RDSORT3,RDSORT4,RDSORT5,RDPHOTO,
+		RDNATION,RDNATIVE,RDINTIME,OPERATOR,DUETIME, LIBUSER,OLDRDPASSWD,SYNSTATUS
+		]]>
+	</sql>
+	
+	<insert id="insert" parameterType="com.interlib.sso.domain.Reader">
+		<![CDATA[
+		INSERT INTO READER 
+		(RDID,RDNAME,RDLIB,RDCFSTATE,RDENDDATE,RDPHOTO) 
+		values 
+		(#{rdId,jdbcType=VARCHAR},#{rdName,jdbcType=VARCHAR},#{rdLib,jdbcType=VARCHAR},#{rdCfstate,jdbcType=VARCHAR},
+		,#{rdEndDate,jdbcType=VARCHAR},#{rdPhoto, javaType=byte[], jdbcType=BLOB, typeHandler=org.apache.ibatis.type.BlobTypeHandler})
+		]]>
+	</insert>
+	
+	<update id="update" parameterType="com.interlib.sso.domain.Reader">
+		<![CDATA[
+		UPDATE READER 
+		SET 
+		RDCFSTATE=#{rdCfstate} 
+		WHERE 
+		RDID=#{rdId}
+		]]>
+	</update>
+	<delete id="delete" parameterType="java.lang.String">
+		<![CDATA[
+		DELETE 
+		FROM 
+		READER 
+		WHERE 
+		RDID=#{rdId}
+		]]>
+	</delete>
+
+	<select id="get" resultMap="resultMap" parameterType="java.lang.String">
+		SELECT 
+		<include refid="simple_columns"/>
+		<![CDATA[
+		FROM 
+		READER 
+		WHERE 
+		RDID=#{rdId}
+		]]>
+	</select>
+	
+	<select id="getAllList" resultMap="resultMap">
+		SELECT 
+		<include refid="base_columns"/> 
+		<![CDATA[
+		FROM 
+		READER
+		ORDER　BY RDINTIME DESC
+		]]>
+	</select>
+	
+	<select id="existById" parameterType="java.lang.String" 
+		resultType="java.lang.Integer">
+		<![CDATA[
+		SELECT 
+		count(*) as totalcount 
+		FROM 
+		READER 
+		WHERE 
+		RDID=#{rdId}
+		]]>
+	</select>
+	
+	<select id="existByRdCertify" parameterType="java.lang.String" resultType="java.lang.Integer">
+		SELECT 
+		count(RDID) as totalcount 
+		FROM 
+		READER 
+		WHERE 
+		RDCERTIFY=#{rdCertify}
+	</select>
+	
+	<select id="checkReaderActivate" parameterType="java.lang.String" resultType="java.lang.Integer">
+		SELECT 
+		count(RDID) as totalcount 
+		FROM 
+		READER 
+		WHERE 
+		RDID LIKE 'E%'
+	</select>
+	
+	<select id="deleteByIds">
+		DELETE 
+		FROM READER 
+		WHERE RDID in 
+		<foreach item="item" index="index" collection="array" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+	
+	<sql id="findPage.where">
+		<where>
+			<if test="@Ognl@isNotEmpty(rdLib)">
+				AND rdlib=#{rdLib}
+			</if>
+		</where>
+	</sql>
+	
+	<select id="findPage.count" resultType="java.lang.Long">
+		SELECT 
+			COUNT(*) 
+		FROM 
+			READER
+		<include refid="findPage.where"/>
+	</select>
+	
+	<select id="findPage" parameterType="map" resultMap="resultMap">
+		SELECT 
+			<include refid="simple_columns"/> 
+		FROM 
+			READER
+		<include refid="findPage.where"/>
+	</select>
+	
+	<insert id="insertReaderRole" parameterType="com.interlib.sso.domain.UReader_Role">
+	    <![CDATA[
+		INSERT INTO U_READER_ROLE 
+		(ROLEID, RDID) 
+		values 
+		(#{roleId}, #{rdId})
+		]]>
+	</insert>
+
+	<update id="updateReaderRole" parameterType="java.util.Map">
+	    <![CDATA[
+	    UPDATE U_READER_ROLE
+	    set 
+	    ROLEID=#{roleId} 
+	    WHERE
+	    RDID=#{rdId} 
+	    ]]>
+	</update>
+	
+	<delete id="deleteReaderRole" parameterType="java.lang.String">
+	    <![CDATA[
+		DELETE 
+		FROM 
+		U_READER_ROLE 
+		WHERE 
+		RDID=#{rdId}
+		]]>
+	</delete>
+	<select id="getReaderRoles" resultType="Roles" parameterType="java.lang.String">
+	    SELECT 
+	    R.ROLEID, R.ROLENAME, R.LIBCODE 
+	    <![CDATA[
+	    FROM 
+	    U_READER_ROLE RR, U_ROLES R
+	    ]]>
+	    WHERE 
+	    RR.ROLEID = R.ROLEID AND RDID=#{rdId}
+	</select>
+	
+	<select id="getOtherRoles" resultType="Roles" parameterType="java.lang.String">
+	    SELECT 
+	    R.ROLEID, R.ROLENAME, R.LIBCODE 
+	    <![CDATA[
+	    FROM 
+	    U_ROLES R
+	    ]]>
+	    WHERE 
+	    R.ROLEID NOT IN 
+	    (SELECT 
+	    R.ROLEID 
+	    <![CDATA[
+	    FROM 
+	     U_READER_ROLE RR, U_ROLES R
+	    ]]>
+	    WHERE 
+	    RR.ROLEID = R.ROLEID AND RDID=#{rdId}) 
+	</select>
+	
+	<select id="getAllLibUser" resultMap="resultMap" parameterType="java.lang.Integer">
+		SELECT 
+		<include refid="simple_columns"/>
+		<![CDATA[
+		FROM 
+		READER 
+		WHERE 
+		LIBUSER =#{libUser} AND RDCFSTATE=1
+		]]>
+	</select>
+	
+	<select id="getCardGroups" resultType="CardGroup">
+		SELECT GROUPID,GROUPNAME FROM CARD_GROUP
+	</select>
+	
+	<insert id="setReaderGroup" parameterType="Map">
+		INSERT INTO CARD_GROUP_MEMBER (GROUPID, RDID) VALUES (#{groupId,jdbcType=INTEGER}, #{rdId, jdbcType=VARCHAR})
+	</insert>
+	
+	<select id="getReaderGroupId" parameterType="String" resultType="Integer">
+		SELECT GROUPID FROM CARD_GROUP_MEMBER WHERE RDID = #{rdId}
+	</select>
+	
+	<delete id="deleteReaderBelongGroup" parameterType="String">
+		DELETE FROM CARD_GROUP_MEMBER WHERE RDID = #{rdId}
+	</delete>
+	
+	<select id="getReaderGroupBelong" parameterType="String" resultType="CardGroup">
+		SELECT GROUPID,GROUPNAME FROM CARD_GROUP 
+		WHERE GROUPID = (
+			SELECT GROUPID FROM CARD_GROUP_MEMBER WHERE RDID = #{rdId}
+		)
+	</select>
+	
+	<select id="readerUnSynList" parameterType="Reader" resultType="Reader">
+		SELECT A.RDID,A.RDCFSTATE,A.RDNAME,B.NAME RDLIB, A.RDUNIT, A.RDEMAIL, A.RDLOGINID ,A.SYNSTATUS FROM READER A
+		LEFT JOIN P_LIBCODE B ON A.RDLIB=B.LIBCODE
+		<where>
+			    A.SYNSTATUS=0
+			<if test="rdCFState!=null and rdCFState!=0">
+				AND A.RDCFSTATE=#{rdCFState}
+			</if>
+			<if test="rdType!=null and rdType!=''">
+				AND A.RDTYPE=#{rdType}
+			</if>
+			<if test="rdLib!=null and rdLib!=''">
+				AND A.RDLIB=#{rdLib}
+			</if>
+			<if test="rdId!=null and rdId!=''">
+				AND A.RDID LIKE '%'||#{rdId}||'%'
+			</if>
+			<if test="rdName!=null and rdName!=''">
+				AND A.RDNAME LIKE '%'||#{rdName}||'%'
+			</if>
+			<if test="rdCertify!=null and rdCertify!=''">
+				AND A.RDCERTIFY LIKE '%'||#{rdCertify}||'%'
+			</if>
+			<if test="rdStartDate!=null and rdStartDate!=''">
+				AND A.RDSTARTDATE = #{rdStartDate}
+			</if>
+			<if test="rdEndDate!=null and rdEndDate!=''">
+				AND A.RDENDDATE = #{rdEndDate}
+			</if>
+			<if test="rdInTime!=null and rdInTime!=''">
+				AND A.RDINTIME = #{rdInTime}
+			</if>
+			<if test="rdBornDate!=null and rdBornDate!=''">
+				AND A.RDBORNDATE = #{rdBornDate}
+			</if>
+			<if test="rdLoginId!=null and rdLoginId!=''">
+				AND A.RDLOGINID LIKE '%'||#{rdLoginId}||'%'
+			</if>
+			<if test="rdNative!=null and rdNative!=''">
+				AND A.RDNATIVE LIKE '%'||#{rdNative}||'%'
+			</if>
+			<if test="rdAddress!=null and rdAddress!=''">
+				AND A.RDADDRESS LIKE '%'||#{rdAddress}||'%'
+			</if>
+			<if test="rdNation!=null and rdNation!=''">
+				AND A.RDNATION LIKE '%'||#{rdNation}||'%'
+			</if>
+			<if test="rdUnit!=null and rdUnit!=''">
+				AND A.RDUNIT LIKE '%'||#{rdUnit}||'%'
+			</if>
+			<if test="rdPhone!=null and rdPhone!=''">
+				AND A.RDPHONE LIKE '%'||#{rdPhone}||'%'
+			</if>
+			<if test="rdPostCode!=null and rdPostCode!=''">
+				AND A.RDPOSTCODE LIKE '%'||#{rdPostCode}||'%'
+			</if>
+			<if test="rdSort1!=null and rdSort1!=''">
+				AND A.RDSORT1 LIKE '%'||#{rdSort1}||'%'
+			</if>
+			<if test="rdSort2!=null and rdSort2!=''">
+				AND A.RDSORT2 LIKE '%'||#{rdSort2}||'%'
+			</if>
+			<if test="rdSort3!=null and rdSort3!=''">
+				AND A.RDSORT3 LIKE '%'||#{rdSort3}||'%'
+			</if>
+			<if test="rdSort4!=null and rdSort4!=''">
+				AND A.RDSORT4 LIKE '%'||#{rdSort4}||'%'
+			</if>
+			<if test="rdSort5!=null and rdSort5!=''">
+				AND A.RDSORT5 LIKE '%'||#{rdSort5}||'%'
+			</if>
+			<if test="rdSex!=null and rdSex!=''">
+				AND A.RDSEX = #{rdSex}
+			</if>
+			<if test="rdGlobal!=null and rdGlobal!=''">
+				AND A.RDGLOBAL = #{rdGlobal}
+			</if>
+			<if test="libUser!=null">
+				AND A.LIBUSER =#{libUser}
+			</if>
+		</where>
+		<choose>
+			<when test="ordertype!=null and ordertype!=''">
+				<choose>
+					<when test="condition!=null and condition!=''">
+						ORDER BY ${condition} ${ordertype}
+					</when>
+					<otherwise>
+						ORDER BY A.RDINTIME ${ordertype}
+					</otherwise>
+				</choose>
+			</when>
+			<otherwise>
+				ORDER BY A.RDINTIME,A.RDCFSTATE,A.RDID
+			</otherwise>
+		</choose>
+	</select>
+	
+</mapper>

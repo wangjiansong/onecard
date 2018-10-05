@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="CompetsMapper">
+
+	<resultMap id="Compets.resultMap" type="com.interlib.sso.domain.Compets">
+		<result property="competId" column="COMPETID" />
+		<result property="competName" column="COMPETNAME" />
+		<result property="describe" column="DESCRIBE" />
+	</resultMap>
+	
+	<sql id="Compets.base_columns">
+		<![CDATA[
+		COMPETID, COMPETNAME, DESCRIBE
+		]]>
+	</sql>
+	
+	<insert id="Compets.insert" parameterType="com.interlib.sso.domain.Compets">
+	    <selectKey resultType="int"  keyProperty="competId" order="BEFORE">   
+        	<![CDATA[SELECT SEQ_COMPETS.NEXTVAL AS COMPETID FROM DUAL]]>
+        </selectKey>
+		<![CDATA[
+		INSERT INTO U_COMPETS 
+		(COMPETID, COMPETNAME, DESCRIBE) 
+		values 
+		(#{competId}, #{competName, jdbcType=VARCHAR}, #{describe, jdbcType=VARCHAR})
+		]]>
+	</insert>
+
+	<update id="Compets.update" parameterType="com.interlib.sso.domain.Compets">
+		<![CDATA[
+		UPDATE U_COMPETS 
+		SET 
+		COMPETNAME=#{competName, jdbcType=VARCHAR},
+		DESCRIBE=#{describe, jdbcType=VARCHAR}
+		WHERE 
+		COMPETID=#{competId}
+		]]>
+	</update>
+
+	<insert id="Compets.insertCompRes" parameterType="com.interlib.sso.domain.UCompet_Resource">
+	    <![CDATA[
+		INSERT INTO U_COMPET_RESOURCE 
+		(COMPETID, RESOURCEID) 
+		values 
+		(#{competId}, #{resourceId})
+		]]>
+	</insert>
+	
+	<select id="Compets.getCompRes" resultType="java.lang.String" parameterType="java.lang.Integer">
+	    SELECT 
+		RESOURCEID 
+		<![CDATA[
+		FROM 
+		U_COMPET_RESOURCE 
+		WHERE 
+		COMPETID=#{competId}
+		]]>
+	</select>
+	
+	<select id="Compets.getResourceByCompetId" resultType="Resources" parameterType="java.lang.Integer">
+	    SELECT 
+		C.RESOURCEID, R.SUBSYS, R.RESOURCENAME, R.RESOURCEURL, R.ISMENU, R.DESCRIBE 
+		<![CDATA[
+		FROM 
+		U_COMPET_RESOURCE C, U_RESOURCES R
+		WHERE 
+		COMPETID=#{competId} AND C.RESOURCEID=R.RESOURCEID
+		]]>
+	</select>
+	
+	<select id="Compets.getRoleComp" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+	    <![CDATA[
+	    SELECT 
+	    ROLEID 
+	    FROM 
+	    U_ROLE_COMPET
+	    WHERE COMPETID=#{competId}
+	    ]]>
+	</select>
+	
+	<delete id="Compets.deleteRoleComp" parameterType="java.lang.Integer">
+	    <![CDATA[
+	    DELETE 
+	    FROM
+	    U_ROLE_COMPET 
+	    WHERE 
+	    COMPETID=#{competId}
+	    ]]>
+	</delete>
+	
+	<update id="Compets.updateCompRes" parameterType="java.util.Map">
+	    <![CDATA[
+	    UPDATE U_COMPET_RESOURCE 
+	    set 
+	    RESOURCEID=#{resourceId} 
+	    WHERE
+	    COMPETID=#{competId} 
+	    ]]>
+	</update>
+	
+	<delete id="Compets.deleteCompRes" parameterType="java.lang.Integer">
+	    <![CDATA[
+		DELETE 
+		FROM 
+		U_COMPET_RESOURCE 
+		WHERE 
+		COMPETID=#{competId}
+		]]>
+	</delete>
+	
+	<delete id="Compets.delete" parameterType="java.lang.Integer">
+		<![CDATA[
+		DELETE 
+		FROM 
+		U_COMPETS 
+		WHERE 
+		COMPETID=#{competId}
+		]]>
+	</delete>
+	
+	<select id="Compets.get" resultMap="Compets.resultMap" parameterType="java.lang.Integer">
+		SELECT 
+		<include refid="Compets.base_columns"/>
+		<![CDATA[
+		FROM 
+		U_COMPETS 
+		WHERE 
+		COMPETID=#{competId}
+		]]>
+	</select>
+	
+	<select id="Compets.getAllList" resultMap="Compets.resultMap">
+		SELECT 
+		<include refid="Compets.base_columns"/> 
+		<![CDATA[
+		FROM 
+		U_COMPETS
+		]]>
+		order by COMPETID
+	</select>
+	
+	<select id="Compets.getTotalCount" resultType="java.lang.Integer">
+		<![CDATA[
+		SELECT  
+		count(*) as totalcount 
+		FROM 
+		U_COMPETS
+		]]>
+	</select>
+	
+	<sql id="Compets.findPage.where">
+		<where>
+			<if test="@Ognl@isNotEmpty(competName)">
+			 COMPETNAME LIKE '%'||#{competName}||'%'
+			</if>
+		</where>
+	</sql>
+	
+	<select id="Compets.findPage.count" resultType="java.lang.Long">
+		SELECT 
+		count(*) 
+		FROM 
+		U_COMPETS 
+		<include refid="Compets.findPage.where"/>
+	</select>
+	
+	<select id="Compets.findPage" resultMap="Compets.resultMap">
+		SELECT 
+		<include refid="Compets.base_columns"/> 
+		FROM 
+		U_COMPETS 
+		<include refid="Compets.findPage.where" />
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+	</select>
+	
+	<select id="Compets.queryPageList" parameterType="Compets" resultType="Map">
+		SELECT 
+		<include refid="Compets.base_columns"/> 
+		FROM 
+		U_COMPETS
+		<include refid="Compets.findPage.where"/>
+		ORDER BY COMPETID
+	</select>
+	
+	<delete id="Compets.deleteByIds">
+		DELETE FROM U_COMPETS WHERE COMPETID IN
+		<foreach collection="array" item="idArray"  open="(" separator="," close=")">   
+       		#{idArray}   
+    	</foreach>
+	</delete>
+	
+</mapper>

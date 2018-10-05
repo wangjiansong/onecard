@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<row id="loanFinanceSta" title="流通财经统计">
+	<sysconfig>
+		<grouplist>
+			<field id="cir_fin.rdid" name="cir_fin.rdid" describe="读者证号"
+				type="NVARCHAR" describeSQL="" />
+			<field id="cir_fin.feetype" name="cir_fin.feetype" describe="财经类型"
+				type="CHAR"
+				describeSQL="select distinct feetype as code,describe as display from fintype" />
+			<field id="cir_fin.reglib" name="cir_fin.reglib" describe="发生馆"
+				type="NVARCHAR" describeSQL="select libcode as code,name as display from p_libcode" />
+			<field id="cir_fin.orglib" name="cir_fin.orglib" describe="文献所有馆"
+				type="NVARCHAR" describeSQL="select libcode as code,name as display from p_libcode" />
+			<field id="cir_fin.localcode" name="cir_fin.localcode"
+				describe="发生地点" type="NVARCHAR"
+				describeSQL="select localcode as code,name as display from p_local[liblimit] where libcode='{userlib}'[/liblimit]" />
+			<field id="cir_fin.paysign" name="cir_fin.paysign" describe="交付标识"
+				type="NUMBER"
+				describeSQL="select 0 as code,'未交付' as display from dual union all select 1 as code,'已交付' as display from dual union all select 2 code,'已取消' as display from dual" />
+			<field id="cir_fin.paytype" name="cir_fin.paytype" describe="收款方式"
+				type="NVARCHAR" describeSQL="select typeno as code,typename as display from p_paytype" />
+			<field id="cir_fin.regtime_day" name="to_char(cir_fin.regtime,'yyyymmdd')"
+				describe="日收费" type="NVARCHAR2(20)" describeSQL="" />
+			<field id="cir_fin.regtime_month" name="to_char(cir_fin.regtime,'yyyymm')"
+				describe="月收费" type="NVARCHAR2(20)" describeSQL="" />
+			<field id="cir_fin.regtime_year" name="to_char(cir_fin.regtime,'yyyy')"
+				describe="年收费" type="NVARCHAR2(20)" describeSQL="" />
+			<field id="cir_fin.regman" name="cir_fin.regman" describe="经手人员"
+				type="NVARCHAR"
+				describeSQL="select loginid as code,name as display from p_operator[liblimit] where libcode='{userlib}'[/liblimit]" />
+		</grouplist>
+		<valuelist>
+			<field id="totalfee" name="sum(cir_fin.fee)" describe="金额" />
+			<field id="readerTimes" name="count(*)" describe="人次" />
+			<field id="readerNumber" name="count(distinct cir_fin.rdid)"
+				describe="人数" />
+		</valuelist>
+		<sqlsegment
+			value="select [ROW1] rowline,[COL1] colline,[VAL1] val1,[VAL2] val2,[VAL3] val3 FROM cir_fin GROUP BY [ROW2],[COL2]" />
+	</sysconfig>
+	<defaultconfig>
+		<rowset fieldid="cir_fin.feetype" isRowTotal="true" isRowOther="true">
+		</rowset>
+		<colset fieldid="" isColTotal="false" isColOther="false" />
+		<valset statisVal1="totalfee" statisVal2="" statisVal3="" />
+	</defaultconfig>
+</row>
+	

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="SubsidyGrantTaskMapper">
+	<select id="queryCurrentGrants" parameterType="Date" resultType="Map">
+		SELECT A.GRANTID,B.GRANTAMOUNT,B.GRANTTITLE FROM DATE_GRANT A,SUBSIDY_GRANT B 
+		WHERE A.GRANTID = B.GRANTID 
+			AND GRANTDATE = #{currentDate} 
+			AND ISAUTOGRANT = 1
+	</select>
+	
+	<select id="queryGrantGroups" parameterType="int" resultType="Integer">
+		SELECT GROUPID FROM ASSIGN_GRANT WHERE GRANTID = #{grantId}
+	</select>
+	
+	<update id="doGrant" parameterType="Map">
+		UPDATE RDACCOUNT SET PREPAY = PREPAY + #{grantAmount} 
+		WHERE GROUPID IN 
+		<foreach collection="groupIds" item="groupIds" index="index" open="(" separator="," close=")">
+			#{groupIds}
+		</foreach>
+	</update>
+</mapper>

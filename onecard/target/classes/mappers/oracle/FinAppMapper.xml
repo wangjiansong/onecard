@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="FinAppMapper">
+
+	<resultMap id="FinApp.resultMap" type="com.interlib.sso.domain.FinApp">
+		<result property="appCode" column="APPCODE" />
+		<result property="appName" column="APPNAME" />
+		<result property="serviceURL" column="SERVICEURL" />
+		<result property="regtime" column="REGTIME" />
+		<result property="describe" column="DESCRIBE" />
+		<result property="paramInfo" column="PARAMINFO"/>
+	</resultMap>
+	
+	<sql id="FinApp.base_columns">
+		<![CDATA[
+		APPCODE, APPNAME, SERVICEURL, REGTIME, DESCRIBE, PARAMINFO
+		]]>
+	</sql>
+	
+	<sql id="FinApp.base_columns.simple">
+		<![CDATA[
+		APPCODE, APPNAME
+		]]>
+	</sql>
+	
+	<insert id="FinApp.insert" parameterType="com.interlib.sso.domain.FinApp">
+		<![CDATA[
+		INSERT INTO FIN_APP  
+		(APPCODE, APPNAME, SERVICEURL, REGTIME, DESCRIBE,PARAMINFO) 
+		values 
+		(#{appCode}, #{appName, jdbcType=VARCHAR}, #{serviceURL, jdbcType=VARCHAR}, 
+		sysdate, #{describe, jdbcType=VARCHAR}, #{paramInfo, jdbcType=VARCHAR}
+		)
+		]]>
+	</insert>
+
+	<update id="FinApp.update" parameterType="com.interlib.sso.domain.FinApp">
+		<![CDATA[
+		UPDATE FIN_APP 
+		SET 
+		APPNAME=#{appName, jdbcType=VARCHAR},
+		SERVICEURL=#{serviceURL, jdbcType=VARCHAR},
+		DESCRIBE=#{describe, jdbcType=VARCHAR},
+		PARAMINFO=#{paramInfo,jdbcType=VARCHAR}
+		WHERE 
+		APPCODE=#{appCode}
+		]]>
+	</update>
+	
+	<delete id="FinApp.delete" parameterType="java.lang.String">
+		<![CDATA[
+		DELETE 
+		FROM 
+		FIN_APP 
+		WHERE 
+		APPCODE=#{appCode}
+		]]>
+	</delete>
+	
+	<select id="FinApp.get" resultMap="FinApp.resultMap" parameterType="java.lang.String">
+		SELECT 
+		<include refid="FinApp.base_columns"/>
+		<![CDATA[
+		FROM 
+		FIN_APP  
+		WHERE 
+		APPCODE=#{appCode}
+		]]>
+	</select>
+	
+	<select id="FinApp.getAllList" resultMap="FinApp.resultMap">
+		SELECT 
+		<include refid="FinApp.base_columns"/> 
+		<![CDATA[
+		FROM 
+		FIN_APP 
+		]]>
+		order by APPCODE
+	</select>
+	
+	<select id="FinApp.getAllSimple" resultMap="FinApp.resultMap">
+		SELECT
+		<include refid="FinApp.base_columns"/>
+		FROM
+		FIN_APP
+	</select>
+	
+	<select id="FinApp.getSimpleByAppCode" resultMap="FinApp.resultMap" parameterType="string">
+		SELECT
+		<include refid="FinApp.base_columns.simple" />
+		FROM
+		FIN_APP
+		WHERE
+		APPCODE = #{appcode}
+	</select>
+	
+	<select id="FinApp.getTotalCount" resultType="java.lang.Integer">
+		<![CDATA[
+		SELECT  
+		count(*) as totalcount 
+		FROM 
+		FIN_APP 
+		]]>
+	</select>
+	
+	<sql id="FinApp.findPage.where">
+		<where>
+			<if test="@Ognl@isNotEmpty(appCode)">
+			 APPCODE LIKE '%'||#{appCode}||'%'
+			</if>
+			<if test="@Ognl@isNotEmpty(appName)">
+			APPNAME LIKE '%'||#{appName}||'%'
+			</if>
+		</where>
+	</sql>
+	
+	<select id="FinApp.findPage.count" resultType="java.lang.Long">
+		SELECT 
+		count(*) 
+		FROM 
+		FIN_APP  
+		<include refid="FinApp.findPage.where"/>
+	</select>
+	
+	<select id="FinApp.findPage" resultMap="FinApp.resultMap" parameterType="java.util.Map">
+		SELECT 
+		<include refid="FinApp.base_columns"/> 
+		FROM 
+		FIN_APP 
+		<include refid="FinApp.findPage.where"/>
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+	</select>
+	
+	<select id="FinApp.queryPageList" parameterType="FinApp" resultType="FinApp">
+		SELECT 
+		<include refid="FinApp.base_columns"/> 
+		FROM 
+		FIN_APP
+		<include refid="FinApp.findPage.where"/>
+		ORDER BY APPCODE
+	</select>
+	
+	<delete id="FinApp.deleteByIds">
+		DELETE FROM FIN_APP WHERE APPCODE IN
+		<foreach collection="array" item="idArray"  open="(" separator="," close=")">   
+       		#{idArray}   
+    	</foreach>
+	</delete>
+	
+</mapper>

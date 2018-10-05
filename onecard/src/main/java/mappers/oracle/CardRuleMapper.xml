@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CardRuleMapper">
+	<select id="getRuleId" resultType="int">
+		SELECT SEQ_CARD_RULE.NEXTVAL FROM DUAL
+	</select>
+	
+	<insert id="insertCardRule" parameterType="CardRule">
+		INSERT INTO CARD_RULE (RULEID,RULETITLE,CREATETIME,LASTMODIFYTIME,REMARK,SUBSIDIZETIMES) 
+		VALUES (
+			#{ruleId,jdbcType=INTEGER},
+			#{ruleTitle,jdbcType=VARCHAR},
+			SYSDATE,SYSDATE,
+			#{remark,jdbcType=VARCHAR},
+			#{subsidizeTimes, jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<insert id="insertCardRuleDetail" parameterType="CardRuleDetail">
+		INSERT INTO CARD_RULE_DETAIL (RULEID,STARTTIME,ENDTIME,SALEPRICE,COSTPRICE,TIMEFLAG) 
+		(
+			<foreach collection="list" item="item" index="index" separator="union all">
+				SELECT 
+					#{item.ruleId,jdbcType=INTEGER},
+					#{item.startTime,jdbcType=VARCHAR},
+					#{item.endTime,jdbcType=VARCHAR},
+					#{item.salePrice,jdbcType=FLOAT},
+					#{item.costPrice,jdbcType=FLOAT},
+					#{item.timeFlag,jdbcType=CHAR}
+				FROM DUAL
+			</foreach>
+		)
+	</insert>
+	
+	<select id="queryCardRuleList" parameterType="CardRule" resultType="Map">
+		SELECT RULEID,SUBSIDIZETIMES,RULETITLE,CREATETIME,REMARK FROM CARD_RULE
+		<where>
+			<if test="ruleTitle!=null and ruleTitle!=''">
+				RULETITLE LIKE '%'||TRIM(#{ruleTitle})||'%'
+			</if>
+		</where>
+		ORDER BY RULEID
+	</select>
+	
+	<delete id="deleteCardRule" parameterType="String">
+		DELETE FROM CARD_RULE WHERE RULEID IN 
+		<foreach collection="array" item="idArray" index="index" open="(" separator="," close=")">
+			#{idArray}
+		</foreach>
+	</delete>
+	
+	<delete id="deleteCardRuleDetail" parameterType="String">
+		DELETE FROM CARD_RULE_DETAIL WHERE RULEID IN 
+		<foreach collection="array" item="idArray" index="index" open="(" separator="," close=")">
+			#{idArray}
+		</foreach>
+	</delete>
+	
+	<delete id="deleteCardRuleAssign" parameterType="String">
+		DELETE FROM CARD_GROUP_ASSIGN WHERE RULEID IN 
+		<foreach collection="array" item="idArray" index="index" open="(" separator="," close=")">
+			#{idArray}
+		</foreach>
+	</delete>
+	
+	<select id="getCardRuleById" parameterType="int" resultType="Map">
+		SELECT RULEID,RULETITLE,TO_CHAR(CREATETIME,'YYYY-MM-DD HH24:MI') CREATETIME,REMARK,SUBSIDIZETIMES FROM CARD_RULE WHERE RULEID = #{ruleId}
+	</select>
+	
+	<select id="getCardRuleDetails" parameterType="int" resultType="Map">
+		SELECT RULEID,STARTTIME,ENDTIME,SALEPRICE,COSTPRICE FROM CARD_RULE_DETAIL
+		WHERE RULEID = #{ruleId}
+	</select>
+	
+	<update id="updateCardRule" parameterType="CardRule">
+		UPDATE CARD_RULE SET 
+			RULETITLE = #{ruleTitle},
+			LASTMODIFYTIME = SYSDATE,
+			REMARK = #{remark, jdbcType=VARCHAR},
+			SUBSIDIZETIMES = #{subsidizeTimes, jdbcType=VARCHAR}
+		WHERE 
+			RULEID = #{ruleId}
+	</update>
+	
+	<select id="queryAssignGroupList" parameterType="CardRule" resultType="Map">
+		SELECT GROUPID,GROUPNAME,CREATETIME,REMARK 
+		FROM CARD_GROUP 
+		WHERE ISASSIGNED = 1  
+			AND GROUPID IN (
+				SELECT GROUPID FROM CARD_GROUP_ASSIGN WHERE RULEID = #{ruleId}
+			)
+			<if test="groupName!=null and groupName!=''">
+				AND GROUPNAME LIKE '%'||TRIM(#{groupName})||'%'
+			</if>
+	</select>
+	
+	<select id="queryUnAssignedGroupList" parameterType="CardRule" resultType="Map">
+		SELECT GROUPID,GROUPNAME,CREATETIME,REMARK 
+		FROM CARD_GROUP 
+		WHERE ISASSIGNED = 0 
+			AND GROUPID NOT IN (
+				SELECT GROUPID FROM CARD_GROUP_ASSIGN WHERE RULEID = #{ruleId}
+			)
+			<if test="groupName!=null and groupName!=''">
+				AND GROUPNAME LIKE '%'||TRIM(#{groupName})||'%'
+			</if>
+	</select>
+	
+	<insert id="insertAssignGroup" parameterType="Map">
+		INSERT INTO CARD_GROUP_ASSIGN (RULEID,GROUPID)
+		(
+		<foreach collection="list" item="item" index="index" separator="union all">
+			SELECT 
+				#{item.ruleId,jdbcType=INTEGER},
+				#{item.groupId,jdbcType=INTEGER}
+			FROM DUAL
+		</foreach>
+		)
+	</insert>
+	
+	<update id="updateGroupAssigned" parameterType="String">
+		UPDATE CARD_GROUP SET 
+			ISASSIGNED = 1
+		WHERE GROUPID IN 
+		<foreach collection="array" item="groupIds" index="index" open="(" separator="," close=")">
+			#{groupIds}
+		</foreach>
+	</update>
+	
+	<delete id="deleteAssignGroup" parameterType="Map">
+		DELETE FROM CARD_GROUP_ASSIGN 
+		WHERE RULEID = #{ruleId}
+			AND GROUPID IN 
+			<foreach collection="groupIds" item="groupIds" index="index" open="(" separator="," close=")">
+				#{groupIds}
+			</foreach>
+	</delete>
+	
+	<update id="updateGroupUnAssigned" parameterType="String">
+		UPDATE CARD_GROUP SET 
+			ISASSIGNED = 0
+		WHERE GROUPID IN 
+		<foreach collection="array" item="groupIds" index="index" open="(" separator="," close=")">
+			#{groupIds}
+		</foreach>
+	</update>
+	
+	<select id="getSlotDetail" parameterType="Map" resultType="CardRuleDetail">
+		SELECT RULEID,TO_CHAR(STARTTIME, 'HH24:MI:SS') AS STARTTIME,TO_CHAR(ENDTIME, 'HH24:MI:SS') AS ENDTIME,SALEPRICE,COSTPRICE,TIMEFLAG FROM (
+			SELECT RULEID,TO_DATE(#{todayStr}||STARTTIME,'YYYY-MM-DD HH24:MI:SS') STARTTIME,
+				TO_DATE(#{todayStr}||ENDTIME,'YYYY-MM-DD HH24:MI:SS') ENDTIME,SALEPRICE,COSTPRICE,TIMEFLAG 
+			FROM CARD_RULE_DETAIL 
+			WHERE RULEID = (
+				SELECT RULEID FROM 
+				CARD_GROUP_ASSIGN 
+				WHERE GROUPID = (
+					SELECT GROUPID FROM CARD_GROUP_MEMBER WHERE RDID = #{rdId}
+				)
+			)
+		)
+		WHERE 
+			#{slotTime} 
+			<![CDATA[
+			>=
+			]]>
+			STARTTIME 
+			AND #{slotTime} 
+			<![CDATA[
+			<=
+			]]>
+			ENDTIME
+	</select>
+</mapper>

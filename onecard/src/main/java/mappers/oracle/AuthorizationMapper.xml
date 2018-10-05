@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="AuthorizationMapper">
+
+	<resultMap id="Authorization.resultMap" type="com.interlib.sso.domain.Authorization">
+		<result property="id" column="ID" />
+		<result property="appCode" column="APPCODE" />
+		<result property="appName" column="APPNAME" />
+		<result property="ipAddress" column="IPADDRESS" />
+		<result property="staticCode" column="STATICCODE" />
+		<result property="authorizeApi" column="AUTHORIZEAPI" />
+		<result property="endDate" column="ENDDATE" />
+		<result property="bindingUserId" column="BINDINGUSERID" />
+		<result property="encodeRule" column="ENCODERULE" />
+	</resultMap>
+	
+	<sql id="Authorization.base_columns">
+		<![CDATA[
+		ID, APPCODE, APPNAME, IPADDRESS, STATICCODE, AUTHORIZEAPI, TO_CHAR(ENDDATE, 'YYYY-MM-DD') ENDDATE, BINDINGUSERID, ENCODERULE
+		]]>
+	</sql>
+	
+	<sql id="Authorization.base_columns.simple">
+		<![CDATA[
+		APPCODE, APPNAME
+		]]>
+	</sql>
+	
+	<insert id="Authorization.insert" parameterType="com.interlib.sso.domain.Authorization">
+	    <selectKey resultType="int"  keyProperty="id" order="BEFORE">   
+        	<![CDATA[SELECT SEQ_AUTHORIZATION.NEXTVAL AS ID FROM DUAL]]>
+        </selectKey>
+		<![CDATA[
+		INSERT INTO AUTHORIZATION 
+		(ID, APPCODE, APPNAME, IPADDRESS, STATICCODE, AUTHORIZEAPI, ENDDATE, BINDINGUSERID, ENCODERULE) 
+		values 
+		(#{id}, #{appCode, jdbcType=VARCHAR}, #{appName, jdbcType=VARCHAR}, #{ipAddress, jdbcType=VARCHAR}, 
+		#{staticCode, jdbcType=VARCHAR}, #{authorizeApi, jdbcType=VARCHAR}, TO_DATE(#{endDate}, 'YYYY-MM-DD'), 
+		#{bindingUserId, jdbcType=VARCHAR}, #{encodeRule})
+		]]>
+	</insert>
+
+	<update id="Authorization.update" parameterType="com.interlib.sso.domain.Authorization">
+		<![CDATA[
+		UPDATE AUTHORIZATION 
+		SET 
+		APPCODE=#{appCode, jdbcType=VARCHAR},
+		APPNAME=#{appName, jdbcType=VARCHAR},
+		IPADDRESS=#{ipAddress, jdbcType=VARCHAR},
+		STATICCODE=#{staticCode, jdbcType=VARCHAR},
+		AUTHORIZEAPI=#{authorizeApi, jdbcType=VARCHAR},
+		ENDDATE=TO_DATE(#{endDate}, 'YYYY-MM-DD'),
+		BINDINGUSERID=#{bindingUserId, jdbcType=VARCHAR},
+		ENCODERULE=#{encodeRule}
+		WHERE 
+		ID=#{id}
+		]]>
+	</update>
+	<delete id="Authorization.delete" parameterType="java.lang.Integer">
+		<![CDATA[
+		DELETE 
+		FROM 
+		AUTHORIZATION 
+		WHERE 
+		ID=#{id}
+		]]>
+	</delete>
+	
+	<select id="Authorization.get" resultMap="Authorization.resultMap" parameterType="java.lang.Integer">
+		SELECT 
+		<include refid="Authorization.base_columns"/>
+		<![CDATA[
+		FROM 
+		AUTHORIZATION 
+		WHERE 
+		ID=#{id}
+		]]>
+	</select>
+	
+	<select id="Authorization.getByAppCode" resultMap="Authorization.resultMap" parameterType="java.lang.String">
+		SELECT 
+		<include refid="Authorization.base_columns"/>
+		<![CDATA[
+		FROM 
+		AUTHORIZATION 
+		WHERE 
+		APPCODE=#{appCode}
+		]]>
+	</select>
+	
+	<select id="Authorization.getAllSimple" resultMap="Authorization.resultMap">
+		SELECT
+		<include refid="Authorization.base_columns.simple" />
+		FROM
+		AUTHORIZATION
+		group by APPCODE, APPNAME
+	</select>
+	
+	<select id="Authorization.getSimpleByAppCode" resultMap="Authorization.resultMap" parameterType="string">
+		SELECT
+		<include refid="Authorization.base_columns.simple" />
+		FROM
+		FIN_APP
+		WHERE
+		APPCODE = #{appcode}
+	</select>
+	
+	
+	<select id="Authorization.getAllList" resultMap="Authorization.resultMap">
+		SELECT 
+		<include refid="Authorization.base_columns"/> 
+		<![CDATA[
+		FROM 
+		AUTHORIZATION
+		]]>
+		order by ID
+	</select>
+	
+	<select id="Authorization.getTotalCount" resultType="java.lang.Integer">
+		<![CDATA[
+		SELECT  
+		count(*) as totalcount 
+		FROM 
+		AUTHORIZATION
+		]]>
+	</select>
+	
+	<sql id="Authorization.findPage.where">
+		<where>
+			<if test="@Ognl@isNotEmpty(appCode)">
+			 APPCODE LIKE '%'||#{appCode}||'%'
+			</if>
+			<if test="@Ognl@isNotEmpty(appName)">
+			 APPNAME LIKE '%'||#{appName}||'%'
+			</if>
+			<if test="@Ognl@isNotEmpty(bindingUserId)">
+			 BINDINGUSERID LIKE '%'||#{bindingUserId}||'%'
+			</if>
+		</where>
+	</sql>
+	
+	<select id="Authorization.findPage.count" resultType="java.lang.Long">
+		SELECT 
+		count(*) 
+		FROM 
+		AUTHORIZATION 
+		<include refid="Authorization.findPage.where"/>
+	</select>
+	
+	<select id="Authorization.findPage" resultMap="Authorization.resultMap">
+		SELECT 
+		<include refid="Authorization.base_columns"/> 
+		FROM 
+		AUTHORIZATION 
+		<include refid="Authorization.findPage.where" />
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+	</select>
+	
+	<select id="Authorization.queryPageList" parameterType="com.interlib.sso.domain.Authorization" resultType="Authorization">
+		SELECT 
+		<include refid="Authorization.base_columns"/> 
+		FROM 
+		AUTHORIZATION
+		<include refid="Authorization.findPage.where"/>
+		ORDER BY ID
+	</select>
+	
+	<select id="Authorization.getAppsByOperator" resultMap="Authorization.resultMap" parameterType="string">
+		SELECT
+		<include refid="Authorization.base_columns.simple" />
+		FROM
+		AUTHORIZATION
+		WHERE
+		BINDINGUSERID LIKE '%'||#{rdId}||'%'
+	</select>
+	
+	
+	<select id="Authorization.getAppsByMultAppcode" resultMap="Authorization.resultMap" resultType="Authorization">
+		SELECT
+		<include refid="Authorization.base_columns.simple" />
+		FROM
+		AUTHORIZATION
+		WHERE APPCODE IN
+		<foreach collection="array" item="appCodes"  open="(" separator="," close=")">   
+       		#{appCodes}   
+    	</foreach>
+	</select>
+	
+	<delete id="Authorization.deleteByIds">
+		DELETE 
+		FROM AUTHORIZATION 
+		WHERE ID IN
+		<foreach collection="array" item="idArray"  open="(" separator="," close=")">   
+       		#{idArray}   
+    	</foreach>
+	</delete>
+	
+</mapper>

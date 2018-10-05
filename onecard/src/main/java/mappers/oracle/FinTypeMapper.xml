@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="FinTypeMapper">
+
+	<resultMap id="FinType.resultMap" type="com.interlib.sso.domain.FinType">
+		<result property="feeType" column="FEETYPE" />
+		<result property="describe" column="DESCRIBE" />
+		<result property="appCode" column="APPCODE" />
+		<result property="appName" column="APPNAME" />
+		<result property="typefee" column="TYPEFEE"/>
+	</resultMap>
+	
+	<sql id="FinType.base_columns">
+		<![CDATA[
+		FEETYPE, DESCRIBE, APPCODE, APPNAME,TYPEFEE
+		]]>
+	</sql>
+	
+	<insert id="FinType.insert" parameterType="com.interlib.sso.domain.FinType">
+		<![CDATA[
+		INSERT INTO FIN_TYPE  
+		(FEETYPE, DESCRIBE, APPCODE, APPNAME,TYPEFEE) 
+		values 
+		(#{feeType}, #{describe, jdbc=VARCHAR}, #{appCode, jdbcType=VARCHAR}, 
+		#{appName, jdbcType=VARCHAR}, #{typefee , jdbcType=VARCHAR})
+		]]>
+	</insert>
+
+	<update id="FinType.update" parameterType="com.interlib.sso.domain.FinType">
+		<![CDATA[
+		UPDATE FIN_TYPE 
+		SET 
+		DESCRIBE=#{describe, jdbcType=VARCHAR},
+		APPCODE=#{appCode, jdbcType=VARCHAR},
+		APPNAME=#{appName, jdbcType=VARCHAR},
+		TYPEFEE=#{typefee, jdbcType=VARCHAR}
+		WHERE 
+		FEETYPE=#{feeType}
+		]]>
+	</update>
+	
+	<delete id="FinType.delete" parameterType="java.lang.String">
+		<![CDATA[
+		DELETE 
+		FROM 
+		FIN_TYPE 
+		WHERE 
+		FEETYPE=#{feeType}
+		]]>
+	</delete>
+	
+	<select id="FinType.get" resultMap="FinType.resultMap" parameterType="java.lang.String">
+		SELECT 
+		<include refid="FinType.base_columns"/>
+		<![CDATA[
+		FROM 
+		FIN_TYPE  
+		WHERE 
+		FEETYPE=#{feeType}
+		]]>
+	</select>
+	
+	<select id="FinType.getAllList" resultMap="FinType.resultMap">
+		SELECT 
+		<include refid="FinType.base_columns"/> 
+		<![CDATA[
+		FROM 
+		FIN_TYPE 
+		]]>
+		order by FEETYPE
+	</select>
+	
+	<select id="FinType.getAll" resultMap="FinType.resultMap">
+		SELECT 
+		T.FEETYPE, T.DESCRIBE, T.APPCODE, A.APPNAME ,T.TYPEFEE
+		FROM 
+		FIN_TYPE T, AUTHORIZATION A
+		WHERE 
+		T.APPCODE = A.APPCODE 
+		order by FEETYPE
+	</select>
+	
+	<select id="FinType.getTotalCount" resultType="java.lang.Integer">
+		<![CDATA[
+		SELECT  
+		count(*) as totalcount 
+		FROM 
+		FIN_TYPE 
+		]]>
+	</select>
+	
+	<sql id="FinType.findPage.where">
+		<where>
+			<if test="@Ognl@isNotEmpty(describe)">
+			 DESCRIBE LIKE #{describe}
+			</if>
+		</where>
+	</sql>
+	
+	<select id="FinType.findPage.count" resultType="java.lang.Long">
+		SELECT 
+		count(*) 
+		FROM 
+		FIN_TYPE  
+		<include refid="FinType.findPage.where"/>
+	</select>
+	
+	<select id="FinType.findPage" resultMap="FinType.resultMap" parameterType="java.util.Map">
+		SELECT 
+		T.FEETYPE, T.DESCRIBE, T.APPCODE, A.APPNAME ,T.TYPEFEE
+		FROM 
+		FIN_TYPE T, AUTHORIZATION A
+		<where>
+			<if test="@Ognl@isNotEmpty(describe)">
+			 DESCRIBE LIKE #{describe}
+			</if>
+			T.APPCODE = A.APPCODE
+		</where>
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+	</select>
+	
+	<select id="FinType.queryPageList" parameterType="FinType" resultType="Map">
+		SELECT 
+		T.FEETYPE, T.DESCRIBE, T.APPCODE, A.APPNAME ,T.TYPEFEE
+		FROM 
+		FIN_TYPE T, AUTHORIZATION A
+		WHERE 1=1
+		<if test="@Ognl@isNotEmpty(describe)">
+			AND T.DESCRIBE LIKE '%'||#{describe}||'%' 
+		</if>
+		<if test="@Ognl@isNotEmpty(appCode)">
+			AND T.APPCODE LIKE '%'||#{appCode}||'%' 
+		</if>
+		AND T.APPCODE = A.APPCODE
+		ORDER BY FEETYPE
+	</select>
+	
+	<delete id="FinType.deleteByIds">
+		DELETE FROM FIN_TYPE WHERE FEETYPE IN
+		<foreach collection="array" item="idArray"  open="(" separator="," close=")">   
+       		#{idArray}   
+    	</foreach>
+	</delete>
+	
+	<select id="FinType.getAllFeeType" resultMap="FinType.resultMap" resultType="FinType">
+		SELECT
+<!-- 		<include refid="FinType.base_columns"/>  -->
+		FEETYPE, (DESCRIBE || '|' || APPNAME) AS DESCRIBE ,TYPEFEE
+		<![CDATA[
+		FROM 
+		FIN_TYPE 
+		]]>
+	</select>
+	
+	<select id="FinType.searchFeeType" resultMap="FinType.resultMap" resultType="FinType">
+		SELECT 
+		FEETYPE,(DESCRIBE || '|' || APPNAME) AS DESCRIBE ,TYPEFEE
+		FROM 
+		FIN_TYPE 
+		WHERE FEETYPE IN 
+		<foreach collection="array" item="feetypes"  open="(" separator="," close=")">   
+      			#{feetypes}   
+   		</foreach>
+    	order by feetype
+	</select>
+	
+	<select id="FinType.getFinTypesByAppcodes" resultMap="FinType.resultMap" resultType="FinType">
+		SELECT 
+		FEETYPE, DESCRIBE, APPCODE, APPNAME ,TYPEFEE
+		FROM 
+		FIN_TYPE 
+		WHERE APPCODE IN 
+		<foreach collection="array" item="appcodes"  open="(" separator="," close=")">   
+      			#{appcodes}   
+   		</foreach>
+	</select>
+	
+	<select id="FinType.getFeeTypeByMultiFeetype" resultMap="FinType.resultMap" resultType="FinType">
+		SELECT
+		<include refid="FinType.base_columns"/>
+		FROM 
+		FIN_TYPE 
+		WHERE FEETYPE IN 
+		<foreach collection="array" item="feetypes"  open="(" separator="," close=")">   
+      		#{feetypes}   
+   		</foreach>
+    	order by feetype
+	</select>
+	
+</mapper>

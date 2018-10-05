@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="NetReaderMapper">
+	<select id="getReaderNum" parameterType="String" resultType="Integer">
+		SELECT COUNT(0) FROM READER WHERE RDID=#{rdId}
+	</select>
+	
+	<select id="getNetReaderNum" parameterType="String" resultType="Integer">
+		SELECT COUNT(0) FROM NETREADER WHERE READERID=#{readerId}
+	</select>
+	
+	<select id="getBatchNetReader" parameterType="String" resultType="Integer">
+		SELECT COUNT(0) FROM NETREADER WHERE READERID=READERNAME
+	</select>
+	
+	
+	<insert id="insertNetReader" parameterType="NetReader" keyColumn="readerId">
+		INSERT INTO NETREADER 
+			(READERID,READERCARDSTATE,READERTYPE,READERLIB,READERSTARTDATE,
+			READERENDDATE,READERHANDLEDATE,CHECKSTATE,READERNAME,READERPASSWORD,
+			READERCERTIFY,READERGENDER,READERMOBILE,READERNATIVE,READERADDRESS,
+			READEREMAIL,READERSORT1,READERSORT2,READERSORT3,READERSORT4,READERSORT5,REMARK,READERUNIT,READERBORNDATE)
+		VALUES 
+			(#{readerId},#{readerCardState},#{readerType,jdbcType=VARCHAR},#{readerLib,jdbcType=VARCHAR},#{readerStartDate,jdbcType=TIMESTAMP},
+			#{readerEndDate,jdbcType=TIMESTAMP},#{readerHandleDate,jdbcType=TIMESTAMP},1,#{readerName},#{readerPassword},#{readerCertify, jdbcType=VARCHAR},
+			#{readerGender},#{readerMobile, jdbcType=VARCHAR},#{readerNative, jdbcType=VARCHAR},#{readerAddress, jdbcType=VARCHAR},#{readerEmail, jdbcType=VARCHAR},
+			#{readerSort1, jdbcType=VARCHAR},#{readerSort2, jdbcType=VARCHAR},#{readerSort3, jdbcType=VARCHAR},#{readerSort4, jdbcType=VARCHAR},
+			#{readerSort5, jdbcType=VARCHAR},#{remark, jdbcType=VARCHAR},#{readerUnit, jdbcType=VARCHAR},#{readerBornDate, jdbcType=TIMESTAMP})
+	</insert>
+	
+	<select id="queryNetReaderList" parameterType="NetReader" resultType="NetReader">
+		SELECT A.READERID,A.READERNAME,A.READERCARDSTATE,A.CHECKSTATE,A.READERUNIT,B.DESCRIPE READERTYPE,C.NAME READERLIB 
+		FROM NETREADER A 
+			LEFT JOIN P_RCTYPE B
+			ON A.READERTYPE=B.READERTYPE 
+				LEFT JOIN P_LIBCODE C 
+				ON A.READERLIB=C.LIBCODE 
+		<where>
+			1=1
+			<if test="checkState!=null and checkState!=''">
+				AND A.CHECKSTATE=#{checkState}
+			</if>
+			<if test="readerName!=null and readerName!=''">
+				AND A.READERNAME LIKE '%'||#{readerName}||'%'
+			</if>
+			<if test="readerId!=null and readerId!=''">
+				AND A.READERID=#{readerId}
+			</if>
+		</where>
+		ORDER BY CHECKSTATE, READERHANDLEDATE desc
+	</select>
+	
+	<select id="queryBatchNetReaderList" parameterType="NetReader" resultType="NetReader">
+		SELECT A.READERID,A.READERNAME,A.READERPASSWORD,A.READERHANDLEDATE,A.READERCARDSTATE,A.CHECKSTATE,A.READERUNIT,B.DESCRIPE READERTYPE,C.NAME READERLIB 
+		FROM NETREADER A 
+			LEFT JOIN P_RCTYPE B
+			ON A.READERTYPE=B.READERTYPE 
+				LEFT JOIN P_LIBCODE C 
+				ON A.READERLIB=C.LIBCODE 
+		<where>
+			 A.READERNAME = A.READERID 
+		</where>
+		ORDER BY READERHANDLEDATE desc
+	</select>
+	
+	<select id="queryBatchNetReaderListByReaderType" parameterType="Map" resultType="NetReader">
+		SELECT * FROM NETREADER  
+			WHERE READERTYPE = #{rdtype,jdbcType=VARCHAR}
+			<if test="start!=null and start!=''">			
+			 	AND to_char(READERHANDLEDATE, 'YYYY-MM-DD') <![CDATA[>=]]> #{start,jdbcType=VARCHAR}
+			</if>
+			<if test="end!=null and end!=''">
+			 	AND to_char(READERHANDLEDATE, 'YYYY-MM-DD') <![CDATA[<=]]> #{end,jdbcType=VARCHAR}
+			</if>
+				ORDER BY READERID desc
+	</select>
+	
+	<update id="approveReject" parameterType="List">
+		UPDATE NETREADER SET CHECKSTATE=3 
+		WHERE READERID IN 
+		<foreach collection="list" item="idList" index="index" open="(" separator="," close=")">
+			#{idList}
+		</foreach>
+	</update>
+	
+	<select id="getNetReaders" parameterType="List" resultType="NetReader">
+		SELECT READERID,READERCARDSTATE,READERTYPE,READERLIB,READERSTARTDATE,
+			READERENDDATE,READERHANDLEDATE,CHECKSTATE,READERNAME,READERPASSWORD,
+			READERCERTIFY,READERGENDER,READERMOBILE,READERNATIVE,READERADDRESS,
+			READEREMAIL,READERSORT1,READERSORT2,READERSORT3,READERSORT4,READERSORT5,REMARK, READERUNIT,READERBORNDATE
+		FROM NETREADER 
+		WHERE READERID IN 
+		<foreach collection="list" index="index" item="idList" open="(" separator="," close=")">
+			#{idList}
+		</foreach>
+	</select>
+	
+	<insert id="approvePass" parameterType="NetReader">
+		INSERT INTO READER (RDID,RDCFSTATE,RDTYPE,RDGLOBAL,RDLIBTYPE,RDSTARTDATE,
+			RDENDDATE,RDINTIME,RDLIB,RDSORT1,RDSORT2,RDSORT3,RDSORT4,RDSORT5,RDNAME,
+			RDPASSWD,OLDRDPASSWD,RDCERTIFY,RDSEX,RDLOGINID,RDNATIVE,RDADDRESS,RDEMAIL,
+			RDREMARK, RDUNIT, LIBUSER,SYNSTATUS,RDBORNDATE)
+		VALUES
+		(#{readerId},#{readerCardState},#{readerType},0,'',#{readerStartDate},
+		#{readerEndDate},#{readerHandleDate},#{readerLib},#{readerSort1,jdbcType=VARCHAR},#{readerSort2,jdbcType=VARCHAR},
+		#{readerSort3,jdbcType=VARCHAR},#{readerSort4,jdbcType=VARCHAR},#{readerSort5,jdbcType=VARCHAR},#{readerName},#{readerPassword},#{readerPassword},
+		#{readerCertify, jdbcType=VARCHAR},#{readerGender},#{readerMobile,jdbcType=VARCHAR},#{readerNative,jdbcType=VARCHAR},#{readerAddress,jdbcType=VARCHAR},
+		#{readerEmail,jdbcType=VARCHAR},#{remark, jdbcType=VARCHAR},#{readerUnit, jdbcType=VARCHAR}, 0, 0,#{readerBornDate, jdbcType=TIMESTAMP})
+	</insert>
+	
+	<insert id="createAccount" parameterType="NetReader">
+		<![CDATA[
+		INSERT INTO RDACCOUNT  
+		(RDID, DEPOSIT, PREPAY, ARREARAGE, SPDEPOSIT, ONECARD, STATUS) 
+		values 
+		(#{readerId}, 0.0, 0.0, 0.0, 0.0, 0.0, 1)
+		]]>
+	</insert>
+	
+	<update id="updateCheckPassed" parameterType="List">
+		UPDATE NETREADER SET CHECKSTATE=2 
+		WHERE READERID IN 
+		<foreach collection="list" item="netreaderIds" index="index" open="(" separator="," close=")">
+			#{netreaderIds}
+		</foreach>
+	</update>
+	
+	<select id="getNetReader" parameterType="String" resultType="NetReader">
+		SELECT A.READERID,A.READERCARDSTATE,B.DESCRIPE READERTYPE,C.NAME READERLIB,A.READERSTARTDATE, 
+			A.READERENDDATE,A.READERHANDLEDATE,A.CHECKSTATE,A.READERNAME,A.READERPASSWORD, 
+			A.READERCERTIFY,A.READERGENDER,A.READERMOBILE,A.READERNATIVE,A.READERADDRESS,A.READEREMAIL,
+			A.READERSORT1,A.READERSORT2,A.READERSORT3,A.READERSORT4,A.READERSORT5,A.REMARK,A.READERUNIT,A.READERBORNDATE
+			FROM NETREADER A 
+				LEFT JOIN P_RCTYPE B 
+					ON A.READERTYPE=B.READERTYPE 
+				LEFT JOIN P_LIBCODE C 
+					ON A.READERLIB=C.LIBCODE
+		WHERE READERID=#{netreaderId}
+	</select>
+	
+	<select id="getNetReaderByRdId" parameterType="String" resultType="NetReader">
+		SELECT A.READERID,A.READERCARDSTATE,A.READERTYPE,A.READERLIB,A.READERSTARTDATE, 
+			A.READERENDDATE,A.READERHANDLEDATE,A.CHECKSTATE,A.READERNAME,A.READERPASSWORD, 
+			A.READERCERTIFY,A.READERGENDER,A.READERMOBILE,A.READERNATIVE,A.READERADDRESS,A.READEREMAIL,
+			A.READERSORT1,A.READERSORT2,A.READERSORT3,A.READERSORT4,A.READERSORT5,A.REMARK,A.READERUNIT,A.READERBORNDATE
+			FROM NETREADER A 
+		WHERE READERID=#{netreaderId}
+	</select>
+	
+	<delete id="deleteNetReader" parameterType="List">
+		DELETE FROM NETREADER
+		WHERE READERID IN 
+		<foreach collection="list" item="idList" index="index" open="(" separator="," close=")">
+			#{idList}
+		</foreach>
+	</delete>
+	
+	<!--针对于虚拟读者年月日统计  -->
+	<select id="queryBatchNetReaderByDayList" resultType="com.interlib.sso.domain.NetReader" parameterType="java.lang.String">
+		select to_char(readerHandleDate, 'YYYY/MM/DD') as day,
+	    <![CDATA[
+	    A.READERID,A.READERNAME,A.READERPASSWORD, A.READERHANDLEDATE,
+		A.READERCARDSTATE,A.CHECKSTATE, A.READERUNIT,B.DESCRIPE READERTYPE,C.NAME READERLIB
+		]]>
+		from NETREADER A 
+			LEFT JOIN P_RCTYPE B
+			ON A.READERTYPE=B.READERTYPE 
+				LEFT JOIN P_LIBCODE C 
+				ON A.READERLIB=C.LIBCODE
+		 
+		<where>
+			 1=1 and A.READERNAME = A.READERID 
+		</where>
+		<if test="@Ognl@isNotEmpty(startTime)">
+		 	AND to_char(READERHANDLEDATE, 'YYYY/MM/DD') <![CDATA[>=]]> #{startTime}
+		</if>
+		<if test="@Ognl@isNotEmpty(endTime)">
+		 	AND to_char(READERHANDLEDATE, 'YYYY/MM/DD') <![CDATA[<=]]> #{endTime}
+		</if>
+		ORDER BY READERHANDLEDATE desc
+	</select>
+	
+	<select id="queryBatchNetReaderByMonthList" resultType="com.interlib.sso.domain.NetReader" parameterType="java.lang.String">
+		select to_char(readerHandleDate, 'YYYY/MM') as day,
+	    <![CDATA[
+	    A.READERID,A.READERNAME,A.READERPASSWORD, A.READERHANDLEDATE,
+		A.READERCARDSTATE,A.CHECKSTATE, A.READERUNIT,
+		B.DESCRIPE READERTYPE,C.NAME READERLIB
+		]]>
+		from NETREADER A 
+			LEFT JOIN P_RCTYPE B
+			ON A.READERTYPE=B.READERTYPE 
+				LEFT JOIN P_LIBCODE C 
+				ON A.READERLIB=C.LIBCODE
+		 
+		<where>
+			 1=1 and A.READERNAME = A.READERID 
+		</where>
+		<if test="@Ognl@isNotEmpty(startTime)">
+		 	AND to_char(READERHANDLEDATE, 'YYYY/MM') <![CDATA[>=]]> #{startTime}
+		</if>
+		<if test="@Ognl@isNotEmpty(endTime)">
+		 	AND to_char(READERHANDLEDATE, 'YYYY/MM') <![CDATA[<=]]> #{endTime}
+		</if>
+		ORDER BY READERHANDLEDATE desc
+	</select>
+	
+	<select id="queryBatchNetReaderByYearList" resultType="com.interlib.sso.domain.NetReader" parameterType="java.lang.String">
+		select to_char(readerHandleDate, 'YYYY') as day,
+	    <![CDATA[
+	    A.READERID,A.READERNAME,A.READERPASSWORD, A.READERHANDLEDATE,
+		A.READERCARDSTATE,A.CHECKSTATE, A.READERUNIT,
+		B.DESCRIPE READERTYPE,C.NAME READERLIB
+		]]>
+		from NETREADER A 
+			LEFT JOIN P_RCTYPE B
+			ON A.READERTYPE=B.READERTYPE 
+				LEFT JOIN P_LIBCODE C 
+				ON A.READERLIB=C.LIBCODE
+		 
+		<where>
+			 1=1 and A.READERNAME = A.READERID 
+		</where>
+		<if test="@Ognl@isNotEmpty(startTime)">
+		 	AND to_char(READERHANDLEDATE, 'YYYY') <![CDATA[>=]]> #{startTime}
+		</if>
+		<if test="@Ognl@isNotEmpty(endTime)">
+		 	AND to_char(READERHANDLEDATE, 'YYYY') <![CDATA[<=]]> #{endTime}
+		</if>
+		ORDER BY READERHANDLEDATE desc
+	</select>
+	
+</mapper>

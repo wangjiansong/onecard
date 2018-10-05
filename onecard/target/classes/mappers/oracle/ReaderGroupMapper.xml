@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ReaderGroupMapper">
+	<insert id="insertReaderGroup" parameterType="ReaderGroup">
+		<selectKey keyProperty="groupId" order="BEFORE" resultType="int">
+			SELECT SEQ_GROUP_GRANT.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO GROUP_GRANT (GROUPID,GROUPNAME,CREATETIME,REMARK)
+		VALUES
+		(#{groupId,jdbcType=INTEGER},#{groupName,jdbcType=VARCHAR},
+		SYSDATE,#{remark,jdbcType=VARCHAR})
+	</insert>
+	
+	<select id="queryGroupList" parameterType="ReaderGroup" resultType="Map">
+		SELECT GROUPID,GROUPNAME,TO_CHAR(CREATETIME,'YYYY-MM-DD HH24:MI') CREATETIME,REMARK
+		FROM GROUP_GRANT
+		<where>
+			<if test="groupName!=null and groupName!=''">
+				AND GROUPNAME LIKE '%'||TRIM(#{groupName})||'%'
+			</if>
+		</where>
+		ORDER BY GROUPID
+	</select>
+	
+	<select id="getGroupById" parameterType="int" resultType="ReaderGroup">
+		SELECT GROUPID,GROUPNAME,REMARK FROM GROUP_GRANT WHERE GROUPID = #{groupId}
+	</select>
+	
+	<update id="updateGroup" parameterType="ReaderGroup">
+		UPDATE GROUP_GRANT SET
+			GROUPNAME = #{groupName},
+			REMARK = #{remark}
+		WHERE GROUPID = #{groupId}
+	</update>
+	
+	<delete id="deleteGroup" parameterType="String">
+		DELETE FROM GROUP_GRANT WHERE GROUPID IN
+		<foreach collection="array" item="idArray" index="index" open="(" separator="," close=")">
+			#{idArray}
+		</foreach>
+	</delete>
+	
+	<select id="queryNoGroupReaderList" resultType="Map" parameterType="Reader">
+		SELECT A.RDID,B.RDNAME,B.RDCERTIFY,B.RDCFSTATE,B.RDTYPE,B.RDLIB 
+		FROM RDACCOUNT A,READER B 
+		<where>
+			A.RDID = B.RDID AND A.GROUPID IS NULL
+			<if test="rdId!=null and rdId!=''">
+				AND A.RDID LIKE '%'||TRIM(#{rdId})||'%'
+			</if>
+			<if test="rdName!=null and rdName!=''">
+				AND B.RDNAME LIKE '%'||TRIM(#{rdName})||'%'
+			</if>
+		</where>
+		ORDER BY RDID
+	</select>
+	
+	<update id="addMember" parameterType="Map">
+		UPDATE RDACCOUNT SET 
+			GROUPID = #{groupId}
+		WHERE RDID IN 
+		<foreach collection="rdIdArray" item="rdIdArray" index="index" open="(" separator="," close=")">
+			#{rdIdArray}
+		</foreach>
+	</update>
+	
+	<select id="queryGroupMemberList" parameterType="Reader" resultType="Map">
+		SELECT A.RDID,B.RDNAME,B.RDCERTIFY,B.RDCFSTATE,B.RDTYPE,B.RDLIB 
+		FROM RDACCOUNT A,READER B 
+		<where>
+			A.RDID = B.RDID AND A.GROUPID = #{groupId}
+			<if test="rdId!=null and rdId!=''">
+				AND A.RDID LIKE '%'||TRIM(#{rdId})||'%'
+			</if>
+			<if test="rdName!=null and rdName!=''">
+				AND B.RDNAME LIKE '%'||TRIM(#{rdName})||'%'
+			</if>
+		</where>
+		ORDER BY RDID
+	</select>
+	
+	<update id="deleteMember" parameterType="String">
+		UPDATE RDACCOUNT 
+			SET GROUPID = NULL 
+		WHERE RDID IN 
+		<foreach collection="array" item="rdIdArray" index="index" open="(" separator="," close=")">
+			#{rdIdArray}
+		</foreach>
+	</update>
+	
+	<select id="getReaderType" resultType="Map">
+		SELECT READERTYPE,DESCRIPE FROM P_RCTYPE WHERE SIGN=1
+	</select>
+	
+	<select id="getLibType" resultType="Map">
+		SELECT LIBCODE,SIMPLENAME FROM P_LIBCODE
+	</select>
+</mapper>

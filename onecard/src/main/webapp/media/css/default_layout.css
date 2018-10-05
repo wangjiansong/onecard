@@ -1,0 +1,39 @@
+/* custom style */
+body {
+	padding-top: 60px;
+	padding-bottom: 10px;
+}
+
+.sidebar-nav {
+	padding: 9px 0;
+}
+
+.submenuItem {
+	text-indent: 25px;
+}
+
+footer a {
+	margin-left: 1em;
+	margin-right: 1em;
+}
+.table th, .table td {
+    text-align: center;
+}
+
+/**loading style*/
+.A_MESSAGEBOX_LOADING {
+	left: 50%;
+	position: fixed;
+	top: 0;
+	z-index: 10000;
+}
+.alert {
+	left: 50%;
+	position: fixed;
+	top: 0;
+	z-index: 10000;
+}
+#editor {
+ 	overflow:scroll; 
+ 	max-height:300px;
+ }

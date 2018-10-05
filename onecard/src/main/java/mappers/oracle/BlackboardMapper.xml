@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="BlackboardMapper">
+
+	<resultMap id="Blackboard.resultMap" type="com.interlib.sso.domain.Blackboard">
+		<result property="id" column="ID" />
+		<result property="title" column="TITLE" />
+		<result property="content" column="CONTENT" />
+		<result property="createTime" column="CREATETIME" />
+	</resultMap>
+	
+	<sql id="Blackboard.base_columns">
+		<![CDATA[
+		ID, TITLE, CONTENT, CREATETIME
+		]]>
+	</sql>
+	
+	<insert id="Blackboard.insert" parameterType="com.interlib.sso.domain.Blackboard">
+		<selectKey resultType="int"  keyProperty="id" order="BEFORE">   
+        	<![CDATA[SELECT SEQ_BLACKBOARD.NEXTVAL AS ID FROM DUAL]]>
+        </selectKey>
+		<![CDATA[
+		INSERT INTO BLACKBOARD  
+		(ID, TITLE, CONTENT, CREATETIME) 
+		values 
+		(#{id}, #{title, jdbc=VARCHAR}, #{content, jdbcType=VARCHAR}, to_date(to_char(sysdate, 'YYYY-MM-DD HH:MI:SS'), 'YYYY-MM-DD HH:MI:SS'))
+		]]>
+	</insert>
+
+	<update id="Blackboard.update" parameterType="com.interlib.sso.domain.Blackboard">
+		<![CDATA[
+		UPDATE BLACKBOARD 
+		SET 
+		TITLE=#{title, jdbcType=VARCHAR},
+		CONTENT=#{content, jdbcType=VARCHAR}
+		WHERE 
+		ID=#{id}
+		]]>
+	</update>
+	
+	<delete id="Blackboard.delete" parameterType="java.lang.Integer">
+		<![CDATA[
+		DELETE 
+		FROM 
+		BLACKBOARD 
+		WHERE 
+		ID=#{id}
+		]]>
+	</delete>
+	
+	<select id="Blackboard.get" resultMap="Blackboard.resultMap" parameterType="java.lang.Integer">
+		SELECT 
+		<include refid="Blackboard.base_columns"/>
+		<![CDATA[
+		FROM 
+		BLACKBOARD  
+		WHERE 
+		ID=#{id}
+		]]>
+	</select>
+	
+	<select id="Blackboard.getAllList" resultMap="Blackboard.resultMap">
+		SELECT 
+		<include refid="Blackboard.base_columns"/> 
+		<![CDATA[
+		FROM 
+		BLACKBOARD 
+		]]>
+		order by CREATETIME DESC
+	</select>
+	
+	
+	<select id="Blackboard.getTotalCount" resultType="java.lang.Integer">
+		<![CDATA[
+		SELECT  
+		count(*) as totalcount 
+		FROM 
+		BLACKBOARD 
+		]]>
+	</select>
+	
+	<sql id="Blackboard.findPage.where">
+		<where>
+			<if test="@Ognl@isNotEmpty(title)">
+			 TITLE LIKE '%'||#{title}||'%'
+			</if>
+			<if test="@Ognl@isNotEmpty(content)">
+			 CONTENT LIKE '%'||#{content}||'%'
+			</if>
+		</where>
+	</sql>
+	
+	<select id="Blackboard.findPage.count" resultType="java.lang.Long">
+		SELECT 
+		count(*) 
+		FROM 
+		BLACKBOARD  
+		<include refid="Blackboard.findPage.where"/>
+	</select>
+	
+	<select id="Blackboard.findPage" resultMap="Blackboard.resultMap" parameterType="java.util.Map">
+		SELECT 
+		<include refid="Blackboard.base_columns"/> 
+		FROM 
+		BLACKBOARD 
+		<include refid="Blackboard.findPage.where"/>
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+	</select>
+	
+	<select id="Blackboard.queryPageList" parameterType="Blackboard" resultType="Blackboard">
+		SELECT 
+		<include refid="Blackboard.base_columns"/> 
+		FROM 
+		BLACKBOARD
+		<include refid="Blackboard.findPage.where"/>
+		ORDER BY CREATETIME DESC
+	</select>
+	<!-- add by 20131218 -->
+	<select id="Blackboard.getBlackboardsByLastSomeone" parameterType="Blackboard" resultType="Blackboard">
+		SELECT
+		ID, TITLE, CONTENT, to_date(to_char(CREATETIME,'YYYY/MM/DD'),'YYYY/MM/DD') as CREATETIME
+		FROM
+		BLACKBOARD
+		WHERE ROWNUM &lt;=6
+		ORDER BY CREATETIME DESC
+	</select>
+	<delete id="Blackboard.deleteByIds">
+		DELETE FROM BLACKBOARD WHERE ID IN
+		<foreach collection="array" item="idArray"  open="(" separator="," close=")">   
+       		#{idArray}   
+    	</foreach>
+	</delete>
+	
+</mapper>

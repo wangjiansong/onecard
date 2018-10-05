@@ -1,0 +1,1079 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="CirFinLogMapper">
+    
+	<resultMap id="CirFinLog.resultMap" type="CirFinLog">
+		<result property="id" column="ID" />
+		<result property="rdid" column="RDID" />
+		<result property="feetype" column="FEETYPE" />
+		<result property="fee" column="FEE" />
+		<result property="regtime" column="REGTIME" jdbcType="TIMESTAMP"/>
+		<result property="regman" column="REGMAN" />
+		<result property="regLib" column="REGLIB" />
+		<result property="orgLib" column="ORGLIB" />
+		<result property="paySign" column="PAYSIGN" />
+		<result property="feeMemo" column="FEEMEMO" />
+		<result property="tranId" column="TRANID" />
+		<result property="feeAppCode" column="FEEAPPCODE" />
+		<result property="rdidSum" column="rdidSum"/>
+		<result property="rdidCount" column="rdidCount"/>
+		<result property="feeSum" column="feeSum" />
+		<result property="cost" column="COST"/>
+		<result property="sumFee" column="sumFee"/>
+		<result property="sumCost" column="sumCost"/>
+		<result property="sumRepairCost" column="sumRepairCost"/>
+		<result property="groupID" column="GROUPID"/>
+		<result property="reglibSet" column="reglibSet"/>
+		<result property="totalfeeSet" column="totalfeeSet"/>
+		<result property="paytype" column="PAYTYPE"/>
+		<result property="isReturn" column="isReturn"/>
+		<result property="payId" column="PAYID"/>
+	</resultMap>
+	
+	<sql id="CirFinLog.base_columns">
+		<![CDATA[
+		RDID, FEETYPE, FEE, REGTIME, REGMAN, REGLIB, ORGLIB, PAYSIGN, FEEMEMO, TRANID, FEEAPPCODE, COST,GROUPID,PAYTYPE,PAYID
+		]]>
+	</sql>
+	
+	
+	<insert id="CirFinLog.insert" parameterType="CirFinLog">
+	    <selectKey resultType="int"  keyProperty="id" order="BEFORE">   
+        	<![CDATA[SELECT SEQ_CIRFINLOG.NEXTVAL AS ID FROM DUAL]]>
+        </selectKey>
+		<![CDATA[
+		INSERT INTO CIR_FIN_LOG  
+		(ID, RDID, FEETYPE, FEE, REGTIME, REGMAN, REGLIB, ORGLIB, PAYSIGN, FEEMEMO, TRANID, FEEAPPCODE, COST,GROUPID, PAYTYPE,PAYID) 
+		values 
+		(#{id}, #{rdid, jdbcType=VARCHAR}, #{feetype, jdbcType=VARCHAR}, #{fee, jdbcType=NUMERIC}, SYSDATE, #{regman, jdbcType=VARCHAR}, 
+		#{regLib, jdbcType=VARCHAR}, #{orgLib, jdbcType=VARCHAR}, #{paySign, jdbcType=NUMERIC}, #{feeMemo, jdbcType=VARCHAR}, 
+		#{tranId, jdbcType=VARCHAR}, #{feeAppCode, jdbcType=VARCHAR},#{cost,jdbcType=NUMERIC},#{groupID,jdbcType=NUMERIC}, 
+		#{paytype,jdbcType=NUMERIC}, #{payId,jdbcType=VARCHAR})
+		]]>
+	</insert>
+
+	<update id="CirFinLog.update" parameterType="CirFinLog">
+		<![CDATA[
+		UPDATE CIR_FIN_LOG 
+		SET 
+		RDID=#{rdid, jdbcType=VARCHAR},
+		FEETYPE=#{feetype, jdbcType=VARCHAR},
+		FEE= #{fee, jdbcType=NUMERIC},
+		REGMAN=#{regman, jdbcType=VARCHAR},
+		REGLIB=#{reglib, jdbcType=VARCHAR},
+		ORGLIB=#{orglib, jdbcType=VARCHAR},
+		PAYSIGN=#{paySign, jdbcType=NUMERIC},
+		FEEMEMO=#{feeMemo, jdbcType=VARCHAR},
+		FEEAPPCODE=#{feeAppCode, jdbcType=VARCHAR},
+		COST=#{cost,jdbcType=NUMERIC}
+		WHERE 
+		RDID=#{rdid}
+		]]>
+	</update>
+	
+	<update id="CirFinLog.updateRdid" parameterType="Map">
+		<![CDATA[
+		UPDATE CIR_FIN_LOG 
+		SET 
+		RDID=#{newRdid}
+		WHERE 
+		RDID=#{rdid}
+		]]>
+	</update>
+	<update id="CirFinLog.updateIsReturnByID" parameterType="Map">
+		<![CDATA[
+		UPDATE CIR_FIN_LOG 
+		SET 
+		isReturn=#{isReturn}
+		WHERE 
+		ID=#{id}
+		]]>
+	</update>
+	
+	<delete id="CirFinLog.delete" parameterType="java.lang.String">
+		<![CDATA[
+		DELETE 
+		FROM 
+		CIR_FIN_LOG 
+		WHERE 
+		TRANID=#{tranId, jdbcType=VARCHAR}
+		]]>
+	</delete>
+	
+	<select id="CirFinLog.get" resultMap="CirFinLog.resultMap" parameterType="java.lang.String">
+		SELECT 
+		<include refid="CirFinLog.base_columns"/>
+		<![CDATA[
+		FROM 
+		CIR_FIN_LOG  
+		WHERE 
+		TRANID=#{tranId}
+		]]>
+	</select>
+	
+	<select id="CirFinLog.getAllList" resultMap="CirFinLog.resultMap">
+		SELECT 
+		<include refid="CirFinLog.base_columns"/> 
+		<![CDATA[
+		FROM 
+		CIR_FIN_LOG 
+		]]>
+		order by REGTIME DESC
+	</select>
+	
+	<select id="CirFinLog.getTotalCount" resultType="java.lang.Integer">
+		<![CDATA[
+		SELECT  
+		count(*) as totalcount 
+		FROM 
+		CIR_FIN_LOG 
+		]]>
+	</select>
+	
+	<!-- 明细 按照条件查找的总数-->
+	<select id="CirFinLog.getCirFinLogCount" parameterType="CirFinLog" resultType="java.lang.Integer">
+	    SELECT 
+	    count(*) 
+		FROM 
+		CIR_FIN_LOG C, P_LIBCODE L, FIN_TYPE F, READER R
+		WHERE 1=1 
+			<if test="@Ognl@isNotEmpty(orgLib)">
+			 	AND ORGLIB =#{orgLib}
+			</if>
+			<if test="@Ognl@isNotEmpty(regLib)">
+			 	AND REGLIB =#{regLib}
+			</if>
+			<if test="@Ognl@isNotEmpty(feetype)">
+			 	AND C.FEETYPE =#{feetype}
+			</if>
+			<if test="@Ognl@isNotEmpty(startTime)">
+		 		AND to_char(REGTIME, 'YYYY-MM-DD') <![CDATA[>=]]> #{startTime}
+			</if>
+			<if test="@Ognl@isNotEmpty(endTime)">
+			 	AND to_char(REGTIME, 'YYYY-MM-DD') <![CDATA[<=]]> #{endTime}
+			</if>
+			<if test="@Ognl@isNotEmpty(regman)">
+			 	AND REGMAN LIKE '%'||#{regman}||'%'
+			</if>
+			<if test="@Ognl@isNotEmpty(rdid)">
+			 	AND C.RDID LIKE '%'||#{rdid}||'%'
+			</if>
+			<if test="@Ognl@isNotEmpty(rdname)">
+			 	AND RDNAME LIKE '%'||#{rdname}||'%'
+			</if>
+			<if test="@Ognl@isNotEmpty(paytype)">
+			 	AND PAYTYPE =#{paytype}
+			</if>
+			<if test="@Ognl@isNotEmpty(payId)">
+			 	AND C.PAYID =#{payId}
+			</if>
+			<if test="@Ognl@isNotEmpty(groupID)">
+				AND GROUPID =#{groupID}
+			</if>
+			AND C.FEETYPE=F.FEETYPE AND C.REGLIB=L.LIBCODE AND C.RDID=R.RDID
+		ORDER BY REGTIME DESC 
+	</select>
+	
+	<sql id="CirFinLog.findPage.where">
+		<where>
+			<if test="@Ognl@isNotEmpty(regman)">
+			 	REGMAN LIKE '%'||#{regman}||'%'
+			</if>
+			<if test="@Ognl@isNotEmpty(rdid)">
+			 	RDID LIKE '%'||#{rdid}||'%'
+			</if>
+		</where>
+	</sql>
+	
+	<select id="CirFinLog.findPage.count" resultType="java.lang.Long">
+		SELECT 
+		count(*) 
+		FROM 
+		CIR_FIN_LOG  
+		<include refid="CirFinLog.findPage.where"/>
+	</select>
+	
+	<select id="CirFinLog.findPage" resultMap="CirFinLog.resultMap" parameterType="java.util.Map">
+		SELECT 
+		<include refid="CirFinLog.base_columns"/> 
+		FROM 
+		CIR_FIN_LOG 
+		<include refid="CirFinLog.findPage.where"/>
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+	</select>
+	
+	<!-- 明细 -->
+	<select id="CirFinLog.queryPageList" parameterType="CirFinLog" resultType="CirFinLog">
+	    SELECT 
+		C.RDID, R.RDNAME, 
+		(F.DESCRIBE || ' | ' || F.APPNAME) AS FEETYPE,
+		C.FEE, C.REGTIME,
+		(select rdid || '|' || reader.rdname from reader where reader.rdid=C.REGMAN ) as REGMAN, 
+		C.GROUPID,
+		L.LIBCODE||' | '||L.SIMPLENAME AS REGLIB,
+		 L.LIBCODE||' | '||L.SIMPLENAME AS ORGLIB, 
+		PAYSIGN, 
+		FEEMEMO, TRANID, FEEAPPCODE, COST, PAYTYPE,PAYID 
+		FROM 
+		CIR_FIN_LOG C, P_LIBCODE L, FIN_TYPE F, READER R
+		WHERE 1=1 
+			<if test="@Ognl@isNotEmpty(orgLib)">
+			 	AND C.ORGLIB =#{orgLib}
+			</if>
+			<if test="@Ognl@isNotEmpty(regLib)">
+			 	AND C.REGLIB =#{regLib}
+			</if>
+			<if test="@Ognl@isNotEmpty(feetype)">
+			 	AND C.FEETYPE =#{feetype}
+			</if>
+			<if test="@Ognl@isNotEmpty(startTime)">
+		 		AND to_char(REGTIME, 'YYYY-MM-DD') <![CDATA[>=]]> #{startTime}
+			</if>
+			<if test="@Ognl@isNotEmpty(endTime)">
+			 	AND to_char(REGTIME, 'YYYY-MM-DD') <![CDATA[<=]]> #{endTime}
+			</if>
+			<if test="@Ognl@isNotEmpty(regman)">
+			 	AND REGMAN = #{regman}
+			</if>
+			<if test="@Ognl@isNotEmpty(paytype)">
+			 	AND PAYTYPE =#{paytype}
+			</if>
+			<if test="@Ognl@isNotEmpty(payId)">
+			 	AND C.PAYID =#{payId}
+			</if>
+			<if test="@Ognl@isNotEmpty(rdid)">
+			 	AND C.RDID LIKE #{rdid}||'%'
+			</if>
+			<if test="@Ognl@isNotEmpty(rdname)">
+			 	AND RDNAME LIKE '%'||#{rdname}||'%'
+			</if>
+			<if test="@Ognl@isNotEmpty(groupID)">
+				AND GROUPID =#{groupID}
+			</if>
+			AND C.FEETYPE=F.FEETYPE AND C.REGLIB=L.LIBCODE AND C.RDID=R.RDID
+		ORDER BY REGTIME DESC 
+	</select>
+	
+	<!-- 财经日志接口明细 -->
+	<select id="CirFinLog.queryPageCirFinLogSet" parameterType="Map" resultType="CirFinLog">
+	select *
+  		from (select tmp_tb.*, ROWNUM row_id
+          from (
+		    SELECT 
+			C.ID,C.RDID, R.RDNAME, 
+			(F.DESCRIBE || ' | ' || F.APPNAME) AS FEETYPE,
+			C.FEE, C.REGTIME,
+			(select rdid || '|' || reader.rdname from reader where reader.rdid=C.REGMAN ) as REGMAN, 
+			C.GROUPID,
+			L.LIBCODE||' | '||L.SIMPLENAME AS REGLIB, L.LIBCODE||' | '||L.SIMPLENAME AS ORGLIB, 
+			PAYSIGN, 
+			FEEMEMO, TRANID, FEEAPPCODE, COST, PAYTYPE ,PAYID
+			FROM 
+			CIR_FIN_LOG C, P_LIBCODE L, FIN_TYPE F, READER R
+			WHERE 1=1 
+				<if test="@Ognl@isNotEmpty(rdid)">
+				 	AND C.RDID = #{rdid}
+				</if>
+				<if test="@Ognl@isNotEmpty(feetype)">
+				 	AND C.FEETYPE =#{feetype}
+				</if>
+				<if test="@Ognl@isNotEmpty(startTime)">
+			 		AND to_char(REGTIME, 'YYYY-MM-DD') <![CDATA[>=]]> #{startTime}
+				</if>
+				<if test="@Ognl@isNotEmpty(endTime)">
+				 	AND to_char(REGTIME, 'YYYY-MM-DD') <![CDATA[<=]]> #{endTime}
+				</if>
+				<if test="@Ognl@isNotEmpty(libcode)">
+				 	AND REGLIB = #{libcode}
+				</if>
+				AND C.FEETYPE=F.FEETYPE AND C.REGLIB=L.LIBCODE AND C.RDID=R.RDID
+			ORDER BY REGTIME DESC 
+			) tmp_tb
+         where ROWNUM <![CDATA[<=]]> #{maxNum})
+ 	where row_id > #{currentNum}
+	</select>
+	
+	<!-- 收费统计按照操作员分组 -->
+	<select id="CirFinLog.statistics" parameterType="CirFinLog" resultType="Map">
+	select (groupname || '|' || reader.rdname) as groupname,
+       feetype,
+       colName1,
+       colName2,
+       paysign,
+       count,
+       num,
+       t.rdtype,
+       feetypesign,
+       groupnamesign 
+  from (
+	    SELECT 
+		min(a.regman) as groupname,
+		a.feetype as feetype,
+		max(a.reglib) as colName1,
+		max(r.rdtype || '|' || rctype.descripe) as colName2,
+		sum(a.paysign) as paysign,
+		count(*) as count, 
+		to_char(sum(a.fee),'9,999,999,990.99') as num,
+		max(r.rdtype) as rdtype,
+		grouping(a.feetype) as feetypesign,
+		grouping(a.regman) as groupnamesign 
+		FROM 
+		CIR_FIN_LOG a 
+		left join reader r on a.rdid=r.rdid 
+		left join p_rctype rctype on r.rdtype = rctype.readertype 
+		WHERE
+		1=1
+		<if test="@Ognl@isNotEmpty(regLib)">
+		 	AND REGLIB =#{regLib}
+		</if>
+		<if test="@Ognl@isNotEmpty(startTime)">
+	 		AND to_char(REGTIME, 'YYYY-MM-DD') <![CDATA[>=]]> #{startTime}
+		</if>
+		<if test="@Ognl@isNotEmpty(endTime)">
+		 	AND to_char(REGTIME, 'YYYY-MM-DD') <![CDATA[<=]]> #{endTime}
+		</if>
+		<if test="@Ognl@isNotEmpty(regman)">
+		 	AND REGMAN=#{regman}
+		</if>
+		<if test="@Ognl@isNotEmpty(groupID)">
+			AND GROUPID=#{groupID}
+		</if>
+		<if test="@Ognl@isNotEmpty(feetypes)">
+			AND FEETYPE IN 
+			<foreach collection="feetypes" item="feetypes"  open="(" separator="," close=")">  
+       			 #{feetypes}  
+    		 </foreach> 
+		</if>
+		group by rollup(a.regman,a.feetype)) t 
+  join reader 
+    on t.groupname = reader.rdid 
+	</select>
+	
+	<!-- 收费统计按照操作馆分组 -->
+	<select id="CirFinLog.statisticsGroupByReglib" parameterType="CirFinLog" resultType="Map">
+	select  groupname,
+       feetype,
+       t.rdname,
+       colName1,
+       colName2,
+       paysign,
+       count,
+       num,
+       t.rdtype,
+       feetypesign,
+       groupnamesign 
+  from (
+	    SELECT 
+		(select p.LIBCODE|| '|' ||p.SIMPLENAME from P_LIBCODE p where a.REGLIB=p.LIBCODE) as groupname,
+		a.feetype,
+		max(r.RDNAME) as rdname,
+		max(r.rdtype || '|' || rctype.descripe) as colName1,
+		max(a.regman) as colName2,
+		sum(a.paysign) as paysign,
+		count(*) as count, 
+		to_char(sum(a.fee),'9,999,999,990.99') as num,
+		max(r.rdtype) as rdtype,
+		grouping(a.feetype) as feetypesign,
+		grouping(a.reglib) as groupnamesign 
+		FROM 
+		CIR_FIN_LOG a 
+		left join reader r on a.rdid=r.rdid 
+		left join p_rctype rctype on r.rdtype = rctype.readertype 
+		WHERE
+		1=1
+		<if test="@Ognl@isNotEmpty(regLib)">
+		 	AND REGLIB =#{regLib}
+		</if>
+		<if test="@Ognl@isNotEmpty(startTime)">
+	 		AND to_char(REGTIME, 'YYYY-MM-DD') <![CDATA[>=]]> #{startTime}
+		</if>
+		<if test="@Ognl@isNotEmpty(endTime)">
+		 	AND to_char(REGTIME, 'YYYY-MM-DD') <![CDATA[<=]]> #{endTime}
+		</if>
+		<if test="@Ognl@isNotEmpty(regman)">
+		 	AND REGMAN=#{regman}
+		</if>
+		<if test="@Ognl@isNotEmpty(groupID)">
+			AND GROUPID=#{groupID}
+		</if>
+		<if test="@Ognl@isNotEmpty(feetypes)">
+			AND FEETYPE IN 
+			<foreach collection="feetypes" item="feetypes"  open="(" separator="," close=")">  
+       			 #{feetypes}  
+    		 </foreach> 
+		</if>
+		group by rollup(a.reglib,a.feetype)) t 
+	</select>
+	
+	<!-- 收费统计读者类型分组 -->
+	<select id="CirFinLog.statisticsGroupByRdtype" parameterType="CirFinLog" resultType="Map">
+	select groupname,
+       feetype,
+       t.rdname,
+       colName1,
+       colName2,
+       paysign,
+       count,
+       num,
+       feetypesign,
+       groupnamesign 
+  from (
+	    SELECT 
+		(select rr.readertype || '|' || rr.descripe from P_RCTYPE rr where rr.readertype=r.RDTYPE) as groupname,
+		a.feetype,
+		max(r.RDNAME) as rdname,
+		max(a.reglib) as colName1,
+		max(a.regman) as colName2,
+		sum(a.paysign) as paysign,
+		count(*) as count, 
+		to_char(sum(a.fee),'9,999,999,990.99') as num,
+		grouping(a.feetype) as feetypesign,
+		grouping(r.rdtype) as groupnamesign 
+		FROM 
+		CIR_FIN_LOG a 
+		left join reader r on a.rdid=r.rdid 
+		left join p_rctype rctype on r.rdtype = rctype.readertype 
+		WHERE
+		1=1
+		<if test="@Ognl@isNotEmpty(regLib)">
+		 	AND REGLIB =#{regLib}
+		</if>
+		<if test="@Ognl@isNotEmpty(startTime)">
+	 		AND to_char(REGTIME, 'YYYY-MM-DD') <![CDATA[>=]]> #{startTime}
+		</if>
+		<if test="@Ognl@isNotEmpty(endTime)">
+		 	AND to_char(REGTIME, 'YYYY-MM-DD') <![CDATA[<=]]> #{endTime}
+		</if>
+		<if test="@Ognl@isNotEmpty(regman)">
+		 	AND REGMAN=#{regman}
+		</if>
+		<if test="@Ognl@isNotEmpty(groupID)">
+			AND GROUPID=#{groupID}
+		</if>
+			AND FEETYPE IN 
+		<foreach collection="feetypes" item="feetypes"  open="(" separator="," close=")">  
+       		 #{feetypes}  
+    	</foreach> 
+		group by rollup(r.rdtype,a.feetype)) t
+	</select>
+	
+	<!-- 消费金额查询 -->
+	<select id="CirFinLog.monetaryList" resultMap="CirFinLog.resultMap" parameterType="java.lang.String">
+	  SELECT rdname,
+	       c.rdid,
+	       (f.DESCRIBE || '|' || f.APPNAME) as feetype,
+	       fee,
+	       (select (rdid || '|' || rdname) from reader where rdid = regman) as regman,
+	       reglib,
+	       orglib,
+	       feeappcode,
+	       regtime 
+	  FROM fin_type f
+		   inner join cir_fin_log c 
+		   on f.feetype=c.feetype 
+		   left join 
+		   reader r 
+	  on c.rdid = r.rdid 
+		WHERE 1=1 
+		<if test="@Ognl@isNotEmpty(regLib)">
+		 	AND c.REGLIB =#{regLib}
+		</if>
+		<if test="@Ognl@isNotEmpty(startTime)">
+	 		AND to_char(REGTIME, 'YYYY-MM-DD') <![CDATA[>=]]> #{startTime}
+		</if>
+		<if test="@Ognl@isNotEmpty(endTime)">
+		 	AND to_char(REGTIME, 'YYYY-MM-DD') <![CDATA[<=]]> #{endTime}
+		</if>
+		<if test="@Ognl@isNotEmpty(rdname)">
+		 	AND r.RDNAME like '%'||#{rdname}||'%'
+		</if>
+		<if test="@Ognl@isNotEmpty(rdid)">
+		 	AND r.RDID like '%'||#{rdid}||'%'
+		</if>
+		<if test="@Ognl@isNotEmpty(groupID)">
+			AND c.GROUPID=#{groupID}
+		</if>
+		order by REGTIME desc
+	</select>
+	
+	<!-- 消费金额统计查询 -->
+	<select id="CirFinLog.monetaryStatistics" resultMap="CirFinLog.resultMap" parameterType="java.lang.String">
+	 SELECT count(0) as rdidSum,
+           count(distinct(rdid)) as rdidCount,
+           (sum(fee)) as feeSum
+      FROM (
+		  SELECT rdname,
+		       c.rdid,
+		       feetype,
+		       fee,
+		       (select rdname from reader where rdid = regman) as regman,
+		       reglib,
+		       orglib,
+		       feeappcode,
+		       regtime 
+		  FROM cir_fin_log c 
+		  inner join reader r 
+		  on c.rdid = r.rdid 
+			WHERE 1=1 
+			<if test="@Ognl@isNotEmpty(regman)">
+			 	AND c.REGMAN =#{regman}
+			</if>
+			<if test="@Ognl@isNotEmpty(regLib)">
+			 	AND c.REGLIB =#{regLib}
+			</if>
+			<if test="@Ognl@isNotEmpty(startTime)">
+		 		AND to_char(REGTIME, 'YYYY-MM-DD') <![CDATA[>=]]> #{startTime}
+			</if>
+			<if test="@Ognl@isNotEmpty(endTime)">
+			 	AND to_char(REGTIME, 'YYYY-MM-DD') <![CDATA[<=]]> #{endTime}
+			</if>
+			<if test="@Ognl@isNotEmpty(rdname)">
+			 	AND r.RDNAME like '%'||#{rdname}||'%'
+			</if>
+			<if test="@Ognl@isNotEmpty(rdid)">
+			 	AND r.RDID like #{rdid}||'%'
+			</if>
+			<if test="@Ognl@isNotEmpty(feetype)">
+			 	AND c.FEETYPE = #{feetype}
+			</if>
+			<if test="@Ognl@isNotEmpty(groupID)">
+				AND c.GROUPID=#{groupID}
+			</if>
+			
+		)
+	</select>
+	
+	<!-- 财经结算统计 -->
+	<select id="CirFinLog.finSettlementByDayList" resultType="com.interlib.sso.domain.FinSettlementResult" parameterType="java.lang.String">
+		select to_char(regtime, 'YYYY/MM/DD') as day,
+	    <![CDATA[
+		to_char(sum(case when feememo='1_sale' then fee else 0 end), '9,999,999,990.99') as morningsale,
+		to_char(sum(case when feememo='1_cost' then fee else 0 end), '9,999,999,990.99') as morningcost,
+		to_char(sum(case when feememo='2_sale' then fee else 0 end), '9,999,999,990.99') as noonsale,
+		to_char(sum(case when feememo='2_cost' then fee else 0 end), '9,999,999,990.99') as nooncost,
+		to_char(sum(case when feememo='3_sale' then fee else 0 end), '9,999,999,990.99') as nightsale,
+		to_char(sum(case when feememo='3_cost' then fee else 0 end), '9,999,999,990.99') as nightcost,
+		to_char(sum(case when feememo='1_sale' or feememo='2_sale' or feememo='3_sale' then fee else 0 end), '9,999,999,990.99') as daysale,
+		to_char(sum(case when feememo='1_cost' or feememo='2_cost' or feememo='3_cost' then fee else 0 end), '9,999,999,990.99') as daycost,
+		to_char(sum(case when feememo is not null then fee else 0 end), '9,999,999,990.99') as sumfee,
+		to_char(sum(case when cost is not null then cost else 0 end),'9,999,999,990.99') as sumcost
+		]]>
+		from CIR_FIN_LOG
+		where 1=1
+		<if test="@Ognl@isNotEmpty(regLib)">
+		 	AND REGLIB =#{regLib}
+		</if>
+		<if test="@Ognl@isNotEmpty(startTime)">
+		 	AND to_char(REGTIME, 'YYYY/MM/DD') <![CDATA[>=]]> #{startTime}
+		</if>
+		<if test="@Ognl@isNotEmpty(endTime)">
+		 	AND to_char(REGTIME, 'YYYY/MM/DD') <![CDATA[<=]]> #{endTime}
+		</if>
+		<if test="@Ognl@isNotEmpty(regman)">
+		 	AND REGMAN=#{regman}
+		</if>
+		<if test="@Ognl@isNotEmpty(feetype)">
+		 	AND feetype=#{feetype}
+		</if>
+		<if test="@Ognl@isNotEmpty(groupID)">
+			AND GROUPID=#{groupID}
+		</if>
+		group by to_char(regtime, 'YYYY/MM/DD')
+		order by day
+	</select>
+	
+	<select id="CirFinLog.finSettlementByMonthList" resultType="com.interlib.sso.domain.FinSettlementResult" parameterType="java.lang.String">
+		select to_char(regtime, 'YYYY/MM') as day,
+	 	<![CDATA[
+		to_char(sum(case when feememo='1_sale' then fee else 0 end), '9,999,999,990.99') as morningsale,
+		to_char(sum(case when feememo='1_cost' then fee else 0 end), '9,999,999,990.99') as morningcost,
+		to_char(sum(case when feememo='2_sale' then fee else 0 end), '9,999,999,990.99') as noonsale,
+		to_char(sum(case when feememo='2_cost' then fee else 0 end), '9,999,999,990.99') as nooncost,
+		to_char(sum(case when feememo='3_sale' then fee else 0 end), '9,999,999,990.99') as nightsale,
+		to_char(sum(case when feememo='3_cost' then fee else 0 end), '9,999,999,990.99') as nightcost,
+		to_char(sum(case when feememo='1_sale' or feememo='2_sale' or feememo='3_sale' then fee else 0 end), '9,999,999,990.99') as daysale,
+		to_char(sum(case when feememo='1_cost' or feememo='2_cost' or feememo='3_cost' then fee else 0 end), '9,999,999,990.99') as daycost,
+		to_char(sum(case when feememo is not null then fee else 0 end), '9,999,999,990.99') as sumfee,
+		to_char(sum(case when cost is not null then cost else 0 end),'9,999,999,990.99') as sumcost
+		]]>
+		from CIR_FIN_LOG
+		where 1=1
+		<if test="@Ognl@isNotEmpty(regLib)">
+		 	AND REGLIB =#{regLib}
+		</if>
+		<if test="@Ognl@isNotEmpty(startTime)">
+		 	AND to_char(REGTIME, 'YYYY/MM') <![CDATA[>=]]> #{startTime}
+		</if>
+		<if test="@Ognl@isNotEmpty(endTime)">
+		 	AND to_char(REGTIME, 'YYYY/MM') <![CDATA[<=]]> #{endTime}
+		</if>
+		<if test="@Ognl@isNotEmpty(regman)">
+		 	AND REGMAN=#{regman}
+		</if>
+		<if test="@Ognl@isNotEmpty(feetype)">
+		 	AND feetype=#{feetype}
+		</if>
+		<if test="@Ognl@isNotEmpty(groupID)">
+			AND GROUPID=#{groupID}
+		</if>
+		group by to_char(regtime, 'YYYY/MM')
+		order by day
+	</select>
+	
+	<select id="CirFinLog.finSettlementByYearList" resultType="com.interlib.sso.domain.FinSettlementResult" parameterType="java.lang.String">
+		select to_char(regtime, 'YYYY') as day, 
+	    <![CDATA[
+		to_char(sum(case when feememo='1_sale' then fee else 0 end), '9,999,999,990.99') as morningsale,
+		to_char(sum(case when feememo='1_cost' then fee else 0 end), '9,999,999,990.99') as morningcost,
+		to_char(sum(case when feememo='2_sale' then fee else 0 end), '9,999,999,990.99') as noonsale,
+		to_char(sum(case when feememo='2_cost' then fee else 0 end), '9,999,999,990.99') as nooncost,
+		to_char(sum(case when feememo='3_sale' then fee else 0 end), '9,999,999,990.99') as nightsale,
+		to_char(sum(case when feememo='3_cost' then fee else 0 end), '9,999,999,990.99') as nightcost,
+		to_char(sum(case when feememo='1_sale' or feememo='2_sale' or feememo='3_sale' then fee else 0 end), '9,999,999,990.99') as daysale,
+		to_char(sum(case when feememo='1_cost' or feememo='2_cost' or feememo='3_cost' then fee else 0 end), '9,999,999,990.99') as daycost,
+		to_char(sum(case when feememo is not null then fee else 0 end), '9,999,999,990.99') as sumfee,
+		to_char(sum(case when cost is not null then cost else 0 end),'9,999,999,990.99') as sumcost
+		]]>
+		from CIR_FIN_LOG
+		where 1=1
+		<if test="@Ognl@isNotEmpty(regLib)">
+		 	AND REGLIB =#{regLib}
+		</if>
+		<if test="@Ognl@isNotEmpty(startTime)">
+		 	AND to_char(REGTIME, 'YYYY') <![CDATA[>=]]> #{startTime}
+		</if>
+		<if test="@Ognl@isNotEmpty(endTime)">
+		 	AND to_char(REGTIME, 'YYYY') <![CDATA[<=]]> #{endTime}
+		</if>
+		<if test="@Ognl@isNotEmpty(regman)">
+		 	AND REGMAN=#{regman}
+		</if>
+		<if test="@Ognl@isNotEmpty(feetype)">
+		 	AND feetype=#{feetype}
+		</if>
+		<if test="@Ognl@isNotEmpty(groupID)">
+			AND GROUPID=#{groupID}
+		</if>
+		group by to_char(regtime, 'YYYY') 
+		order by day
+	</select>
+	
+	<select id="CirFinLog.finSettlementStatisticsByDay" resultType="com.interlib.sso.domain.FinSettlementResult" parameterType="java.lang.String">
+	    select 
+	    <![CDATA[
+		to_char(sum(case when feememo='1_sale' then fee else 0 end), '9,999,999,990.99') as morningsale,
+		to_char(sum(case when feememo='1_cost' then fee else 0 end), '9,999,999,990.99') as morningcost,
+		to_char(sum(case when feememo='2_sale' then fee else 0 end), '9,999,999,990.99') as noonsale,
+		to_char(sum(case when feememo='2_cost' then fee else 0 end), '9,999,999,990.99') as nooncost,
+		to_char(sum(case when feememo='3_sale' then fee else 0 end), '9,999,999,990.99') as nightsale,
+		to_char(sum(case when feememo='3_cost' then fee else 0 end), '9,999,999,990.99') as nightcost,
+		to_char(sum(case when feememo='1_sale' or feememo='2_sale' or feememo='3_sale' then fee else 0 end), '9,999,999,990.99') as daysale,
+		to_char(sum(case when feememo='1_cost' or feememo='2_cost' or feememo='3_cost' then fee else 0 end), '9,999,999,990.99') as daycost,
+		to_char(sum(case when feememo is not null then fee else 0 end), '9,999,999,990.99') as sumfee,
+		to_char(sum(case when cost is not null then cost else 0 end),'9,999,999,990.99') as sumcost
+		]]>
+		from CIR_FIN_LOG
+		where 1=1
+		<if test="@Ognl@isNotEmpty(regLib)">
+		 	AND REGLIB =#{regLib}
+		</if>
+		<if test="@Ognl@isNotEmpty(startTime)">
+		 	AND to_char(REGTIME, 'YYYY/MM/DD') <![CDATA[>=]]> #{startTime}
+		</if>
+		<if test="@Ognl@isNotEmpty(endTime)">
+		 	AND to_char(REGTIME, 'YYYY/MM/DD') <![CDATA[<=]]> #{endTime}
+		</if>
+		<if test="@Ognl@isNotEmpty(regman)">
+		 	AND REGMAN=#{regman}
+		</if>
+		<if test="@Ognl@isNotEmpty(feetype)">
+		 	AND feetype=#{feetype}
+		</if>
+		<if test="@Ognl@isNotEmpty(groupID)">
+			AND GROUPID=#{groupID}
+		</if>
+	</select>
+	<select id="CirFinLog.finSettlementStatisticsByYear" resultType="com.interlib.sso.domain.FinSettlementResult" parameterType="java.lang.String">
+	    select 
+	    <![CDATA[
+		to_char(sum(case when feememo='1_sale' then fee else 0 end), '9,999,999,990.99') as morningsale,
+		to_char(sum(case when feememo='1_cost' then fee else 0 end), '9,999,999,990.99') as morningcost,
+		to_char(sum(case when feememo='2_sale' then fee else 0 end), '9,999,999,990.99') as noonsale,
+		to_char(sum(case when feememo='2_cost' then fee else 0 end), '9,999,999,990.99') as nooncost,
+		to_char(sum(case when feememo='3_sale' then fee else 0 end), '9,999,999,990.99') as nightsale,
+		to_char(sum(case when feememo='3_cost' then fee else 0 end), '9,999,999,990.99') as nightcost,
+		to_char(sum(case when feememo='1_sale' or feememo='2_sale' or feememo='3_sale' then fee else 0 end), '9,999,999,990.99') as daysale,
+		to_char(sum(case when feememo='1_cost' or feememo='2_cost' or feememo='3_cost' then fee else 0 end), '9,999,999,990.99') as daycost,
+		to_char(sum(case when feememo is not null then fee else 0 end), '9,999,999,990.99') as sumfee,
+		to_char(sum(case when cost is not null then cost else 0 end),'9,999,999,990.99') as sumcost
+		]]>
+		from CIR_FIN_LOG
+		where 1=1
+		<if test="@Ognl@isNotEmpty(regLib)">
+		 	AND REGLIB =#{regLib}
+		</if>
+		<if test="@Ognl@isNotEmpty(startTime)">
+		 	AND to_char(REGTIME, 'YYYY') <![CDATA[>=]]> #{startTime}
+		</if>
+		<if test="@Ognl@isNotEmpty(endTime)">
+		 	AND to_char(REGTIME, 'YYYY') <![CDATA[<=]]> #{endTime}
+		</if>
+		<if test="@Ognl@isNotEmpty(regman)">
+		 	AND REGMAN=#{regman}
+		</if>
+		<if test="@Ognl@isNotEmpty(feetype)">
+		 	AND feetype=#{feetype}
+		</if>
+		<if test="@Ognl@isNotEmpty(groupID)">
+			AND GROUPID=#{groupID}
+		</if>
+	</select>
+	<select id="CirFinLog.finSettlementStatisticsByMonth" resultType="com.interlib.sso.domain.FinSettlementResult" parameterType="java.lang.String">
+	    select 
+	    <![CDATA[
+		to_char(sum(case when feememo='1_sale' then fee else 0 end), '9,999,999,990.99') as morningsale,
+		to_char(sum(case when feememo='1_cost' then fee else 0 end), '9,999,999,990.99') as morningcost,
+		to_char(sum(case when feememo='2_sale' then fee else 0 end), '9,999,999,990.99') as noonsale,
+		to_char(sum(case when feememo='2_cost' then fee else 0 end), '9,999,999,990.99') as nooncost,
+		to_char(sum(case when feememo='3_sale' then fee else 0 end), '9,999,999,990.99') as nightsale,
+		to_char(sum(case when feememo='3_cost' then fee else 0 end), '9,999,999,990.99') as nightcost,
+		to_char(sum(case when feememo='1_sale' or feememo='2_sale' or feememo='3_sale' then fee else 0 end), '9,999,999,990.99') as daysale,
+		to_char(sum(case when feememo='1_cost' or feememo='2_cost' or feememo='3_cost' then fee else 0 end), '9,999,999,990.99') as daycost,
+		to_char(sum(case when feememo is not null then fee else 0 end), '9,999,999,990.99') as sumfee,
+		to_char(( sum(COST)- sum(FEE)),'9,999,999,990.99') as sumRepairCost
+		]]>
+		from CIR_FIN_LOG
+		where 1=1
+		<if test="@Ognl@isNotEmpty(regLib)">
+		 	AND REGLIB =#{regLib}
+		</if>
+		<if test="@Ognl@isNotEmpty(startTime)">
+		 	AND to_char(REGTIME, 'YYYY/MM') <![CDATA[>=]]> #{startTime}
+		</if>
+		<if test="@Ognl@isNotEmpty(endTime)">
+		 	AND to_char(REGTIME, 'YYYY/MM') <![CDATA[<=]]> #{endTime}
+		</if>
+		<if test="@Ognl@isNotEmpty(regman)">
+		 	AND REGMAN=#{regman}
+		</if>
+		<if test="@Ognl@isNotEmpty(feetype)">
+		 	AND feetype=#{feetype}
+		</if>
+		<if test="@Ognl@isNotEmpty(groupID)">
+			AND GROUPID=#{groupID}
+		</if>
+	</select>
+	
+	<!-- 消费类型应补差价统计  morningsale morningcost 这6个参数是统计数量-->
+	<select id="CirFinLog.finSettlementRepairCostByDay" resultType="com.interlib.sso.domain.FinSettlementResult" parameterType="java.lang.String">
+	    select 
+	    <![CDATA[
+	      to_char(sum(case when feememo = '1_sale' then 1 else 0 end),'9,999,999,990') as morningsale,
+          to_char(sum(case when feememo = '1_cost' then 1 else 0 end),'9,999,999,990') as morningcost,
+          to_char(sum(case when feememo = '2_sale' then 1 else 0 end),'9,999,999,990') as noonsale,
+       	  to_char(sum(case when feememo = '2_cost' then 1 else 0 end),'9,999,999,990') as nooncost,
+       	  to_char(sum(case when feememo = '3_sale' then 1 else 0 end),'9,999,999,990') as nightsale,
+          to_char(sum(case when feememo = '3_cost' then 1 else 0 end),'9,999,999,990') as nightcost,
+		 to_char(sum(COST),'9,999,999,990.99') as sumCost,
+      	 to_char(sum(FEE),'9,999,999,990.99') as sumFee,
+      	 to_char(( sum(COST)- sum(FEE)),'9,999,999,990.99') as sumRepairCost
+		]]>
+		from CIR_FIN_LOG
+		where FEETYPE=206 
+		<if test="@Ognl@isNotEmpty(regLib)">
+		 	AND REGLIB =#{regLib}
+		</if>
+		<if test="@Ognl@isNotEmpty(startTime)">
+		 	AND to_char(REGTIME, 'YYYY/MM/DD') <![CDATA[>=]]> #{startTime}
+		</if>
+		<if test="@Ognl@isNotEmpty(endTime)">
+		 	AND to_char(REGTIME, 'YYYY/MM/DD') <![CDATA[<=]]> #{endTime}
+		</if>
+		<if test="@Ognl@isNotEmpty(regman)">
+		 	AND REGMAN=#{regman}
+		</if>
+		<if test="@Ognl@isNotEmpty(feetype)">
+		 	AND feetype=#{feetype}
+		</if>
+		<if test="@Ognl@isNotEmpty(groupID)">
+			AND GROUPID=#{groupID}
+		</if>
+	</select>
+	<select id="CirFinLog.finSettlementRepairCostByYear" resultType="com.interlib.sso.domain.FinSettlementResult" parameterType="java.lang.String">
+	    select 
+	    <![CDATA[
+	     to_char(sum(case when feememo = '1_sale' then 1 else 0 end),'9,999,999,990') as morningsale,
+          to_char(sum(case when feememo = '1_cost' then 1 else 0 end),'9,999,999,990') as morningcost,
+          to_char(sum(case when feememo = '2_sale' then 1 else 0 end),'9,999,999,990') as noonsale,
+       	  to_char(sum(case when feememo = '2_cost' then 1 else 0 end),'9,999,999,990') as nooncost,
+       	  to_char(sum(case when feememo = '3_sale' then 1 else 0 end),'9,999,999,990') as nightsale,
+          to_char(sum(case when feememo = '3_cost' then 1 else 0 end),'9,999,999,990') as nightcost,
+		 to_char(sum(COST),'9,999,999,990.99') as sumCost,
+      	 to_char(sum(FEE),'9,999,999,990.99') as sumFee,
+      	 to_char(( sum(COST)- sum(FEE)),'9,999,999,990.99') as sumRepairCost
+		]]>
+		from CIR_FIN_LOG
+		where FEETYPE=206 
+		<if test="@Ognl@isNotEmpty(regLib)">
+		 	AND REGLIB =#{regLib}
+		</if>
+		<if test="@Ognl@isNotEmpty(startTime)">
+		 	AND to_char(REGTIME, 'YYYY') <![CDATA[>=]]> #{startTime}
+		</if>
+		<if test="@Ognl@isNotEmpty(endTime)">
+		 	AND to_char(REGTIME, 'YYYY') <![CDATA[<=]]> #{endTime}
+		</if>
+		<if test="@Ognl@isNotEmpty(regman)">
+		 	AND REGMAN=#{regman}
+		</if>
+		<if test="@Ognl@isNotEmpty(feetype)">
+		 	AND feetype=#{feetype}
+		</if>
+		<if test="@Ognl@isNotEmpty(groupID)">
+			AND GROUPID=#{groupID}
+		</if>
+	</select>
+	<select id="CirFinLog.finSettlementRepairCostByMonth" resultType="com.interlib.sso.domain.FinSettlementResult" parameterType="java.lang.String">
+	    select 
+	    <![CDATA[
+	     to_char(sum(case when feememo = '1_sale' then 1 else 0 end),'9,999,999,990') as morningsale,
+          to_char(sum(case when feememo = '1_cost' then 1 else 0 end),'9,999,999,990') as morningcost,
+          to_char(sum(case when feememo = '2_sale' then 1 else 0 end),'9,999,999,990') as noonsale,
+       	  to_char(sum(case when feememo = '2_cost' then 1 else 0 end),'9,999,999,990') as nooncost,
+       	  to_char(sum(case when feememo = '3_sale' then 1 else 0 end),'9,999,999,990') as nightsale,
+          to_char(sum(case when feememo = '3_cost' then 1 else 0 end),'9,999,999,990') as nightcost,
+		 to_char(sum(COST),'9,999,999,990.99') as sumCost,
+      	 to_char(sum(FEE),'9,999,999,990.99') as sumFee,
+      	 to_char(( sum(COST)- sum(FEE)),'9,999,999,990.99') as sumRepairCost
+		]]>
+		from CIR_FIN_LOG
+		where FEETYPE=206 
+		<if test="@Ognl@isNotEmpty(regLib)">
+		 	AND REGLIB =#{regLib}
+		</if>
+		<if test="@Ognl@isNotEmpty(startTime)">
+		 	AND to_char(REGTIME, 'YYYY/MM') <![CDATA[>=]]> #{startTime}
+		</if>
+		<if test="@Ognl@isNotEmpty(endTime)">
+		 	AND to_char(REGTIME, 'YYYY/MM') <![CDATA[<=]]> #{endTime}
+		</if>
+		<if test="@Ognl@isNotEmpty(regman)">
+		 	AND REGMAN=#{regman}
+		</if>
+		<if test="@Ognl@isNotEmpty(feetype)">
+		 	AND feetype=#{feetype}
+		</if>
+		<if test="@Ognl@isNotEmpty(groupID)">
+			AND GROUPID=#{groupID}
+		</if>
+	</select>
+		
+	<select id="CirFinLog.slotCountByRules"  parameterType="Map" resultType="java.lang.String" >
+	    select count(rdid) as count from CIR_FIN_LOG
+	    where 
+	    RDID=#{rdid}
+	    and
+	    FEEMEMO like '%sale%'
+	    and
+	    to_char(regtime, 'HH24:MI:SS') 
+	    <![CDATA[
+	    >=
+	    ]]>
+	    #{startTime}
+	    and to_char(regtime, 'HH24:MI:SS') 
+	    <![CDATA[
+	    <=
+	    ]]>
+	    #{endTime}
+	    and feetype=#{feetype}
+	    <if test="@Ognl@isNotEmpty(yearMonth)">
+	    AND to_char(regtime, 'YYYYMM') = #{yearMonth}
+	    </if>
+	    <if test="@Ognl@isNotEmpty(today)">
+	    AND to_char(regtime,'YYYYMMDD') = #{today}
+	    </if>
+	</select>
+	
+	<!-- 自动统计功能 -->
+	<select id="CirFinLog.autoStatistics"  resultMap="CirFinLog.resultMap" parameterType="java.lang.String" >
+     select *
+         from (select tmp_tb.*, ROWNUM row_id
+                 from
+     (
+	  select rdid,
+            sumFee,
+            wmsys.wm_concat(reglib) reglibSet,
+            wmsys.wm_concat(totalfee) totalfeeSet
+       from (select t1.rdid,
+                    sumFee,
+                    to_char(reglib) as reglib,
+                    (case when sumFee > 0 then case when fee=sumFee  then 0 when fee <![CDATA[<]]>sumFee then -fee else sumFee-fee end else sumFee - fee end) as totalfee 
+               from (select rdid, sum(fee) as sumFee
+                       from cir_fin_log
+                      group by rdid) t1,
+                    (select rdid, reglib, sum(fee) as fee
+                       from cir_fin_log
+                       where 1=1 
+			            <if test="@Ognl@isNotEmpty(regLib)">
+					 		AND REGLIB =#{regLib}
+						</if>
+						<if test="@Ognl@isNotEmpty(startTime)">
+					 		AND to_char(REGTIME, 'YYYY-MM-DD') <![CDATA[>=]]> #{startTime}
+						</if>
+						<if test="@Ognl@isNotEmpty(endTime)">
+						 	AND to_char(REGTIME, 'YYYY-MM-DD') <![CDATA[<=]]> #{endTime}
+						</if>
+						<if test="@Ognl@isNotEmpty(rdname)">
+						 	AND RDNAME like '%'||#{rdname}||'%'
+						</if>
+						<if test="@Ognl@isNotEmpty(rdid)">
+						 	AND RDID like '%'||#{rdid}||'%'
+						</if>
+						<if test="@Ognl@isNotEmpty(groupID)">
+							AND GROUPID=#{groupID}
+						</if>
+                      group by (rdid, reglib) order by reglib) t2
+              where t1.rdid = t2.rdid and fee!=0) t 
+      group by rdid, sumFee)tmp_tb
+                where totalfeeSet!='0' and ROWNUM  <![CDATA[<=]]> 
+               <if test="@Ognl@isNotEmpty(maxResult)">
+                #{maxResult}
+      		   </if>
+                )
+        where row_id > 
+         <if test="@Ognl@isNotEmpty(firstResult)">
+            #{firstResult}
+         </if>
+        
+	</select>
+	<select id="CirFinLog.autoStatisticsCount" parameterType="CirFinLog" resultType="java.lang.Integer">
+		   select count(*)
+                 from
+     (select rdid,
+            sumfee,
+            wmsys.wm_concat(reglib) reglibSet,
+            wmsys.wm_concat(totalfee) totalfeeSet
+       from (select t1.rdid,
+                    sumfee,
+                    to_char(reglib) as reglib,
+                    (case when sumFee > 0 then case when fee=sumFee  then 0 when fee <![CDATA[<]]>sumFee then -fee else sumFee-fee end else sumFee - fee end) as totalfee 
+               from (select rdid, sum(fee) as sumfee
+                       from cir_fin_log
+                      group by rdid) t1,
+                    (select rdid, reglib, sum(fee) as fee
+                       from cir_fin_log
+                        where 1=1
+			            <if test="@Ognl@isNotEmpty(regLib)">
+					 		AND REGLIB =#{regLib}
+						</if>
+						<if test="@Ognl@isNotEmpty(startTime)">
+					 		AND to_char(REGTIME, 'YYYY-MM-DD') <![CDATA[>=]]> #{startTime}
+						</if>
+						<if test="@Ognl@isNotEmpty(endTime)">
+						 	AND to_char(REGTIME, 'YYYY-MM-DD') <![CDATA[<=]]> #{endTime}
+						</if>
+						<if test="@Ognl@isNotEmpty(rdname)">
+						 	AND RDNAME like '%'||#{rdname}||'%'
+						</if>
+						<if test="@Ognl@isNotEmpty(rdid)">
+						 	AND RDID like '%'||#{rdid}||'%'
+						</if>
+						<if test="@Ognl@isNotEmpty(groupID)">
+							AND GROUPID=#{groupID}
+						</if>
+                      group by (rdid, reglib)
+                      order by reglib) t2
+              where t1.rdid = t2.rdid and fee!=0) t
+      group by rdid, sumfee)tmp_tb
+      where totalfeeSet!='0'
+	</select>
+	
+	<!-- 多馆财经结算 20140710 -->
+	<select id="CirFinLog.moreLibFinSettle" parameterType="Map" resultType="Map">
+	  select t.*,lib.simplename from 
+		(
+		select 
+		   c.orglib,
+		  <if test="@Ognl@isNotEmpty(colNames)">
+			${colNames}
+		 </if>
+		   sum(fee) as total_fee
+		  from cir_fin_log c 
+		  where fee <![CDATA[<>]]>0
+		 <if test="@Ognl@isNotEmpty(startTime)">
+			AND to_char(REGTIME, 'YYYY-MM-DD') <![CDATA[>=]]> #{startTime}
+		 </if>
+		 <if test="@Ognl@isNotEmpty(endTime)">
+			AND to_char(REGTIME, 'YYYY-MM-DD') <![CDATA[<=]]> #{endTime}
+		 </if>
+		 <if test="@Ognl@isNotEmpty(orgLib)">
+			AND orglib=#{orgLib}
+		 </if>
+		 <if test="@Ognl@isNotEmpty(groupID)">
+			AND GROUPID=#{groupID}
+		 </if>
+		  group by c.orglib
+		  order by c.orglib)t 
+		  left join
+ 		(SELECT LIBCODE,SIMPLENAME
+		 from P_LIBCODE t, cir_fin_log c
+		 where libcode = reglib
+		 group by libcode, simplename
+		 order by libcode)lib
+     on lib.libcode=t.orglib
+	</select>
+	
+	<!-- 多馆财经明细 -->
+	<select id="CirFinLog.moreLibFinSettleDetail" parameterType="Map" resultType="Map">
+	  select t.*,lib.simplename from 
+		(
+		select 
+		   c.orglib,
+		   c.feetype,
+		   ftype.describe as feetypename,
+		  <if test="@Ognl@isNotEmpty(colNames)">
+			${colNames}
+		 </if>
+		   sum(fee) as total_fee
+		  from cir_fin_log c 
+		  left join 
+          fin_type ftype
+          on c.feetype=ftype.feetype
+		  where fee <![CDATA[<>]]>0
+		 <if test="@Ognl@isNotEmpty(startTime)">
+			AND to_char(REGTIME, 'YYYY-MM-DD') <![CDATA[>=]]> #{startTime}
+		 </if>
+		 <if test="@Ognl@isNotEmpty(endTime)">
+			AND to_char(REGTIME, 'YYYY-MM-DD') <![CDATA[<=]]> #{endTime}
+		 </if>
+		 <if test="@Ognl@isNotEmpty(orgLib)">
+			AND orglib=#{orgLib}
+		 </if>
+		 <if test="@Ognl@isNotEmpty(groupID)">
+			AND GROUPID=#{groupID}
+		 </if>
+		  group by c.orglib,c.feetype,ftype.describe 
+		  order by c.orglib)t 
+		  left join
+ 		(SELECT LIBCODE,SIMPLENAME
+		 from P_LIBCODE t, cir_fin_log c
+		 where libcode = reglib
+		 group by libcode, simplename
+		 order by libcode)lib
+     on lib.libcode=t.orglib
+	</select>
+	
+	<delete id="CirFinLog.deleteByIds">
+		DELETE FROM CIR_FIN_LOG WHERE RDID IN
+		<foreach collection="array" item="idArray"  open="(" separator="," close=")">   
+       		#{idArray}   
+    	</foreach>
+	</delete>
+	
+	
+	
+</mapper>

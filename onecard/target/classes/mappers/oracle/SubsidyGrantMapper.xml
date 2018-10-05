@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="SubsidyGrantMapper">
+	<select id="getGrantId" resultType="int">
+		SELECT SEQ_SUBSIDY_GRANT.NEXTVAL FROM DUAL
+	</select>
+	
+	<insert id="insertGrant" parameterType="SubsidyGrant">
+		INSERT INTO SUBSIDY_GRANT (GRANTID,GRANTTITLE,GRANTAMOUNT,
+		ISAUTOGRANT,CREATETIME,LASTMODIFYTIME,REMARK)
+		VALUES
+		(#{grantId,jdbcType=INTEGER},#{grantTitle,jdbcType=VARCHAR},
+		#{grantAmount,jdbcType=FLOAT},#{isAutoGrant,jdbcType=CHAR},
+		SYSDATE,SYSDATE,#{remark,jdbcType=VARCHAR})
+	</insert>
+	
+	<insert id="insertGrantDate" parameterType="List">
+		INSERT INTO DATE_GRANT (GRANTID,GRANTDATE)
+		(
+		<foreach collection="list" item="item" index="index" separator="union all">
+			SELECT 
+				#{item.grantId,jdbcType=INTEGER},
+				#{item.grantDate,jdbcType=DATE}
+			FROM DUAL
+		</foreach>
+		)
+	</insert>
+	
+	<select id="queryGrantList" parameterType="SubsidyGrant" resultType="Map">
+		SELECT GRANTID,GRANTTITLE,GRANTAMOUNT,
+			CASE ISAUTOGRANT WHEN '1' THEN '是' ELSE '否' END ISAUTOGRANT,
+			TO_CHAR(CREATETIME,'YYYY-MM-DD HH24:MI') CREATETIME,REMARK
+		FROM SUBSIDY_GRANT
+		<where>
+			<if test="grantTitle!=null and grantTitle!=''">
+				AND GRANTTITLE LIKE '%'||TRIM(#{grantTitle})||'%'
+			</if>
+			<if test="isAutoGrant!=null and isAutoGrant!=''">
+				AND ISAUTOGRANT = #{isAutoGrant}
+			</if>
+		</where>
+		ORDER BY CREATETIME DESC
+	</select>
+	
+	<select id="getGrantById" parameterType="int" resultType="SubsidyGrant">
+		SELECT GRANTID,GRANTTITLE,GRANTAMOUNT,ISAUTOGRANT,REMARK FROM SUBSIDY_GRANT WHERE GRANTID = #{grantId}
+	</select>
+	
+	<select id="getGrantDatesById" parameterType="int" resultType="String">
+		SELECT TO_CHAR(GRANTDATE,'YYYY-MM-DD') FROM DATE_GRANT WHERE GRANTID = #{grantId} ORDER BY GRANTDATE
+	</select>
+	
+	<delete id="deleteGrantDateById" parameterType="int">
+		DELETE FROM DATE_GRANT WHERE GRANTID = #{grantId}
+	</delete>
+	
+	<update id="updateGrantById" parameterType="SubsidyGrant">
+		UPDATE SUBSIDY_GRANT SET 
+			GRANTTITLE = #{grantTitle,jdbcType=VARCHAR},
+			GRANTAMOUNT = #{grantAmount,jdbcType=FLOAT},
+			ISAUTOGRANT = #{isAutoGrant,jdbcType=CHAR},
+			REMARK = #{remark,jdbcType=VARCHAR},
+			LASTMODIFYTIME = SYSDATE
+		WHERE GRANTID = #{grantId}
+	</update>
+	
+	<delete id="deleteGrantByIdArray" parameterType="String">
+		DELETE FROM SUBSIDY_GRANT WHERE GRANTID IN 
+		<foreach collection="array" item="idArray" index="index" open="(" separator="," close=")">
+			#{idArray}
+		</foreach>
+	</delete>
+	
+	<delete id="deleteGrantDateByIdArray" parameterType="String">
+		DELETE FROM DATE_GRANT WHERE GRANTID IN 
+		<foreach collection="array" item="idArray" index="index" open="(" separator="," close=")">
+			#{idArray}
+		</foreach>
+	</delete>
+	
+	<select id="queryUnassignedGroupList" parameterType="ReaderGroup" resultType="Map">
+		SELECT GROUPID,GROUPNAME,CREATETIME,REMARK FROM GROUP_GRANT 
+		WHERE GROUPID NOT IN (
+			SELECT GROUPID FROM ASSIGN_GRANT WHERE GRANTID = #{grantId}
+		)
+		<if test="groupName!=null and groupName!=''">
+			AND GROUPNAME LIKE '%'||TRIM(#{groupName})||'%'
+		</if>
+	</select>
+	
+	<insert id="insertAssignGroup" parameterType="Map">
+		INSERT INTO ASSIGN_GRANT (GRANTID,GROUPID)
+		(
+		<foreach collection="list" item="item" index="index" separator="union all">
+			SELECT 
+				#{item.grantId,jdbcType=INTEGER},
+				#{item.groupId,jdbcType=INTEGER}
+			FROM DUAL
+		</foreach>
+		)
+	</insert>
+	
+	<select id="queryAssignGroupList" parameterType="ReaderGroup" resultType="Map">
+		SELECT GROUPID,GROUPNAME,TO_CHAR(CREATETIME,'YYYY-MM-DD HH24:MI') CREATETIME,REMARK FROM GROUP_GRANT 
+		WHERE GROUPID IN (
+			SELECT GROUPID FROM ASSIGN_GRANT WHERE GRANTID = #{grantId}
+		)
+		<if test="groupName!=null and groupName!=''">
+			AND GROUPNAME LIKE '%'||TRIM(#{groupName})||'%'
+		</if>
+	</select>
+	
+	<delete id="deleteAssignGroup" parameterType="Map">
+		DELETE FROM ASSIGN_GRANT 
+		WHERE GRANTID = (#{grantId}) AND GROUPID IN
+		<foreach collection="groupIds" item="groupIds" index="index" open="(" separator="," close=")">
+			#{groupIds}
+		</foreach>
+	</delete>
+</mapper>

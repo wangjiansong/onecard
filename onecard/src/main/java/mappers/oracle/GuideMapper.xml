@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="GuideMapper">
+
+	<resultMap id="Guide.resultMap" type="com.interlib.sso.domain.Guide">
+		<result property="id" column="ID" />
+		<result property="title" column="TITLE" />
+		<result property="content" column="CONTENT" />
+		<result property="createtime" column="CREATETIME" />
+	</resultMap>
+	
+	<sql id="Guide.base_columns">
+		<![CDATA[
+		ID, TITLE, CONTENT, CREATETIME
+		]]>
+	</sql>
+	
+	<insert id="Guide.insert" parameterType="com.interlib.sso.domain.Guide">
+		<selectKey resultType="int"  keyProperty="id" order="BEFORE">   
+        	<![CDATA[SELECT SEQ_GUIDE.NEXTVAL AS ID FROM DUAL]]>
+        </selectKey>
+		<![CDATA[
+		INSERT INTO GUIDE  
+		(ID, TITLE, CONTENT, CREATETIME) 
+		values 
+		(#{id}, #{title, jdbc=VARCHAR}, #{content, jdbcType=VARCHAR}, to_date(to_char(sysdate, 'YYYY-MM-DD HH:MI:SS'), 'YYYY-MM-DD HH:MI:SS'))
+		]]>
+	</insert>
+
+	<update id="Guide.update" parameterType="com.interlib.sso.domain.Guide">
+		<![CDATA[
+		UPDATE GUIDE 
+		SET 
+		TITLE=#{title, jdbcType=VARCHAR},
+		CONTENT=#{content, jdbcType=VARCHAR}
+		WHERE 
+		ID=#{id}
+		]]>
+	</update>
+	
+	<delete id="Guide.delete" parameterType="java.lang.Integer">
+		<![CDATA[
+		DELETE 
+		FROM 
+		GUIDE 
+		WHERE 
+		ID=#{id}
+		]]>
+	</delete>
+	
+	<select id="Guide.get" resultMap="Guide.resultMap" parameterType="java.lang.Integer">
+		SELECT 
+		<include refid="Guide.base_columns"/>
+		<![CDATA[
+		FROM 
+		GUIDE  
+		WHERE 
+		ID=#{id}
+		]]>
+	</select>
+	
+	<select id="Guide.getAllList" resultMap="Guide.resultMap">
+		SELECT 
+		<include refid="Guide.base_columns"/> 
+		<![CDATA[
+		FROM 
+		GUIDE 
+		]]>
+		order by CREATETIME DESC
+	</select>
+	
+	
+	<select id="Guide.getTotalCount" resultType="java.lang.Integer">
+		<![CDATA[
+		SELECT  
+		count(*) as totalcount 
+		FROM 
+		GUIDE 
+		]]>
+	</select>
+	
+	<sql id="Guide.findPage.where">
+		<where>
+			<if test="@Ognl@isNotEmpty(title)">
+			 TITLE LIKE '%'||#{title}||'%'
+			</if>
+			<if test="@Ognl@isNotEmpty(content)">
+			 CONTENT LIKE '%'||#{content}||'%'
+			</if>
+		</where>
+	</sql>
+	
+	<select id="Guide.findPage.count" resultType="java.lang.Long">
+		SELECT 
+		count(*) 
+		FROM 
+		GUIDE  
+		<include refid="Guide.findPage.where"/>
+	</select>
+	
+	<select id="Guide.findPage" resultMap="Guide.resultMap" parameterType="java.util.Map">
+		SELECT 
+		<include refid="Guide.base_columns"/> 
+		FROM 
+		GUIDE 
+		<include refid="Guide.findPage.where"/>
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+	</select>
+	
+	<select id="Guide.queryPageList" parameterType="Guide" resultType="Guide">
+		SELECT 
+		<include refid="Guide.base_columns"/> 
+		FROM 
+		GUIDE
+		<include refid="Guide.findPage.where"/>
+		ORDER BY CREATETIME DESC
+	</select>
+	
+	<!-- add 20131218 -->
+	<select id="Guide.getGuidesByLastSomeone" parameterType="Guide" resultType="Guide">
+		SELECT 
+		<include refid="Guide.base_columns"/> 
+		FROM 
+		GUIDE
+		WHERE ROWNUM  &lt;=6
+		ORDER BY CREATETIME DESC
+	</select>
+	
+	<delete id="Guide.deleteByIds">
+		DELETE FROM GUIDE WHERE ID IN
+		<foreach collection="array" item="idArray"  open="(" separator="," close=")">   
+       		#{idArray}   
+    	</foreach>
+	</delete>
+	
+</mapper>
